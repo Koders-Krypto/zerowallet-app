@@ -31,10 +31,10 @@ export default function Home() {
               <div></div>
               <div className="flex flex-row gap-2 items-center justify-center col-span-3 w-full">
                 <Image
-                  src={walletInfo.icon || ""}
+                  src={walletInfo.icon || "/icons/wallet.svg"}
                   alt="Wallet Icon"
-                  width={30}
-                  height={30}
+                  width={25}
+                  height={25}
                 />
                 <p className="">{Truncate(address, 12, "...")}</p>
               </div>
