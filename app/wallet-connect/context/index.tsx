@@ -22,6 +22,11 @@ createWeb3Modal({
   projectId,
   enableAnalytics: true, // Optional - defaults to your Cloud configuration
   enableOnramp: true, // Optional - false as default
+  themeVariables: {
+    "--w3m-color-mix": "#0A0A0A",
+    "--w3m-color-mix-strength": 40,
+    "--w3m-border-radius-master": "0px",
+  },
 });
 
 export default function Web3ModalProvider({
