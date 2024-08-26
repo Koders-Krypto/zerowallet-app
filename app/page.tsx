@@ -16,7 +16,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col gap-16 justify-center items-center min-h-screen text-center pt-24 md:pt-0  px-6">
-      <div className="flex flex-col gap-4 items-center max-w-2xl">
+      <div className="flex flex-col gap-8 items-center max-w-2xl">
         <Image
           className="w-56 md:w-80"
           src={"/logo/logo.svg"}
@@ -25,8 +25,8 @@ export default function Home() {
           height={280}
         />
         <p className="px-1.5 mt-2 text-base md:text-lg text-white">
-          🚀 ZeroWallet by LayerZero: Simplified gas experience ⛽, seamless
-          dApp access across all chains 🌐, no bridging needed.
+          🚀 ZeroWallet powered by LayerZero: Simplified gas experience ⛽,
+          seamless dApp access across all chains 🌐, no bridging needed.
         </p>
       </div>
 
@@ -66,7 +66,7 @@ export default function Home() {
 
         {!walletInfo && (
           <h2 className="text-accent text-sm">
-            Connect your wallet to get started with a gas-free experience
+            Connect your wallet to get started
           </h2>
         )}
       </div>
