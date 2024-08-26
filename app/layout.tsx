@@ -15,6 +15,38 @@ export const metadata: Metadata = {
   title: "ZeroWallet - Your Universal Crypto Wallet",
   description:
     "ZeroWallet is a LayerZero-powered crypto wallet that lets you manage gas fees on one chain while accessing dApps across all chains.",
+  openGraph: {
+    title: "ZeroWallet - Your Universal Crypto Wallet",
+    url: "https://zerowallet-app.vercel.app/",
+    description:
+      "ZeroWallet is a LayerZero-powered crypto wallet that lets you manage gas fees on one chain while accessing dApps across all chains.",
+    images: [
+      {
+        url: "https://zerowallet-app.vercel.app/og/home.png",
+        secureUrl: "https://zerowallet-app.vercel.app/og/home.png",
+        alt: "ZeroWallet - Your Universal Crypto Wallet",
+        width: 1200,
+        height: 630,
+        type: "image/png",
+      },
+    ],
+    locale: "en-US",
+    type: "website",
+  },
+  alternates: {
+    canonical: "https://zerowallet-app.vercel.app/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ZeroWallet - Your Universal Crypto Wallet",
+    description:
+      "ZeroWallet is a LayerZero-powered crypto wallet that lets you manage gas fees on one chain while accessing dApps across all chains.",
+    creator: "@ZeroWallet",
+    images: ["https://zerowallet-app.vercel.app/og/home.png"],
+  },
+  robots: {
+    index: true,
+  },
 };
 
 export default function RootLayout({
