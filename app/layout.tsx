@@ -7,6 +7,7 @@ import { cookieToInitialState } from "wagmi";
 
 import { config } from "@/app/wallet-connect/config";
 import Web3ModalProvider from "@/app/wallet-connect/context";
+import { LoginProvider } from "./context/LoginProvider";
 
 const roboto = Roboto_Mono({ subsets: ["latin"] });
 
@@ -24,10 +25,16 @@ export default function RootLayout({
   const initialState = cookieToInitialState(config, headers().get("cookie"));
   return (
     <html lang="en">
-      <body className={roboto.className + " bg-gradient text-white"}>
-        <Web3ModalProvider initialState={initialState}>
-          {children}
-        </Web3ModalProvider>
+      <body
+        className={
+          roboto.className + " bg-gradient text-white max-w-screen-2xl mx-auto"
+        }
+      >
+        <div className=" flex flex-col items-center justify-center w-full">
+          <Web3ModalProvider initialState={initialState}>
+            <LoginProvider>{children}</LoginProvider>
+          </Web3ModalProvider>
+        </div>
       </body>
     </html>
   );

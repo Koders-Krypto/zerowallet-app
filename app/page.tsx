@@ -15,16 +15,22 @@ export default function Home() {
   const { walletInfo } = useWalletInfo();
 
   return (
-    <div className="flex flex-col gap-16 justify-center items-center min-h-screen text-center">
-      <div className="flex flex-col gap-4 items-center max-w-lg">
-        <Image src={"/logo.svg"} alt="Zero Logo" width={280} height={280} />
-        <p className="px-1.5 mt-2 text-lg text-white">
-          ZeroWallet powered by LayerZero, you{"'"}ll never need to bridge to
-          access dApps across all chains effortlessly.
+    <div className="flex flex-col gap-16 justify-center items-center min-h-screen text-center pt-24 md:pt-0  px-6">
+      <div className="flex flex-col gap-4 items-center max-w-2xl">
+        <Image
+          className="w-56 md:w-80"
+          src={"/logo/logo.svg"}
+          alt="Zero Logo"
+          width={280}
+          height={280}
+        />
+        <p className="px-1.5 mt-2 text-base md:text-lg text-white">
+          🚀 ZeroWallet by LayerZero: Simplified gas experience ⛽, seamless
+          dApp access across all chains 🌐, no bridging needed.
         </p>
       </div>
 
-      <div className="text-sm flex flex-col gap-4 items-center justify-center w-full max-w-sm">
+      <div className=" flex flex-col gap-4 items-center justify-center w-full max-w-sm text-lg">
         <div className="flex flex-col gap-2 items-center justify-center w-full border border-accent p-4">
           {walletInfo ? (
             <div className="grid grid-cols-5 gap-2 items-center justify-between px-6 bg-white text-black w-full py-2.5">
@@ -43,17 +49,23 @@ export default function Home() {
               </div>
             </div>
           ) : (
-            <button
-              className="w-full bg-white text-black px-6 py-2.5"
-              onClick={() => open()}
-            >
-              Connect Wallet
-            </button>
+            <div className="flex flex-col gap-2 items-center justify-center w-full">
+              <button
+                className="w-full bg-white text-black px-6 py-2.5"
+                onClick={() => open()}
+              >
+                Connect Wallet
+              </button>
+              <div>(OR)</div>
+              <button className="border border-accent px-6 py-2.5 w-full">
+                Login with Passkey
+              </button>
+            </div>
           )}
         </div>
 
         {!walletInfo && (
-          <h2 className="text-accent">
+          <h2 className="text-accent text-sm">
             Connect your wallet to get started with a gas-free experience
           </h2>
         )}
