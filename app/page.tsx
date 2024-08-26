@@ -31,6 +31,11 @@ export default function Home() {
       </div>
 
       <div className=" flex flex-col gap-4 items-center justify-center w-full max-w-sm text-lg">
+        {!walletInfo && (
+          <h2 className="text-accent text-sm">
+            Connect your wallet to get started
+          </h2>
+        )}
         <div className="flex flex-col gap-2 items-center justify-center w-full border border-accent p-4">
           {walletInfo ? (
             <div className="grid grid-cols-5 gap-2 items-center justify-between px-6 bg-white text-black w-full py-2.5">
@@ -63,12 +68,6 @@ export default function Home() {
             </div>
           )}
         </div>
-
-        {!walletInfo && (
-          <h2 className="text-accent text-sm">
-            Connect your wallet to get started
-          </h2>
-        )}
       </div>
 
       <Footer />
