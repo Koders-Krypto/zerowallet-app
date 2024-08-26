@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import { Roboto_Mono } from "next/font/google";
 import "./styles/globals.css";
+import { headers } from "next/headers";
+
+import { cookieToInitialState } from "wagmi";
+
+import { config } from "@/app/wallet-connect/config";
+import Web3ModalProvider from "@/app/wallet-connect/context";
 
 const roboto = Roboto_Mono({ subsets: ["latin"] });
 
@@ -15,10 +21,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const initialState = cookieToInitialState(config, headers().get("cookie"));
   return (
     <html lang="en">
       <body className={roboto.className + " bg-gradient text-white"}>
-        {children}
+        <Web3ModalProvider initialState={initialState}>
+          {children}
+        </Web3ModalProvider>
       </body>
     </html>
   );
