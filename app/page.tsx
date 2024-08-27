@@ -1,12 +1,12 @@
 "use client";
 import Image from "next/image";
 import Footer from "./components/Footer";
-
 import { useWalletInfo, useWeb3Modal } from "@web3modal/wagmi/react";
 import { LogOut } from "lucide-react";
 import { useDisconnect } from "wagmi";
 import { useAccount } from "wagmi";
 import Truncate from "./utils/truncate";
+import Typewriter from "typewriter-effect";
 
 export default function Home() {
   const { address, isConnecting, isDisconnected } = useAccount();
@@ -16,7 +16,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col gap-16 justify-center items-center min-h-screen text-center pt-24 md:pt-0  px-6">
-      <div className="flex flex-col gap-8 items-center max-w-2xl">
+      <div className="flex flex-col gap-20 items-center max-w-3xl">
         <Image
           className="w-56 md:w-80"
           src={"/logo/logo.svg"}
@@ -24,10 +24,25 @@ export default function Home() {
           width={280}
           height={280}
         />
-        <p className="px-1.5 mt-2 text-base md:text-lg text-white">
-          🚀 ZeroWallet powered by LayerZero: Simplified gas experience ⛽,
-          seamless dApp access across all chains 🌐, no bridging needed.
-        </p>
+        <div className="flex flex-col items-center justify-center gap-3">
+          <h1 className="text-2xl md:text-4xl font-bold">
+            <Typewriter
+              options={{
+                cursor: "",
+              }}
+              onInit={(typewriter) => {
+                typewriter
+                  .typeString("Welcome to ZeroWallet")
+                  .pauseFor(1500)
+                  .start();
+              }}
+            />
+          </h1>
+          <p className="text-base md:text-lg text-white">
+            🚀 ZeroWallet powered by LayerZero: Simplified gas experience ⛽,
+            seamless dApp access across all chains 🌐, no bridging needed.
+          </p>
+        </div>
       </div>
 
       <div className=" flex flex-col gap-4 items-center justify-center w-full max-w-sm text-lg">

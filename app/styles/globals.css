@@ -10,3 +10,32 @@
     rgba(115, 115, 115, 1) 100%
   );
 }
+
+::-webkit-scrollbar {
+  width: 0px; /* Width of the scrollbar */
+}
+
+/* Ensure the default cursor is hidden */
+.Typewriter__cursor {
+  display: inline-block; /* Ensure the cursor is displayed */
+  visibility: visible; /* Make sure it is visible */
+  position: relative; /* Ensure z-index works */
+}
+
+/* Create and style the custom white square cursor */
+.Typewriter__cursor::after {
+  content: "";
+  display: inline-block;
+  margin-left: 2px; /* Adjust if needed */
+  width: 12px; /* Size of the square cursor */
+  height: 30px; /* Size of the square cursor */
+  background-color: #f2f2f2; /* Color of the square cursor */
+  animation: blink 1s infinite; /* Blinking effect */
+  vertical-align: middle; /* Align with text */
+  position: relative; /* Ensure z-index is effective */
+  z-index: 1000; /* Ensure it's on top of other elements */
+}
+
+textarea {
+  resize: none;
+}
