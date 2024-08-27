@@ -15,7 +15,7 @@ export default function Home() {
   const { walletInfo } = useWalletInfo();
 
   return (
-    <div className="flex flex-col gap-16 justify-center items-center min-h-[95vh] text-center pt-6 md:pt-0 px-6">
+    <div className="flex flex-col gap-12 md:gap-16 justify-center items-center min-h-[90vh] md:min-h-[95vh] text-center pt-6 md:pt-0 px-6">
       <div className="flex flex-col gap-20 items-center max-w-2xl">
         <Image
           className="w-56 md:w-72"
