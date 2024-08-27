@@ -18,12 +18,12 @@ export default function Sidebar() {
 
   return (
     <div
-      className={`text-white h-[97vh] hidden md:flex flex-col justify-start items-start border border-accent transition-all duration-300 ease-in-out max-w-64 ${
-        !open ? "w-full" : "w-28"
+      className={`text-white h-[97vh] hidden md:flex flex-col justify-start items-start border border-accent transition-all duration-300 ease-in-out max-w-60 ${
+        !open ? "w-full" : "w-24"
       }`}
     >
       <div className="border-b border-accent w-full bg-gradient flex flex-row justify-center items-center relative">
-        <Link className="py-4 px-4" href={"/app"}>
+        <Link className={!open ? "py-4 px-4 pt-5" : "p-4"} href={"/app"}>
           <Image
             src={open ? "/logo/icon.svg" : "/logo/logo.svg"}
             alt="Zero Logo"
@@ -34,9 +34,9 @@ export default function Sidebar() {
         </Link>
         <button
           onClick={() => setOpen(!open)}
-          className={`absolute h-7 w-7 border border-accent bg-black shadow-lg flex justify-center items-center ${
+          className={`absolute h-8 w-8 border border-accent bg-gradient shadow-lg rounded-full flex justify-center items-center -right-4 p-0.5 ${
             open ? "top-6" : "top-8"
-          } right-[-0.8rem] transition-all duration-300 ease-in-out`}
+          } transition-all duration-300 ease-in-out`}
         >
           <Image
             src={!open ? "/icons/minimise.svg" : "/icons/maximise.svg"}
@@ -99,13 +99,17 @@ export default function Sidebar() {
         </div>
         <Link
           href={"/app/settings"}
-          className={`flex flex-row gap-4 items-center justify-center border-t border-accent w-full py-5 px-6 transition-all duration-300 ease-in-out`}
+          className={`flex flex-row gap-4 items-center justify-center border-t border-accent w-full ${
+            !open ? "py-5 px-6" : "p-4"
+          } transition-all duration-300 ease-in-out ${
+            pathname === "/app/settings" && "bg-white"
+          }`}
         >
           {!open ? (
             <Icons
               path={"/app/settings"}
               className={
-                pathname === "/app/settings" ? "text-white" : "text-accent"
+                pathname === "/app/settings" ? "text-black" : "text-accent"
               }
             />
           ) : (
@@ -116,7 +120,7 @@ export default function Sidebar() {
                     path={"/app/settings"}
                     className={
                       pathname === "/app/settings"
-                        ? "text-white"
+                        ? "text-black"
                         : "text-accent"
                     }
                   />
@@ -131,7 +135,7 @@ export default function Sidebar() {
           {!open && (
             <button
               className={`w-full ${
-                pathname === "/app/settings" ? "text-white" : "text-accent"
+                pathname === "/app/settings" ? "text-black" : "text-accent"
               } font-bold text-lg text-left`}
             >
               Settings

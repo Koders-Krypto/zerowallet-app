@@ -18,6 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog";
 
 export default function Topbar() {
@@ -56,7 +57,7 @@ export default function Topbar() {
               <p className="font-bold">Connect</p>
             </button>
           </DialogTrigger>
-          <DialogContent className="bg-white dark:bg-white flex flex-col justify-start items-start gap-6 max-w-md mx-auto">
+          <DialogContent className="bg-black dark:bg-white flex flex-col justify-center items-center gap-6 max-w-md mx-auto border border-accent ">
             <DialogHeader>
               <div className="flex flex-row justify-start items-center gap-3">
                 <Image
@@ -67,7 +68,9 @@ export default function Topbar() {
                 />
                 <div className="flex flex-col justify-start items-start text-left">
                   <DialogTitle>
-                    <h3 className="text-base">Connect with WalletConnect</h3>
+                    <h3 className="text-base text-white">
+                      Connect with WalletConnect
+                    </h3>
                   </DialogTitle>
                   <DialogDescription className="text-xs text-accent dark:text-accent w-full md:max-w-xs">
                     Connect your wallet to start using ZeroWallet with any
@@ -80,12 +83,12 @@ export default function Topbar() {
               <div className="flex flex-row justify-between items-center border border-accent w-full">
                 <input
                   type="text"
-                  placeholder="QR Code or link"
-                  className="bg-transparent w-full px-2 py-2 focus:outline-none"
+                  placeholder="Scan QR Code or Enter the link"
+                  className="bg-transparent w-full px-2 py-2 focus:outline-none text-white"
                 />
-                <ScanQrCode className="mr-2" />
+                <ScanQrCode className="mr-2 text-white" />
               </div>
-              <button className="bg-black border-accent border py-2 text-lg text-white w-full">
+              <button className="bg-white border-accent border py-2 text-lg text-black w-full">
                 Connect
               </button>
             </div>

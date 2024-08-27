@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Mulish } from "next/font/google";
+import { Mulish, Space_Grotesk } from "next/font/google";
 import "./styles/globals.css";
 import { headers } from "next/headers";
 
@@ -8,8 +8,10 @@ import { cookieToInitialState } from "wagmi";
 import { config } from "@/app/wallet-connect/config";
 import Web3ModalProvider from "@/app/wallet-connect/context";
 import { LoginProvider } from "./context/LoginProvider";
+import Footer from "./components/Footer";
 
 const mulish = Mulish({ subsets: ["latin"] });
+const space_grotesk = Space_Grotesk({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "ZeroWallet - Your Universal Crypto Wallet",
@@ -57,7 +59,7 @@ export default function RootLayout({
   const initialState = cookieToInitialState(config, headers().get("cookie"));
   return (
     <html lang="en">
-      <body className={mulish.className + " bg-gradient"}>
+      <body className={space_grotesk.className + " bg-gradient"}>
         <div className="bg-gradient text-white max-w-screen-2xl mx-auto">
           <div className=" flex flex-col items-center justify-center w-full">
             <Web3ModalProvider initialState={initialState}>
@@ -65,6 +67,7 @@ export default function RootLayout({
             </Web3ModalProvider>
           </div>
         </div>
+        <Footer />
       </body>
     </html>
   );
