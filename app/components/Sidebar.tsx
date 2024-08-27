@@ -10,6 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import Icons from "../utils/Icons";
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
@@ -45,18 +46,18 @@ export default function Sidebar() {
           />
         </button>
       </div>
-      <div className="p-4 w-full flex flex-col justify-between items-center text-center h-full">
-        <div className="flex flex-col gap-4 items-center justify-start w-full h-full text-left">
+      <div className=" w-full flex flex-col justify-between items-center text-center h-full">
+        <div className="flex flex-col gap-0 items-center justify-start w-full h-full text-left ">
           {Links.map((link) => (
             <Link
               href={link.href}
               key={link.name}
-              className={`border border-accent w-full ${
-                open ? "p-4" : "py-4 px-6"
-              } bg-white text-black transition-all duration-300 ease-in-out ${
+              className={`border-b border-accent w-full ${
+                open ? "p-4" : "py-5 px-6"
+              }  transition-all duration-300 ease-in-out ${
                 pathname === link.href
-                  ? " font-bold "
-                  : "bg-transparent font-base "
+                  ? " font-bold bg-white text-black "
+                  : "bg-transparent font-base text-accent"
               }`}
             >
               <div
@@ -65,23 +66,23 @@ export default function Sidebar() {
                 }`}
               >
                 {!open ? (
-                  <Image
-                    className="text-white"
-                    src={link.icon}
-                    alt="Wallet Icon"
-                    width={24}
-                    height={24}
+                  <Icons
+                    path={link.href}
+                    className={
+                      pathname === link.href ? "text-black" : "text-accent"
+                    }
                   />
                 ) : (
                   <TooltipProvider delayDuration={100}>
                     <Tooltip>
                       <TooltipTrigger>
-                        <Image
-                          className="text-white"
-                          src={link.icon}
-                          alt="Wallet Icon"
-                          width={24}
-                          height={24}
+                        <Icons
+                          path={link.href}
+                          className={
+                            pathname === link.href
+                              ? "text-black"
+                              : "text-accent"
+                          }
                         />
                       </TooltipTrigger>
                       <TooltipContent side="right">
@@ -91,15 +92,28 @@ export default function Sidebar() {
                   </TooltipProvider>
                 )}
 
+                {/* {!open ? (
+                  <Icons path={link.href} />
+                ) : (
+                  <TooltipProvider delayDuration={100}>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Icons path={link.href} />
+                      </TooltipTrigger>
+                      <TooltipContent side="right">
+                        <p>{link.name}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )} */}
+
                 {!open && <p className="text-base">{link.name}</p>}
               </div>
             </Link>
           ))}
         </div>
         <div
-          className={`flex flex-row gap-4 items-center justify-center w-full ${
-            open ? "p-4" : "py-4 px-6"
-          } transition-all duration-300 ease-in-out`}
+          className={`flex flex-row gap-4 items-center justify-center border-t border-accent w-full py-5 px-8 transition-all duration-300 ease-in-out`}
         >
           {!open ? (
             <Image

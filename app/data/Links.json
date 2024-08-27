@@ -1,22 +1,18 @@
 [
     {
         "name": "Assets",
-        "href": "/app",
-        "icon": "/icons/pie.svg"
+        "href": "/app"
     },
     {
         "name": "Send",
-        "href": "/app/send",
-        "icon": "/icons/send.svg"
+        "href": "/app/send"
     },
     {
         "name": "Swap",
-        "href": "/app/swap",
-        "icon": "/icons/swap.svg"
+        "href": "/app/swap"
     },
     {
         "name": "Savings",
-        "href": "/app/savings",
-        "icon": "/icons/piggy-bank.svg"
+        "href": "/app/savings"
     }
 ]
