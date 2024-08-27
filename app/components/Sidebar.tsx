@@ -17,7 +17,7 @@ export default function Sidebar() {
 
   return (
     <div
-      className={`text-white h-[97vh] flex flex-col justify-start items-start border border-white transition-all duration-300 ease-in-out max-w-72 ${
+      className={`text-white h-[97vh] flex flex-col justify-start items-start border border-white transition-all duration-300 ease-in-out max-w-64 ${
         !open ? "w-full" : "w-28"
       }`}
     >
@@ -25,7 +25,7 @@ export default function Sidebar() {
         <Image
           src={open ? "/logo/icon.svg" : "/logo/logo.svg"}
           alt="Zero Logo"
-          width={open ? 80 : 180}
+          width={open ? 80 : 150}
           height={180}
           className="transition-all duration-300 ease-in-out"
         />
