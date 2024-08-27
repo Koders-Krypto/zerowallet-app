@@ -32,7 +32,7 @@ export default function Sidebar() {
         <button
           onClick={() => setOpen(!open)}
           className={`absolute h-8 w-8 border border-white bg-black flex justify-center items-center ${
-            open ? "top-8" : "top-10"
+            open ? "top-8" : "top-[1.8rem]"
           } right-[-1.3rem] transition-all duration-300 ease-in-out`}
         >
           <Image

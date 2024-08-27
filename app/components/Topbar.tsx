@@ -4,8 +4,10 @@ import Image from "next/image";
 import { useAccount, useDisconnect } from "wagmi";
 import Truncate from "../utils/truncate";
 import { LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Topbar() {
+  const router = useRouter();
   const { address, isConnecting, isDisconnected } = useAccount();
   const { disconnect } = useDisconnect();
   const { walletInfo } = useWalletInfo();
@@ -20,9 +22,15 @@ export default function Topbar() {
         />
         <p className="">{Truncate(address, 12, "...")}</p>
 
-        <div className="flex justify-end items-center">
-          <LogOut onClick={() => disconnect()} />
-        </div>
+        <button
+          onClick={() => {
+            disconnect();
+            router.push("/");
+          }}
+          className="flex justify-end items-center"
+        >
+          <LogOut />
+        </button>
       </div>
     </div>
   );

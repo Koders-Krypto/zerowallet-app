@@ -23,6 +23,9 @@ export const LoginProvider = ({
   const { walletInfo } = useWalletInfo();
 
   useEffect(() => {
+    if (!walletInfo) {
+      router.push("/");
+    }
     console.log(walletInfo, "walletInfo");
     if (walletInfo && pathname === "/") {
       router.push("/app");
@@ -30,7 +33,7 @@ export const LoginProvider = ({
     if (!walletInfo && pathname !== "/app") {
       router.push("/");
     }
-  }, [router, walletInfo]);
+  }, [pathname, router, walletInfo]);
 
   return (
     <LoginContext.Provider value={{ walletInfo }}>
