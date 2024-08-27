@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Roboto_Mono } from "next/font/google";
+import { Mulish } from "next/font/google";
 import "./styles/globals.css";
 import { headers } from "next/headers";
 
@@ -9,7 +9,7 @@ import { config } from "@/app/wallet-connect/config";
 import Web3ModalProvider from "@/app/wallet-connect/context";
 import { LoginProvider } from "./context/LoginProvider";
 
-const roboto = Roboto_Mono({ subsets: ["latin"] });
+const mulish = Mulish({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "ZeroWallet - Your Universal Crypto Wallet",
@@ -57,7 +57,7 @@ export default function RootLayout({
   const initialState = cookieToInitialState(config, headers().get("cookie"));
   return (
     <html lang="en">
-      <body className={roboto.className + " bg-gradient"}>
+      <body className={mulish.className + " bg-gradient"}>
         <div className="bg-gradient text-white max-w-screen-2xl mx-auto">
           <div className=" flex flex-col items-center justify-center w-full">
             <Web3ModalProvider initialState={initialState}>

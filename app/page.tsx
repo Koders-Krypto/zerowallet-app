@@ -16,9 +16,9 @@ export default function Home() {
 
   return (
     <div className="flex flex-col gap-16 justify-center items-center min-h-screen text-center pt-24 md:pt-0  px-6">
-      <div className="flex flex-col gap-20 items-center max-w-3xl">
+      <div className="flex flex-col gap-20 items-center max-w-2xl">
         <Image
-          className="w-56 md:w-80"
+          className="w-56 md:w-72"
           src={"/logo/logo.svg"}
           alt="Zero Logo"
           width={280}

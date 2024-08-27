@@ -37,7 +37,7 @@ export default function Topbar() {
 
   return (
     <div className="flex flex-row justify-between items-center w-full">
-      <h1 className="capitalize text-xl font-semibold hidden md:block">
+      <h1 className="capitalize text-2xl font-bold hidden md:block ml-2">
         {formatedPathname || "Assets"}
       </h1>
       <div className="flex flex-row justify-end items-center gap-4 w-full">
@@ -99,7 +99,7 @@ export default function Topbar() {
             width={25}
             height={25}
           />
-          <p className="">{Truncate(address, 12, "...")}</p>
+          <p className="hidden md:block">{Truncate(address, 12, "...")}</p>
 
           <button
             onClick={() => {

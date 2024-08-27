@@ -22,8 +22,8 @@ export default function Sidebar() {
         !open ? "w-full" : "w-28"
       }`}
     >
-      <div className="border-b border-accent py-4 px-4 w-full flex flex-row justify-center items-center relative">
-        <Link href={"/app"}>
+      <div className="border-b border-accent w-full bg-gradient flex flex-row justify-center items-center relative">
+        <Link className="py-4 px-4" href={"/app"}>
           <Image
             src={open ? "/logo/icon.svg" : "/logo/logo.svg"}
             alt="Zero Logo"
@@ -34,7 +34,7 @@ export default function Sidebar() {
         </Link>
         <button
           onClick={() => setOpen(!open)}
-          className={`absolute h-7 w-7 border border-accent bg-gradient flex justify-center items-center ${
+          className={`absolute h-7 w-7 border border-accent bg-black shadow-lg flex justify-center items-center ${
             open ? "top-6" : "top-8"
           } right-[-0.8rem] transition-all duration-300 ease-in-out`}
         >
@@ -92,45 +92,33 @@ export default function Sidebar() {
                   </TooltipProvider>
                 )}
 
-                {/* {!open ? (
-                  <Icons path={link.href} />
-                ) : (
-                  <TooltipProvider delayDuration={100}>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Icons path={link.href} />
-                      </TooltipTrigger>
-                      <TooltipContent side="right">
-                        <p>{link.name}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )} */}
-
                 {!open && <p className="text-base">{link.name}</p>}
               </div>
             </Link>
           ))}
         </div>
-        <div
-          className={`flex flex-row gap-4 items-center justify-center border-t border-accent w-full py-5 px-8 transition-all duration-300 ease-in-out`}
+        <Link
+          href={"/app/settings"}
+          className={`flex flex-row gap-4 items-center justify-center border-t border-accent w-full py-5 px-6 transition-all duration-300 ease-in-out`}
         >
           {!open ? (
-            <Image
-              src="/icons/settings.svg"
-              alt="Wallet Icon"
-              width={24}
-              height={24}
+            <Icons
+              path={"/app/settings"}
+              className={
+                pathname === "/app/settings" ? "text-white" : "text-accent"
+              }
             />
           ) : (
             <TooltipProvider delayDuration={100}>
               <Tooltip>
                 <TooltipTrigger>
-                  <Image
-                    src="/icons/settings.svg"
-                    alt="Wallet Icon"
-                    width={24}
-                    height={24}
+                  <Icons
+                    path={"/app/settings"}
+                    className={
+                      pathname === "/app/settings"
+                        ? "text-white"
+                        : "text-accent"
+                    }
                   />
                 </TooltipTrigger>
                 <TooltipContent side="right">
@@ -141,11 +129,15 @@ export default function Sidebar() {
           )}
 
           {!open && (
-            <button className=" w-full text-white font-bold text-lg text-left">
+            <button
+              className={`w-full ${
+                pathname === "/app/settings" ? "text-white" : "text-accent"
+              } font-bold text-lg text-left`}
+            >
               Settings
             </button>
           )}
-        </div>
+        </Link>
       </div>
     </div>
   );
