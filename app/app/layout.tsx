@@ -7,11 +7,12 @@ export default function AppLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex flex-row gap-4 items-start justify-start p-4 w-full min-h-screen">
+    <div className="flex flex-row gap-6 items-start justify-start p-4 w-full min-h-screen">
       <Sidebar />
 
-      <div className="flex flex-col justify-start items-start w-full">
+      <div className="flex flex-col gap-8 justify-start items-start w-full h-[97vh] border border-accent p-4">
         <Topbar />
+
         {children}
       </div>
     </div>

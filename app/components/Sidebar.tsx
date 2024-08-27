@@ -17,23 +17,23 @@ export default function Sidebar() {
 
   return (
     <div
-      className={`text-white h-[97vh] flex flex-col justify-start items-start border border-white transition-all duration-300 ease-in-out max-w-64 ${
+      className={`text-white h-[97vh] hidden md:flex flex-col justify-start items-start border border-accent transition-all duration-300 ease-in-out max-w-64 ${
         !open ? "w-full" : "w-28"
       }`}
     >
-      <div className="border-b border-white py-4 px-4 w-full flex flex-row justify-center items-center relative">
+      <div className="border-b border-accent py-4 px-4 w-full flex flex-row justify-center items-center relative">
         <Image
           src={open ? "/logo/icon.svg" : "/logo/logo.svg"}
           alt="Zero Logo"
-          width={open ? 80 : 150}
+          width={open ? 50 : 150}
           height={180}
           className="transition-all duration-300 ease-in-out"
         />
         <button
           onClick={() => setOpen(!open)}
-          className={`absolute h-8 w-8 border border-white bg-black flex justify-center items-center ${
-            open ? "top-8" : "top-[1.8rem]"
-          } right-[-1.3rem] transition-all duration-300 ease-in-out`}
+          className={`absolute h-8 w-8 border border-accent bg-gradient flex justify-center items-center ${
+            open ? "top-6" : "top-[1.8rem]"
+          } right-[-1rem] transition-all duration-300 ease-in-out`}
         >
           <Image
             src={!open ? "/icons/minimise.svg" : "/icons/maximise.svg"}
@@ -49,9 +49,9 @@ export default function Sidebar() {
             <Link
               href={link.href}
               key={link.name}
-              className={`border border-white w-full ${
+              className={`border border-accent w-full ${
                 open ? "p-4" : "py-4 px-6"
-              } bg-white text-black text-lg transition-all duration-300 ease-in-out ${
+              } bg-white text-black transition-all duration-300 ease-in-out ${
                 pathname === link.href
                   ? " font-bold "
                   : "bg-transparent font-base "
@@ -89,7 +89,7 @@ export default function Sidebar() {
                   </TooltipProvider>
                 )}
 
-                {!open && <p className="text-lg">{link.name}</p>}
+                {!open && <p className="text-base">{link.name}</p>}
               </div>
             </Link>
           ))}
