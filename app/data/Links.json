@@ -1,8 +1,13 @@
 [
     {
-        "name": "Home",
+        "name": "Assets",
         "href": "/app",
-        "icon": "/icons/home.svg"
+        "icon": "/icons/pie.svg"
+    },
+    {
+        "name": "Send",
+        "href": "/app/send",
+        "icon": "/icons/send.svg"
     },
     {
         "name": "Swap",
@@ -10,13 +15,8 @@
         "icon": "/icons/swap.svg"
     },
     {
-        "name": "Bridge",
-        "href": "/app/bridge",
-        "icon": "/icons/cable.svg"
-    },
-    {
-        "name": "Transactions",
-        "href": "/app/transactions",
-        "icon": "/icons/history.svg"
+        "name": "Savings",
+        "href": "/app/savings",
+        "icon": "/icons/piggy-bank.svg"
     }
 ]

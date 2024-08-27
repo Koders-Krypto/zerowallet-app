@@ -22,24 +22,26 @@ export default function Sidebar() {
       }`}
     >
       <div className="border-b border-accent py-4 px-4 w-full flex flex-row justify-center items-center relative">
-        <Image
-          src={open ? "/logo/icon.svg" : "/logo/logo.svg"}
-          alt="Zero Logo"
-          width={open ? 50 : 150}
-          height={180}
-          className="transition-all duration-300 ease-in-out"
-        />
+        <Link href={"/app"}>
+          <Image
+            src={open ? "/logo/icon.svg" : "/logo/logo.svg"}
+            alt="Zero Logo"
+            width={open ? 50 : 150}
+            height={180}
+            className="transition-all duration-300 ease-in-out"
+          />
+        </Link>
         <button
           onClick={() => setOpen(!open)}
-          className={`absolute h-8 w-8 border border-accent bg-gradient flex justify-center items-center ${
-            open ? "top-6" : "top-[1.8rem]"
-          } right-[-1rem] transition-all duration-300 ease-in-out`}
+          className={`absolute h-7 w-7 border border-accent bg-gradient flex justify-center items-center ${
+            open ? "top-6" : "top-8"
+          } right-[-0.8rem] transition-all duration-300 ease-in-out`}
         >
           <Image
             src={!open ? "/icons/minimise.svg" : "/icons/maximise.svg"}
             alt="Wallet Icon"
-            width={24}
-            height={24}
+            width={20}
+            height={20}
           />
         </button>
       </div>

@@ -57,15 +57,13 @@ export default function RootLayout({
   const initialState = cookieToInitialState(config, headers().get("cookie"));
   return (
     <html lang="en">
-      <body
-        className={
-          roboto.className + " bg-gradient text-white max-w-screen-2xl mx-auto"
-        }
-      >
-        <div className=" flex flex-col items-center justify-center w-full">
-          <Web3ModalProvider initialState={initialState}>
-            <LoginProvider>{children}</LoginProvider>
-          </Web3ModalProvider>
+      <body className={roboto.className + " bg-gradient"}>
+        <div className="bg-gradient text-white max-w-screen-2xl mx-auto">
+          <div className=" flex flex-col items-center justify-center w-full">
+            <Web3ModalProvider initialState={initialState}>
+              <LoginProvider>{children}</LoginProvider>
+            </Web3ModalProvider>
+          </div>
         </div>
       </body>
     </html>
