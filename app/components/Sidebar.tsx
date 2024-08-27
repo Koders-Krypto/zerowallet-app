@@ -99,12 +99,31 @@ export default function Sidebar() {
             open ? "p-4" : "py-4 px-6"
           } transition-all duration-300 ease-in-out`}
         >
-          <Image
-            src="/icons/settings.svg"
-            alt="Wallet Icon"
-            width={24}
-            height={24}
-          />
+          {!open ? (
+            <Image
+              src="/icons/settings.svg"
+              alt="Wallet Icon"
+              width={24}
+              height={24}
+            />
+          ) : (
+            <TooltipProvider delayDuration={100}>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Image
+                    src="/icons/settings.svg"
+                    alt="Wallet Icon"
+                    width={24}
+                    height={24}
+                  />
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p>Settings</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+
           {!open && (
             <button className=" w-full text-white font-bold text-lg text-left">
               Settings
