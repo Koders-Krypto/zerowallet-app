@@ -33,7 +33,7 @@ export default function Home() {
       <div className=" flex flex-col gap-4 items-center justify-center w-full max-w-sm text-lg">
         {!walletInfo && (
           <h2 className="text-accent text-sm">
-            Connect your wallet to get started
+            Connect your wallet to Get Started
           </h2>
         )}
         <div className="flex flex-col gap-2 items-center justify-center w-full border border-accent p-4">

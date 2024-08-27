@@ -1,18 +1,22 @@
 [
     {
         "name": "Home",
-        "href": "/app"
+        "href": "/app",
+        "icon": "/icons/home.svg"
     },
     {
         "name": "Swap",
-        "href": "/app/swap"
+        "href": "/app/swap",
+        "icon": "/icons/swap.svg"
     },
     {
         "name": "Bridge",
-        "href": "/app/bridge"
+        "href": "/app/bridge",
+        "icon": "/icons/cable.svg"
     },
     {
         "name": "Transactions",
-        "href": "/app/transactions"
+        "href": "/app/transactions",
+        "icon": "/icons/history.svg"
     }
 ]

@@ -7,9 +7,10 @@ export default function AppLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start justify-start p-4 w-full min-h-screen">
+    <div className="flex flex-row gap-4 items-start justify-start p-4 w-full min-h-screen">
       <Sidebar />
-      <div className="col-span-3 flex flex-col justify-start items-start">
+
+      <div className="flex flex-col justify-start items-start w-full">
         <Topbar />
         {children}
       </div>

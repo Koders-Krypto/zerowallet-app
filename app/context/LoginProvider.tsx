@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect } from "react";
 import { useWalletInfo } from "@web3modal/wagmi/react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface LoginContextProps {
   walletInfo: any;
@@ -18,14 +18,16 @@ export const LoginProvider = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
+  const pathname = usePathname();
   const router = useRouter();
   const { walletInfo } = useWalletInfo();
 
   useEffect(() => {
     console.log(walletInfo, "walletInfo");
-    if (walletInfo) {
+    if (walletInfo && pathname === "/") {
       router.push("/app");
-    } else {
+    }
+    if (!walletInfo && pathname !== "/app") {
       router.push("/");
     }
   }, [router, walletInfo]);
