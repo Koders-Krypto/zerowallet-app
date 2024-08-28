@@ -1,15 +1,22 @@
 "use client";
 
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { useWalletInfo } from "@web3modal/wagmi/react";
+import { useAccount } from "wagmi";
 import { usePathname, useRouter } from "next/navigation";
 
 interface LoginContextProps {
   walletInfo: any;
+  accountInfo: any;
+  setWalletInfo: (info: any) => void;
+  setAccountInfo: (info: any) => void;
 }
 // Create the context
 const LoginContext = createContext<LoginContextProps>({
   walletInfo: undefined,
+  accountInfo: undefined,
+  setWalletInfo: () => {},
+  setAccountInfo: () => {},
 });
 
 // Create the provider component
@@ -20,23 +27,36 @@ export const LoginProvider = ({
 }>) => {
   const pathname = usePathname();
   const router = useRouter();
-  const { walletInfo } = useWalletInfo();
+
+  const wallet  = useWalletInfo();
+  const account = useAccount();
+  const [walletInfo, setWalletInfo] = useState<any>(wallet.walletInfo);
+  const [accountInfo, setAccountInfo] = useState<any>(account);
+
+
+  useEffect(() => {
+
+     if(walletInfo?.name != 'passkey') {
+     setWalletInfo(wallet.walletInfo)
+     if (account?.address && account?.address != accountInfo?.address) {
+      setAccountInfo(account);
+    }
+  }
+  }, [ wallet, account ]);
+
 
   useEffect(() => {
     if (!walletInfo) {
       router.push("/");
     }
-    console.log(walletInfo, "walletInfo");
     if (walletInfo && pathname === "/") {
       router.push("/app");
     }
-    if (!walletInfo && pathname !== "/app") {
-      router.push("/");
-    }
+
   }, [pathname, router, walletInfo]);
 
   return (
-    <LoginContext.Provider value={{ walletInfo }}>
+    <LoginContext.Provider value={{ walletInfo, accountInfo, setWalletInfo, setAccountInfo }}>
       {children}
     </LoginContext.Provider>
   );
