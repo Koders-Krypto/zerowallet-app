@@ -3,18 +3,16 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAccount } from "wagmi";
 import Truncate from "../utils/truncate";
-import { Copy, QrCode, Trash } from "lucide-react";
+import { Copy, Trash } from "lucide-react";
 import { CopytoClipboard } from "../utils/copyclipboard";
 import WalletConnectButton from "../components/WalletConnect/WalletConnect";
 import { useContext, useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import ShowQR from "../components/QR/ShowQR";
 import { SignClientContext } from "../context/SignClientProvider";
-import Image from "next/image";
 import useDappStore from "../store/walletConnect";
 import Link from "next/link";
-import { WalletWorth } from "../utils/url";
-import axios from "axios";
+import { GET_USER_BALANCE } from "../utils/urls";
 
 export default function App() {
   const { toast } = useToast();
@@ -23,28 +21,30 @@ export default function App() {
   const { address, isConnecting, isDisconnected } = useAccount();
   const { connectedDapps } = useDappStore();
   const { disconnect } = useContext(SignClientContext);
-  const [worth, setWorth] = useState<any>({});
+  const [balance, setBalance] = useState<BigInt>(BigInt(0));
 
   const fetchWorth = async (address: string) => {
     try {
       const res = await fetch(
-        `${WalletWorth}${address}/net-worth?exclude_spam=true&exclude_unverified_contracts=true`,
+        `${GET_USER_BALANCE}?chainId=1&address=${address}`,
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "X-API-Key": process.env.NEXT_PUBLIC_MORALIS_API_KEY || "",
+            "X-API-Key": process.env.NEXT_PUBLIC_EXPAND_KEY || "",
           },
         }
       );
       const data = await res.json();
-      console.log(data);
-      setWorth(data);
+      console.log(data, "data api");
+      setBalance(data);
     } catch (error) {}
   };
 
   useEffect(() => {
-    fetchWorth(address || "");
+    if (address) {
+      fetchWorth(address);
+    }
   }, [address]);
 
   return (
@@ -53,9 +53,7 @@ export default function App() {
         <div className="w-full flex flex-col md:flex-row gap-4 justify-between items-center">
           <div className="flex flex-row justify-start items-center w-full">
             <div className="flex flex-col justify-start items-start ml-0 gap-1">
-              <h1 className="text-2xl font-black">
-                ${worth?.total_networth_usd}
-              </h1>
+              <h1 className="text-2xl font-black">{Number(balance)}</h1>
               <div className="text-xl font-bold">rohanreddy.eth</div>
               <div className="flex flex-row justify-center items-center gap-2 text-sm">
                 <div>{Truncate(address, 20, "...")}</div>
