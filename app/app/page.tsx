@@ -10,13 +10,14 @@ import { useToast } from "@/components/ui/use-toast";
 import ShowQR from "../components/QR/ShowQR";
 import { SignClientContext } from "../context/SignClientProvider";
 import Image from "next/image";
+import useDappStore from "../store/walletConnect";
 
 export default function App() {
   const { toast } = useToast();
   const [openWalletConnect, setOpenWalletConnect] = useState(false);
   const [openShowQR, setOpenShowQR] = useState(false);
   const { address, isConnecting, isDisconnected } = useAccount();
-  const { connectedDapp } = useContext(SignClientContext);
+  const { connectedDapps } = useDappStore();
   return (
     <div className=" flex flex-col items-start justify-center gap-8 w-full h-full">
       <div className="w-full border border-accent flex flex-col gap-6 px-4 py-4 md:py-6">
@@ -56,25 +57,27 @@ export default function App() {
             />
           </div>
         </div>
-        {connectedDapp && (
+        {connectedDapps.length > 0 && (
           <div className="grid grid-cols-5 w-full text-white text-sm">
-            <div className="flex flex-row justify-start items-center gap-4 border border-accent px-4 py-3">
-              <img
-                src={connectedDapp?.icons[0]}
-                alt="icon"
-                width={30}
-                height={30}
-              />
-              <div className="flex flex-col">
-                <h3 className="font-bold line-clamp-1">
-                  {connectedDapp?.name}
-                </h3>
-                <h4 className="text-xs line-clamp-1">
-                  {connectedDapp?.description}
-                </h4>
-                <h5 className="text-xs truncate w-36">{connectedDapp?.url}</h5>
+            {connectedDapps.map((dapp: any) => (
+              <div className="flex flex-row justify-start items-center gap-4 border border-accent px-4 py-3">
+                <img
+                  src={dapp?.icons[0]}
+                  alt="icon"
+                  width={30}
+                  height={30}
+                />
+                <div className="flex flex-col">
+                  <h3 className="font-bold line-clamp-1">
+                    {dapp?.name}
+                  </h3>
+                  <h4 className="text-xs line-clamp-1">
+                    {dapp?.description}
+                  </h4>
+                  <h5 className="text-xs truncate w-36">{dapp?.url}</h5>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         )}
       </div>

@@ -1,17 +1,18 @@
 'use client'
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Address } from 'viem';
-import SignClient from '@walletconnect/sign-client'
+import SignClient from '@walletconnect/sign-client';
 import { useAccount } from 'wagmi';
+import useDappStore from '../store/walletConnect';
 
 interface SignClientContextProps {
     setPairing: (url: string) => void;
-    connectedDapp: any;
+    disconnect: (topic: string) => void;
 }
 
 export const SignClientContext = createContext<SignClientContextProps>({
     setPairing: () => { },
-    connectedDapp: null,
+    disconnect: () => { },
 });
 
 export const SignClientProvider = ({ children }: { children: React.ReactNode }) => {
@@ -21,12 +22,13 @@ export const SignClientProvider = ({ children }: { children: React.ReactNode }) 
     const [data, setData] = useState<Address>("0x0");
     const [gas, setGas] = useState<Address>("0x0");
     const [signClient, setSignClient] = useState<SignClient | null>(null);
-    const [sessionProposal, setSessionProposal] = useState<any>(null);
+    const [sessionProposal, setSessionProposal] = useState<any[]>([]);
     const [value, setValue] = useState<Address>("0x0");
     const [chainId, setChainId] = useState<number>(0);
-    const [connectedDapp, setConnectedDapp] = useState<any>(null);
     const { address } = useAccount();
 
+    // Use Zustand store
+    const { addDapp, removeDapp } = useDappStore();
 
     useEffect(() => {
         const initSignClient = async () => {
@@ -45,50 +47,29 @@ export const SignClientProvider = ({ children }: { children: React.ReactNode }) 
         initSignClient();
     }, [address]);
 
-
     const setPairing = (url: string) => {
         if (signClient) {
             signClient.core.pairing.pair({ uri: url });
         }
     }
 
+    const disconnect = (topic: string) => {
+        if (signClient) {
+            signClient.core.pairing.disconnect({ topic });
+            removeDapp(topic); // Use Zustand to remove dApp
+        }
+    }
 
     useEffect(() => {
         if (!signClient || !address) return;
 
         signClient.on('session_proposal', async (event) => {
-            interface Event {
-                id: number
-                params: {
-                    id: number
-                    expiry: number
-                    relays: Array<{
-                        protocol: string
-                        data?: string
-                    }>
-                    proposer: {
-                        publicKey: string
-                        metadata: {
-                            name: string
-                            description: string
-                            url: string
-                            icons: string[]
-                        }
-                    }
-                    requiredNamespaces: Record<
-                        string,
-                        {
-                            chains: string[]
-                            methods: string[]
-                            events: string[]
-                        }
-                    >
-                    pairingTopic?: string
-                }
-            }
             console.log("Session Proposal", event);
-            setSessionProposal(event);
-            setConnectedDapp(event.params.proposer.metadata);
+            const dapp = {
+                ...event.params.proposer.metadata,
+                topic: event.params.pairingTopic,
+            };
+            addDapp(dapp); // Use Zustand to add dApp
 
             const { topic, acknowledged } = await signClient.approve({
                 id: event.id,
@@ -99,13 +80,14 @@ export const SignClientProvider = ({ children }: { children: React.ReactNode }) 
                         events: ['accountsChanged']
                     }
                 }
-            })
+            });
             console.log("Session Approved", topic);
+            setSessionProposal([...sessionProposal, { topic, metadata: event.params.proposer.metadata }]);
 
             // Optionally await acknowledgement from dapp
-            const session = await acknowledged()
+            const session = await acknowledged();
             console.log("Session", session);
-        })
+        });
 
         signClient.on('session_event', event => {
             // Handle session events, such as "chainChanged", "accountsChanged", etc.
@@ -157,6 +139,9 @@ export const SignClientProvider = ({ children }: { children: React.ReactNode }) 
                 topic: string
             }
             console.log("Session Ping", event);
+            signClient.extend({
+                topic: event.topic,
+            })
         })
 
         signClient.on('session_delete', event => {
@@ -166,13 +151,14 @@ export const SignClientProvider = ({ children }: { children: React.ReactNode }) 
                 id: number
                 topic: string
             }
+            // setShowTransactionModal(false);
+            // setConnectedDapp(connectedDapp.filter((dapp: any) => dapp.topic !== event.topic));
             console.log("Session Delete", event);
         })
-    }, [signClient, address])
-
+    }, [signClient, address]);
 
     return (
-        <SignClientContext.Provider value={{ setPairing, connectedDapp }}>
+        <SignClientContext.Provider value={{ setPairing, disconnect }}>
             {children}
         </SignClientContext.Provider>
     );
