@@ -34,9 +34,7 @@ export default function Sidebar() {
         </Link>
         <button
           onClick={() => setOpen(!open)}
-          className={`absolute h-8 w-8 border border-accent bg-gradient shadow-lg rounded-full flex justify-center items-center -right-4 p-0.5 ${
-            open ? "top-6" : "top-8"
-          } transition-all duration-300 ease-in-out`}
+          className={`absolute h-8 w-8 border border-accent bg-gradient shadow-lg rounded-full flex justify-center items-center -right-4 p-0.5 transition-all duration-300 ease-in-out bottom-3`}
         >
           <Image
             src={!open ? "/icons/minimise.svg" : "/icons/maximise.svg"}

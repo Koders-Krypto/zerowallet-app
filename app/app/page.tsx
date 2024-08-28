@@ -16,7 +16,7 @@ export default function App() {
   const { address, isConnecting, isDisconnected } = useAccount();
   return (
     <div className=" flex flex-col items-start justify-center gap-8 w-full h-full">
-      <div className="w-full border border-accent flex flex-col md:flex-row gap-6 justify-between items-center px-4 py-4 md:py-8">
+      <div className="w-full border border-accent flex flex-col md:flex-row gap-4 justify-between items-center px-4 py-4 md:py-8">
         <div className="flex flex-row justify-start items-center w-full">
           <div className="flex flex-col justify-start items-start ml-0 gap-1">
             <div className="text-xl font-bold">rohanreddy.eth</div>
