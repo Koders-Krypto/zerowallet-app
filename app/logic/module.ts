@@ -69,7 +69,7 @@ const buildInstallModule = async (chainId: number, safeAccount: Address, address
         });
 
 
-    const module = getModule({
+    const accountModule = getModule({
         module: address,
         initData: initData,
         type:  type,
@@ -78,7 +78,7 @@ const buildInstallModule = async (chainId: number, safeAccount: Address, address
     const executions = await installModule({
         client,
         account,
-        module,
+        module: accountModule,
       });
 
 
@@ -102,7 +102,7 @@ export const isInstalled = async (chainId: number, safeAddress: Address, address
         });
 
 
-    const module = getModule({
+    const accountModule = getModule({
         module: address,
         initData: '0x',
         type:  type ,
@@ -113,7 +113,7 @@ export const isInstalled = async (chainId: number, safeAddress: Address, address
     return await isModuleInstalled({
         client,
         account,
-        module,
+        module: accountModule,
       });
     }
     catch {

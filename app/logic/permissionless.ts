@@ -82,7 +82,7 @@ export const getSmartAccountClient = async ( { chainId, nonceKey, signer, addres
     address,
     nonceKey,
     safeVersion: '1.4.1',
-    saltNonce: 120n,
+    saltNonce: BigInt(120),
     safe4337ModuleAddress,
     erc7569LaunchpadAddress,
     validators: validators?.length ? validators : [],
