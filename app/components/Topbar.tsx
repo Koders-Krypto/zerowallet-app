@@ -32,6 +32,7 @@ import { MenuIcon } from "lucide-react";
 import Links from "../data/Links.json";
 import Link from "next/link";
 import Icons from "../utils/Icons";
+import { useLoginContext } from "../context/LoginProvider";
 
 export default function Topbar() {
   const [open, setOpen] = useState(false);
@@ -40,8 +41,9 @@ export default function Topbar() {
   const router = useRouter();
   const pathname = usePathname();
   const { address, isConnecting, isDisconnected } = useAccount();
+  const { accountInfo } = useLoginContext()
   const { disconnect } = useDisconnect();
-  const { walletInfo } = useWalletInfo();
+  const { setWalletInfo, walletInfo } = useLoginContext();
   const [formatedPathname, setFormatedPathname] = useState("");
 
   useEffect(() => {
@@ -93,8 +95,8 @@ export default function Topbar() {
               <WalletConnectButton open={open} setOpen={setOpen} />
               <WalletButton
                 walletInfo={walletInfo}
-                address={address}
-                disconnect={disconnect}
+                address={accountInfo.address}
+                disconnect={ () => { setWalletInfo(undefined); disconnect() }}
                 router={router}
               />
             </nav>
@@ -161,8 +163,8 @@ export default function Topbar() {
 
           <WalletButton
             walletInfo={walletInfo}
-            address={address}
-            disconnect={disconnect}
+            address={accountInfo.address}
+            disconnect={ () => { setWalletInfo(undefined); disconnect() }}
             router={router}
           />
         </div>
