@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import Links from "../data/Links.json";
+import Links from "../../data/Links.json";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -10,7 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import Icons from "../utils/Icons";
+import Icons from "../../utils/Icons";
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
