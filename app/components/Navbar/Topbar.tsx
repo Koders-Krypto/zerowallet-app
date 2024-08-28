@@ -68,12 +68,12 @@ export default function Topbar() {
           </SheetTrigger>
           <SheetContent
             side="right"
-            className="sm:hidden bg-black text-white border-l border-accent"
+            className="sm:hidden bg-black text-white border-l border-accent p-0"
           >
-            <SheetHeader>
+            <SheetHeader className="px-6 py-4 border-b border-accent">
               <SheetTitle className="text-white text-left">Menu</SheetTitle>
             </SheetHeader>
-            <nav className="grid gap-0 text-sm font-medium mt-4">
+            <nav className="grid gap-0 text-sm font-medium px-6 py-3">
               {Links.map((link) => (
                 <div
                   key={link.name}

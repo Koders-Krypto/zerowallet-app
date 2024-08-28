@@ -21,7 +21,7 @@ export default function WalletConnectButton(props: any) {
       <DialogTrigger asChild>
         <button
           onClick={() => props.setOpen(true)}
-          className="flex flex-row gap-2 items-center justify-start text-sm px-4 bg-black text-white py-2"
+          className="flex flex-row gap-2 items-center justify-start text-sm px-4 bg-black text-white py-3"
         >
           <Image
             src={"/walletconnect/icon.svg"}
@@ -48,7 +48,7 @@ export default function WalletConnectButton(props: any) {
                 </h3>
               </DialogTitle>
               <DialogDescription className="text-xs text-accent dark:text-accent w-full md:max-w-xs">
-                Connect your wallet to start using ZeroWallet with any dApps.
+                Connect to any dApp with WalletConnect to start using ZeroWallet
               </DialogDescription>
             </div>
           </div>
