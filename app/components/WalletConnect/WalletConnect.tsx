@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { SignClientContext } from "@/app/context/SignClientProvider";
 import {
   Dialog,
@@ -7,21 +7,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from "@/components/ui/dialog";
 import { ScanQrCode } from "lucide-react";
 import Image from "next/image";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 export default function WalletConnectButton(props: any) {
   const [url, setUrl] = useState<string>("");
 
-  const { setPairing, connectedDapp } = useContext(SignClientContext);
-
-
-  useEffect(() => {
-    console.log("Connected Dapp", connectedDapp);
-  }, [connectedDapp]);
-
+  const { setPairing } = useContext(SignClientContext);
 
   return (
     <Dialog open={props.open} onOpenChange={props.setOpen}>
@@ -70,14 +63,16 @@ export default function WalletConnectButton(props: any) {
             />
             <ScanQrCode className="mr-2 text-white" />
           </div>
-          <button onClick={() => {
-            if (url) {
-
-              console.log(url)
-              setPairing(url)
-              props.setOpen(false)
-            }
-          }} className="bg-white border-accent border py-2 text-lg text-black w-full">
+          <button
+            onClick={() => {
+              if (url) {
+                console.log(url);
+                setPairing(url);
+                props.setOpen(false);
+              }
+            }}
+            className="bg-white border-accent border py-2 text-lg text-black w-full"
+          >
             Connect
           </button>
         </div>
