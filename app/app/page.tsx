@@ -28,15 +28,22 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
 import { useAccount } from "wagmi";
 import Image from "next/image";
 import moment from "moment";
+import {
+  getTotalBalanceUSD,
+  Networks,
+  NetworkType,
+  sortByNetwork,
+  ZapperTokenData,
+} from "../data/Zapper";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function App() {
   const { toast } = useToast();
@@ -45,9 +52,29 @@ export default function App() {
   const { address, isConnecting, isDisconnected } = useAccount();
   const { connectedDapps } = useDappStore();
   const { disconnect } = useContext(SignClientContext);
+  const [selectedNetworks, setSelectedNetworks] = useState<NetworkType[]>([]);
 
   const { ensname } = useContext(LoginContext);
+  const data = getTotalBalanceUSD(ZapperTokenData);
+  console.log(data);
 
+  useEffect(() => {
+    addAllNetworks();
+  }, []);
+
+  function addAllNetworks() {
+    setSelectedNetworks((prevSelectedNetworks) => {
+      const newSelectedNetworks = [...prevSelectedNetworks];
+
+      Networks.forEach((network) => {
+        if (!newSelectedNetworks.some((item) => item.name === network.name)) {
+          newSelectedNetworks.push(network);
+        }
+      });
+
+      return newSelectedNetworks;
+    });
+  }
   return (
     <div className=" flex flex-col items-start justify-center gap-6 w-full h-full">
       <div className="w-full border border-accent flex flex-col gap-6 px-4 py-4 md:py-6">
@@ -155,35 +182,90 @@ export default function App() {
               Transactions
             </TabsTrigger>
           </TabsList>
-          <Select defaultValue="1">
-            <SelectTrigger className="max-w-32 h-fit text-black py-2 rounded-none border-0 border-accent focus:outline-none focus:ring-0 focus:ring-offset-0">
-              <SelectValue placeholder="Select Chain" className="text-black" />
-            </SelectTrigger>
-            <SelectContent>
-              {Chains.map((chain, c) => {
+          <div className="flex flex-row justify-start items-center gap-3">
+            <div className="flex flex-row justify-start items-center">
+              {selectedNetworks.slice(0, 5).map((snetwork, s) => {
                 return (
-                  <SelectItem
-                    className="pb-4"
-                    key={c}
-                    value={chain.chainId.toString()}
+                  <div
+                    className=" w-6 h-6 bg-white rounded-full -ml-2.5"
+                    key={s}
                   >
-                    <div className="flex flex-row justify-start items-center gap-2">
-                      <div className="rounded-full flex justify-center items-center">
-                        <img
-                          src={chain.icon}
-                          width={25}
-                          height={20}
-                          alt={chain.name}
-                        />
-                      </div>
-                      <div className="truncate">{chain.name}</div>
-                    </div>
-                  </SelectItem>
+                    <Image
+                      className=" rounded-full p-px"
+                      src={snetwork.logo}
+                      width={30}
+                      height={30}
+                      alt={snetwork.name}
+                    />
+                  </div>
                 );
               })}
-            </SelectContent>
-          </Select>
+              {selectedNetworks.length > 5 && (
+                <span className="w-6 h-6 -ml-2.5 p-px flex justify-center items-center text-sm bg-black rounded-full text-white text-center">
+                  {selectedNetworks.length - 5}
+                </span>
+              )}
+            </div>
+            <Popover>
+              <PopoverTrigger className="px-4 py-2.5 border border-accent bg-white text-black text-sm">
+                Networks
+              </PopoverTrigger>
+              <PopoverContent className="flex flex-col justify-start gap-0 w-56 p-0 rounded-none max-w-lg mr-8">
+                <div className="flex flex-row justify-between items-center py-2 px-4 border-b border-accent">
+                  <h3 className="font-bold">All Networks</h3>
+                  <div className="text-sm">
+                    {selectedNetworks.length === 0 ? (
+                      <button onClick={() => addAllNetworks()}>
+                        Select all
+                      </button>
+                    ) : (
+                      <button onClick={() => setSelectedNetworks([])}>
+                        Clear all
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <div className="overflow-y-scroll px-4 py-0 h-60">
+                  {Networks.map((network, c) => {
+                    return (
+                      <div
+                        key={c}
+                        className="flex flex-row justify-start items-center gap-2 py-2"
+                      >
+                        <Checkbox
+                          onCheckedChange={() =>
+                            setSelectedNetworks((prevSelectedNetworks) =>
+                              prevSelectedNetworks.some(
+                                (item) => item.name === network.name
+                              )
+                                ? prevSelectedNetworks.filter(
+                                    (item) => item.name !== network.name
+                                  )
+                                : [...prevSelectedNetworks, network]
+                            )
+                          }
+                          checked={selectedNetworks.some(
+                            (item) => item.name === network.name
+                          )}
+                          id={network.name.toString()}
+                        />
+                        <div className="grid gap-1.5 leading-none">
+                          <label
+                            htmlFor={network.name}
+                            className="text-sm capitalize font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            {network.name.replaceAll("-", " ")}
+                          </label>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
+
         <div className="border border-accent flex flex-col gap-4 w-full max-h-full h-24 px-4 pb-4 overflow-y-scroll flex-grow">
           <TabsContent value="Tokens" className="p-0 mt-0 flex flex-col gap-4">
             <div className="flex flex-col">
