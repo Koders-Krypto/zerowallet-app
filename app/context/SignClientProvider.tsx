@@ -2,278 +2,341 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Address } from "viem";
 import SignClient from "@walletconnect/sign-client";
-import { useAccount } from "./LoginProvider"
+import { useAccount } from "./LoginProvider";
 import useDappStore, { Dapp } from "../store/walletConnect";
+import GenericBridge from "./GenericBridge";
+import {
+  writeContract,
+  waitForTransaction,
+  waitForTransactionReceipt,
+} from "@wagmi/core";
+import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
+import { WagmiConfig } from "wagmi";
+import { holesky } from "wagmi/chains";
 
 interface SignClientContextProps {
-    setPairing: (url: string) => void;
-    disconnect: (topic: string) => void;
-    from: Address;
-    to: Address;
-    data: Address;
-    gas: Address;
-    value: Address;
-    chainId: number;
-    transactionDapp: Dapp | null;
-    showTransactionModal: boolean;
-    isSignature: boolean;
-    approveTransaction: boolean;
-    setApproveTransaction: (approve: boolean) => void;
-    setShowTransactionModal: (show: boolean) => void;
+  setPairing: (url: string) => void;
+  disconnect: (topic: string) => void;
+  from: Address;
+  to: Address;
+  data: Address;
+  gas: Address;
+  value: Address;
+  chainId: number;
+  transactionDapp: Dapp | null;
+  showTransactionModal: boolean;
+  isSignature: boolean;
+  approveTransaction: boolean;
+  setApproveTransaction: (approve: boolean) => void;
+  setShowTransactionModal: (show: boolean) => void;
 }
 
 export const SignClientContext = createContext<SignClientContextProps>({
-    setPairing: () => { },
-    disconnect: () => { },
-    from: "0x0",
-    to: "0x0",
-    data: "0x0",
-    gas: "0x0",
-    value: "0x0",
-    chainId: 0,
-    transactionDapp: null,
-    showTransactionModal: false,
-    isSignature: false,
-    approveTransaction: false,
-    setApproveTransaction: () => { },
-    setShowTransactionModal: (show: boolean) => void {},
+  setPairing: () => {},
+  disconnect: () => {},
+  from: "0x0",
+  to: "0x0",
+  data: "0x0",
+  gas: "0x0",
+  value: "0x0",
+  chainId: 0,
+  transactionDapp: null,
+  showTransactionModal: false,
+  isSignature: false,
+  approveTransaction: false,
+  setApproveTransaction: () => {},
+  setShowTransactionModal: (show: boolean) => void {},
 });
 
 export const SignClientProvider = ({
-    children,
+  children,
 }: {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }) => {
-    const [showTransactionModal, setShowTransactionModal] =
-        useState<boolean>(false);
-    const [from, setFrom] = useState<Address>("0x0");
-    const [to, setTo] = useState<Address>("0x0");
-    const [data, setData] = useState<Address>("0x0");
-    const [gas, setGas] = useState<Address>("0x0");
-    const [signClient, setSignClient] = useState<SignClient | null>(null);
-    const [sessionProposal, setSessionProposal] = useState<any[]>([]);
-    const [value, setValue] = useState<Address>("0x0");
-    const [chainId, setChainId] = useState<number>(0);
-    const [transactionDapp, setTransactionDapp] = useState<Dapp | null>(null);
-    const [isSignature, setIsSignature] = useState<boolean>(false);
-    const { address } = useAccount();
-    const [approveTransaction, setApproveTransaction] = useState<boolean>(false);
+  const [showTransactionModal, setShowTransactionModal] =
+    useState<boolean>(false);
+  const [from, setFrom] = useState<Address>("0x0");
+  const [to, setTo] = useState<Address>("0x0");
+  const [data, setData] = useState<Address>("0x0");
+  const [gas, setGas] = useState<Address>("0x0");
+  const [signClient, setSignClient] = useState<SignClient | null>(null);
+  const [sessionProposal, setSessionProposal] = useState<any[]>([]);
+  const [value, setValue] = useState<Address>("0x0");
+  const [chainId, setChainId] = useState<number>(0);
+  const [transactionDapp, setTransactionDapp] = useState<Dapp | null>(null);
+  const [isSignature, setIsSignature] = useState<boolean>(false);
+  const { address } = useAccount();
+  const [approveTransaction, setApproveTransaction] = useState<boolean>(false);
 
-    // Use Zustand store
-    const { addDapp, removeDapp, getDapp } = useDappStore();
+  const metadata = {
+    name: "ZeroWallet",
+    description:
+      "ZeroWallet is a LayerZero-powered crypto wallet that lets you manage gas fees on one chain while accessing dApps across all chains.",
+    url: "https://zerowallet-app.vercel.app",
+    icons: ["https://zerowallet-app.vercel.app/logo/logo-black.svg"],
+  };
 
-    useEffect(() => {
-        const initSignClient = async () => {
-            const client = await SignClient.init({
-                projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
-                relayUrl: "wss://relay.walletconnect.com",
-                metadata: {
-                    name: "ZeroWallet",
-                    description:
-                        "ZeroWallet is a LayerZero-powered crypto wallet that lets you manage gas fees on one chain while accessing dApps across all chains.",
-                    url: "#",
-                    icons: ["https://zerowallet-app.vercel.app/logo/logo-black.svg"],
-                },
-            });
-            setSignClient(client);
-        };
-        initSignClient();
-    }, [address]);
+  const projectId = process.env.NEXT_PUBLIC_PROJECT_ID || "";
+  const chains = [holesky] as const;
+  const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata });
 
-    const setPairing = (url: string) => {
-        if (signClient) {
-            signClient.core.pairing.pair({ uri: url });
-        }
+  // Use Zustand store
+  const { addDapp, removeDapp, getDapp } = useDappStore();
+
+  useEffect(() => {
+    const initSignClient = async () => {
+      const client = await SignClient.init({
+        projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+        relayUrl: "wss://relay.walletconnect.com",
+        metadata: {
+          name: "ZeroWallet",
+          description:
+            "ZeroWallet is a LayerZero-powered crypto wallet that lets you manage gas fees on one chain while accessing dApps across all chains.",
+          url: "#",
+          icons: ["https://zerowallet-app.vercel.app/logo/logo-black.svg"],
+        },
+      });
+      setSignClient(client);
     };
+    initSignClient();
+  }, [address]);
 
-    const disconnect = (topic: string) => {
-        if (signClient) {
-            signClient.core.pairing.disconnect({ topic });
-            removeDapp(topic); // Use Zustand to remove dApp
-        }
-    };
+  const setPairing = (url: string) => {
+    if (signClient) {
+      signClient.core.pairing.pair({ uri: url });
+    }
+  };
 
-    useEffect(() => {
-        if (!signClient || !address) return;
+  const disconnect = (topic: string) => {
+    if (signClient) {
+      signClient.core.pairing.disconnect({ topic });
+      removeDapp(topic); // Use Zustand to remove dApp
+    }
+  };
 
-        signClient.on("session_proposal", async (event) => {
-            console.log("Session Proposal", event);
-            interface Event {
-                id: number
-                params: {
-                    id: number
-                    expiry: number
-                    relays: Array<{
-                        protocol: string
-                        data?: string
-                    }>
-                    proposer: {
-                        publicKey: string
-                        metadata: {
-                            name: string
-                            description: string
-                            url: string
-                            icons: string[]
-                        }
-                    }
-                    requiredNamespaces: Record<
-                        string,
-                        {
-                            chains: string[]
-                            methods: string[]
-                            events: string[]
-                        }
-                    >
-                    pairingTopic?: string
-                },
-                topic: string
-            }
+  useEffect(() => {
+    if (!signClient || !address) return;
 
-
-            const { topic, acknowledged } = await signClient.approve({
-                id: event.id,
-                namespaces: {
-                    eip155: {
-                        accounts: ["eip155:1:" + address],
-                        methods: ["personal_sign", "eth_signTransaction", "eth_sign", "eth_sendTransaction"],
-                        events: ["accountsChanged"],
-                    },
-                },
-            });
-            console.log("Session Approved", topic);
-            setSessionProposal([
-                ...sessionProposal,
-                { topic, metadata: event.params.proposer.metadata },
-            ]);
-
-            // Optionally await acknowledgement from dapp
-            const session = await acknowledged();
-            console.log("Session", session);
-            const dapp = {
-                ...event.params.proposer.metadata,
-                topic: session.topic,
+    signClient.on("session_proposal", async (event) => {
+      console.log("Session Proposal", event);
+      interface Event {
+        id: number;
+        params: {
+          id: number;
+          expiry: number;
+          relays: Array<{
+            protocol: string;
+            data?: string;
+          }>;
+          proposer: {
+            publicKey: string;
+            metadata: {
+              name: string;
+              description: string;
+              url: string;
+              icons: string[];
             };
-            addDapp(dapp); // Use Zustand to add dApp
-        });
-
-        signClient.on("session_event", (event) => {
-            // Handle session events, such as "chainChanged", "accountsChanged", etc.
-
-            interface Event {
-                id: number;
-                topic: string;
-                params: {
-                    event: {
-                        name: string;
-                        data: any;
-                    };
-                    chainId: string;
-                };
+          };
+          requiredNamespaces: Record<
+            string,
+            {
+              chains: string[];
+              methods: string[];
+              events: string[];
             }
-            console.log("Session Event", event);
-        });
+          >;
+          pairingTopic?: string;
+        };
+        topic: string;
+      }
 
-        signClient.on("session_request", (event) => {
-            // Handle session method requests, such as "eth_sign", "eth_sendTransaction", etc.
-            interface Event {
-                id: number;
-                topic: string;
-                params: {
-                    request: {
-                        method: string;
-                        params: any;
-                    };
-                    chainId: string;
-                };
-            }
-            const _transactionDapp: Dapp = getDapp(event.topic);
-            console.log("Transaction Dapp", _transactionDapp);
-            setTransactionDapp(_transactionDapp || null);
+      const { topic, acknowledged } = await signClient.approve({
+        id: event.id,
+        namespaces: {
+          eip155: {
+            accounts: ["eip155:1:" + address],
+            methods: [
+              "personal_sign",
+              "eth_signTransaction",
+              "eth_sign",
+              "eth_sendTransaction",
+            ],
+            events: ["accountsChanged"],
+          },
+        },
+      });
+      console.log("Session Approved", topic);
+      setSessionProposal([
+        ...sessionProposal,
+        { topic, metadata: event.params.proposer.metadata },
+      ]);
 
-            if (event.params.request.method === "personal_sign") {
-                setIsSignature(true);
-                setShowTransactionModal(true);
-            } else {
-                setData(event.params.request.params[0].data);
-                setFrom(event.params.request.params[0].from);
-                setTo(event.params.request.params[0].to);
-                setGas(event.params.request.params[0].gas);
-                setValue(event.params.request.params[0].value);
-                setChainId(parseInt(event.params.chainId));
-                setShowTransactionModal(true);
-                console.log("Session Request", event);
-            }
+      // Optionally await acknowledgement from dapp
+      const session = await acknowledged();
+      console.log("Session", session);
+      const dapp = {
+        ...event.params.proposer.metadata,
+        topic: session.topic,
+      };
+      addDapp(dapp); // Use Zustand to add dApp
+    });
 
-        });
+    signClient.on("session_event", (event) => {
+      // Handle session events, such as "chainChanged", "accountsChanged", etc.
 
-        signClient.on("session_ping", (event) => {
-            // React to session ping event
+      interface Event {
+        id: number;
+        topic: string;
+        params: {
+          event: {
+            name: string;
+            data: any;
+          };
+          chainId: string;
+        };
+      }
+      console.log("Session Event", event);
+    });
 
-            interface Event {
-                id: number;
-                topic: string;
-            }
-            console.log("Session Ping", event);
-            signClient.extend({
-                topic: event.topic,
-            });
-        });
+    signClient.on("session_request", (event) => {
+      // Handle session method requests, such as "eth_sign", "eth_sendTransaction", etc.
+      interface Event {
+        id: number;
+        topic: string;
+        params: {
+          request: {
+            method: string;
+            params: any;
+          };
+          chainId: string;
+        };
+      }
+      const _transactionDapp: Dapp = getDapp(event.topic);
+      console.log("Transaction Dapp", _transactionDapp);
+      setTransactionDapp(_transactionDapp || null);
 
-        signClient.on("session_delete", (event) => {
-            // React to session delete event
+      if (event.params.request.method === "personal_sign") {
+        setIsSignature(true);
+        setShowTransactionModal(true);
+      } else {
+        setData(event.params.request.params[0].data);
+        setFrom(event.params.request.params[0].from);
+        setTo(event.params.request.params[0].to);
+        setGas(event.params.request.params[0].gas);
+        setValue(event.params.request.params[0].value);
+        setChainId(parseInt(event.params.chainId));
+        setShowTransactionModal(true);
+        console.log("Session Request", event);
+      }
+    });
 
-            interface Event {
-                id: number;
-                topic: string;
-            }
+    signClient.on("session_ping", (event) => {
+      // React to session ping event
 
-            console.log("Session Delete", event);
-        });
-    }, [signClient, address, addDapp, sessionProposal, getDapp]);
+      interface Event {
+        id: number;
+        topic: string;
+      }
+      console.log("Session Ping", event);
+      signClient.extend({
+        topic: event.topic,
+      });
+    });
 
+    signClient.on("session_delete", (event) => {
+      // React to session delete event
 
-    useEffect(() => {
-        if (approveTransaction) {
-            setShowTransactionModal(false);
-            setApproveTransaction(false);
-            approveTransactionChain()
-        }
-    }, [approveTransaction]);
+      interface Event {
+        id: number;
+        topic: string;
+      }
 
-    const approveTransactionChain = async () => {
-        // if (signClient) {
-        //     const transaction = await signClient.sen({
-        //         topic: transactionDapp?.topic,
-        //         request: {
-        //             method: "eth_sendTransaction",
-        //             params: [from, to, data, gas, value, chainId],
-        //         },
-        //     });
-        // }
+      console.log("Session Delete", event);
+    });
+  }, [signClient, address, addDapp, sessionProposal, getDapp]);
+
+  useEffect(() => {
+    if (approveTransaction) {
+      setShowTransactionModal(false);
+      setApproveTransaction(false);
+      approveTransactionChain();
+    }
+  }, [approveTransaction]);
+
+  const approveTransactionChain = async () => {
+    // Create Web3Modal
+    createWeb3Modal({ wagmiConfig, projectId });
+
+    try {
+      const sepoliaEndpointID = "40161";
+      const toAddress = "0x09545c0Cd0ddfd3B5EfBA5F093B3cA20b6ba4bB9";
+      const options = "0x";
+      const result = await writeContract(wagmiConfig, {
+        abi: GenericBridge,
+        address: "0xdfa96d5E31177F182fc95790Be712D238d0d3b83",
+        functionName: "sendAmount",
+        args: [
+          sepoliaEndpointID,
+          ,
+          "100000000000000",
+          toAddress,
+          data,
+          options,
+        ],
+      });
+
+      await waitForTransaction(result);
+    } catch (error) {
+      console.log(error);
     }
 
-    return (
-        <SignClientContext.Provider
-            value={{
-                setPairing,
-                disconnect,
-                from,
-                to,
-                data,
-                gas,
-                value,
-                chainId,
-                transactionDapp,
-                showTransactionModal,
-                isSignature,
-                approveTransaction,
-                setApproveTransaction,
-                setShowTransactionModal,
-            }}
-        >
-            {children}
-        </SignClientContext.Provider>
-    );
+    //   function sendAmount(
+    //     uint32 _dstEid,
+    //     uint256 fee,
+    //     address to,
+    //     bytes memory data,
+    //     bytes calldata _options
+  };
+  const waitForTransaction = async (hash: Address) => {
+    try {
+      const transactionReceipt = await waitForTransactionReceipt(wagmiConfig, {
+        confirmations: 2,
+        hash,
+      });
+      if (transactionReceipt.status === "success") {
+        return {
+          success: true,
+          data: transactionReceipt,
+        };
+      }
+      throw transactionReceipt.status;
+    } catch (e: any) {
+      throw e;
+    }
+  };
+
+  return (
+    <SignClientContext.Provider
+      value={{
+        setPairing,
+        disconnect,
+        from,
+        to,
+        data,
+        gas,
+        value,
+        chainId,
+        transactionDapp,
+        showTransactionModal,
+        isSignature,
+        approveTransaction,
+        setApproveTransaction,
+        setShowTransactionModal,
+      }}
+    >
+      {children}
+    </SignClientContext.Provider>
+  );
 };
 
 export const useSignClient = () => useContext(SignClientContext);
