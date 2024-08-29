@@ -131,7 +131,7 @@ export default function App() {
         )}
       </div>
       <Tabs defaultValue="Tokens" className="w-full flex flex-col gap-4 h-full">
-        <div className="flex flex-row justify-between items-center gap-2">
+        <div className="flex flex-col md:flex-row md:justify-between items-end md:items-center gap-2">
           <TabsList className="rounded-none h-fit p-0 divide-x divide-accent border border-accent grid grid-cols-3 md:max-w-sm w-full gap-0 bg-black  text-white data-[state=active]:bg-white data-[state=active]:text-black">
             <TabsTrigger
               className="py-2.5 text-sm rounded-none data-[state=active]:bg-white data-[state=active]:text-black"
@@ -181,16 +181,16 @@ export default function App() {
             </SelectContent>
           </Select>
         </div>
-        <div className="border border-accent flex flex-col gap-4 w-full h-full px-4 py-0">
+        <div className="border border-accent flex flex-col gap-4 w-full max-h-full h-24 px-4 py-0 overflow-y-scroll flex-grow">
           <TabsContent value="Tokens" className="p-0 mt-0 flex flex-col gap-4">
-            <div className="flex flex-col overflow-y-scroll h-[38vh] md:h-[62vh]">
+            <div className="flex flex-col">
               {Tokens.map((token, t) => {
                 return (
                   <div
                     key={t}
-                    className="grid grid-cols-9 gap-4 py-3.5 items-center border-b border-accent"
+                    className="grid grid-cols-2 md:grid-cols-9 gap-y-4 md:gap-4 py-3.5 items-center border-b border-accent"
                   >
-                    <div className="flex flex-row justify-start items-center gap-2 col-span-5">
+                    <div className="flex flex-row justify-start items-center gap-2 md:col-span-5">
                       <div className="bg-black rounded-full p-1">
                         <img
                           className="rounded-full"
@@ -202,7 +202,7 @@ export default function App() {
                       </div>
                       <div>{token.name}</div>
                     </div>
-                    <div className="col-span-2 text-center">
+                    <div className="md:col-span-2 text-center">
                       {(Math.random() * 10).toFixed(2)} {token.symbol}
                     </div>
                     <div className="col-span-2 grid grid-cols-3 place-items-center gap-2">

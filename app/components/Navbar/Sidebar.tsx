@@ -18,7 +18,7 @@ export default function Sidebar() {
 
   return (
     <div
-      className={`text-white h-[97vh] hidden md:flex flex-col justify-start items-start border border-accent transition-all duration-300 ease-in-out max-w-60 ${
+      className={`text-white h-[97vh] flex-grow hidden md:flex flex-col justify-start items-start border border-accent transition-all duration-300 ease-in-out max-w-60 ${
         !open ? "w-full" : "w-24"
       }`}
     >
