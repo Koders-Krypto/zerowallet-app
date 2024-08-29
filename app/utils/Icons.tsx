@@ -84,9 +84,9 @@ export default function Icons(props: { path: string; className: string }) {
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           className={props.className}
         >
           <path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z" />
