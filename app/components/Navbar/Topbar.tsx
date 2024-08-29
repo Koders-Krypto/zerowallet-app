@@ -1,7 +1,6 @@
 "use client";
-import { useWalletInfo } from "@web3modal/wagmi/react";
 import Image from "next/image";
-import { useAccount, useDisconnect } from "wagmi";
+import { useWalletInfo, useAccount, useLoginProvider, useDisconnect } from "../../context/LoginProvider";
 import Truncate from "../../utils/truncate";
 import { Power, ScanQrCode } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
@@ -41,6 +40,7 @@ export default function Topbar() {
   const { address, isConnecting, isDisconnected } = useAccount();
   const { disconnect } = useDisconnect();
   const { walletInfo } = useWalletInfo();
+  const { setWalletInfo } = useLoginProvider();
   const [formatedPathname, setFormatedPathname] = useState("");
 
   useEffect(() => {
@@ -93,7 +93,11 @@ export default function Topbar() {
               <WalletButton
                 walletInfo={walletInfo}
                 address={address}
-                disconnect={disconnect}
+                disconnect={ ()=> {
+                  disconnect();
+                  setWalletInfo(undefined);
+                }
+                }
                 router={router}
               />
             </nav>
@@ -108,7 +112,11 @@ export default function Topbar() {
           <WalletButton
             walletInfo={walletInfo}
             address={address}
-            disconnect={disconnect}
+            disconnect={ ()=> {
+              disconnect();
+              setWalletInfo(undefined);
+            } 
+            }       
             router={router}
           />
         </div>

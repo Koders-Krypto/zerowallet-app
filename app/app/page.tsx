@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAccount } from "wagmi";
+import {  useAccount } from "../context/LoginProvider";
 import Truncate from "../utils/truncate";
 import { Copy, Trash } from "lucide-react";
 import { CopytoClipboard } from "../utils/copyclipboard";
