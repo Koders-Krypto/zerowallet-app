@@ -1,9 +1,16 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAccount } from "wagmi";
+import { useAccount, useEnsName } from "wagmi";
 import Truncate from "../utils/truncate";
-import { Copy, Trash } from "lucide-react";
+import {
+  Copy,
+  PiggyBank,
+  RefreshCcw,
+  Send,
+  SendHorizonal,
+  Trash,
+} from "lucide-react";
 import { CopytoClipboard } from "../utils/copyclipboard";
 import WalletConnectButton from "../components/WalletConnect/WalletConnect";
 import { useContext, useEffect, useState } from "react";
@@ -12,7 +19,20 @@ import ShowQR from "../components/QR/ShowQR";
 import { SignClientContext } from "../context/SignClientProvider";
 import useDappStore from "../store/walletConnect";
 import Link from "next/link";
-import { GET_USER_BALANCE } from "../utils/urls";
+import { Chains, Tokens } from "../data/TempData";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function App() {
   const { toast } = useToast();
@@ -21,31 +41,8 @@ export default function App() {
   const { address, isConnecting, isDisconnected } = useAccount();
   const { connectedDapps } = useDappStore();
   const { disconnect } = useContext(SignClientContext);
-  const [balance, setBalance] = useState<BigInt>(BigInt(0));
 
-  const fetchWorth = async (address: string) => {
-    try {
-      const res = await fetch(
-        `${GET_USER_BALANCE}?chainId=1&address=${address}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "X-API-Key": process.env.NEXT_PUBLIC_EXPAND_KEY || "",
-          },
-        }
-      );
-      const data = await res.json();
-      console.log(data, "data api");
-      setBalance(data);
-    } catch (error) {}
-  };
-
-  useEffect(() => {
-    if (address) {
-      fetchWorth(address);
-    }
-  }, [address]);
+  const { data: ensname } = useEnsName({ address });
 
   return (
     <div className=" flex flex-col items-start justify-center gap-6 w-full h-full">
@@ -53,8 +50,10 @@ export default function App() {
         <div className="w-full flex flex-col md:flex-row gap-4 justify-between items-center">
           <div className="flex flex-row justify-start items-center w-full">
             <div className="flex flex-col justify-start items-start ml-0 gap-1">
-              <h1 className="text-2xl font-black">{Number(balance)}</h1>
-              <div className="text-xl font-bold">rohanreddy.eth</div>
+              <h1 className="text-4xl font-black">$10,000</h1>
+              <div className="text-xl font-bold">
+                {ensname || "No ENS Name"}
+              </div>
               <div className="flex flex-row justify-center items-center gap-2 text-sm">
                 <div>{Truncate(address, 20, "...")}</div>
                 <div
@@ -131,23 +130,119 @@ export default function App() {
         )}
       </div>
       <Tabs defaultValue="Tokens" className="w-full flex flex-col gap-4 h-full">
-        <TabsList className="rounded-none h-fit p-px divide-x divide-black grid grid-cols-3 md:max-w-sm w-full gap-0 bg-white  text-black data-[state=active]:bg-black data-[state=active]:text-white">
-          <TabsTrigger className="py-2 text-sm rounded-none" value="Tokens">
-            Tokens
-          </TabsTrigger>
-          <TabsTrigger className="py-2 text-sm rounded-none" value="NFTs">
-            NFTs
-          </TabsTrigger>
-          <TabsTrigger
-            className="py-2 text-sm rounded-none"
-            value="Transactions"
-          >
-            Transactions
-          </TabsTrigger>
-        </TabsList>
-        <div className="border border-accent flex flex-col gap-4 w-full h-full p-4">
-          <TabsContent value="Tokens" className="p-0 mt-0">
-            Tokens
+        <div className="flex flex-row justify-between items-center gap-2">
+          <TabsList className="rounded-none h-fit p-0 divide-x divide-accent border border-accent grid grid-cols-3 md:max-w-sm w-full gap-0 bg-black  text-white data-[state=active]:bg-white data-[state=active]:text-black">
+            <TabsTrigger
+              className="py-2.5 text-sm rounded-none data-[state=active]:bg-white data-[state=active]:text-black"
+              value="Tokens"
+            >
+              Tokens
+            </TabsTrigger>
+            <TabsTrigger
+              className="py-2.5 text-sm rounded-none data-[state=active]:bg-white data-[state=active]:text-black"
+              value="NFTs"
+            >
+              NFTs
+            </TabsTrigger>
+            <TabsTrigger
+              className="py-2.5 text-sm rounded-none data-[state=active]:bg-white data-[state=active]:text-black"
+              value="Transactions"
+            >
+              Transactions
+            </TabsTrigger>
+          </TabsList>
+          <Select defaultValue="1">
+            <SelectTrigger className="max-w-32 h-fit text-black py-2 rounded-none border-0 border-accent focus:outline-none focus:ring-0 focus:ring-offset-0">
+              <SelectValue placeholder="Select Chain" className="text-black" />
+            </SelectTrigger>
+            <SelectContent>
+              {Chains.map((chain, c) => {
+                return (
+                  <SelectItem
+                    className="pb-4"
+                    key={c}
+                    value={chain.chainId.toString()}
+                  >
+                    <div className="flex flex-row justify-start items-center gap-2">
+                      <div className="rounded-full flex justify-center items-center">
+                        <img
+                          src={chain.icon}
+                          width={25}
+                          height={20}
+                          alt={chain.name}
+                        />
+                      </div>
+                      <div className="truncate">{chain.name}</div>
+                    </div>
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="border border-accent flex flex-col gap-4 w-full h-full px-4 py-0">
+          <TabsContent value="Tokens" className="p-0 mt-0 flex flex-col gap-4">
+            <div className="flex flex-col overflow-y-scroll h-[38vh] md:h-[62vh]">
+              {Tokens.map((token, t) => {
+                return (
+                  <div
+                    key={t}
+                    className="grid grid-cols-9 gap-4 py-3.5 items-center border-b border-accent"
+                  >
+                    <div className="flex flex-row justify-start items-center gap-2 col-span-5">
+                      <div className="bg-black rounded-full p-1">
+                        <img
+                          className="rounded-full"
+                          src={token.logoURI}
+                          width={30}
+                          height={30}
+                          alt={token.name}
+                        />
+                      </div>
+                      <div>{token.name}</div>
+                    </div>
+                    <div className="col-span-2 text-center">
+                      {(Math.random() * 10).toFixed(2)} {token.symbol}
+                    </div>
+                    <div className="col-span-2 grid grid-cols-3 place-items-center gap-2">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            {" "}
+                            <SendHorizonal size={25} />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Send</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            {" "}
+                            <RefreshCcw size={25} />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Swap</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            {" "}
+                            <PiggyBank size={25} />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Savings</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </TabsContent>
           <TabsContent value="NFTs" className="p-0 mt-0">
             NFTs
