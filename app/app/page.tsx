@@ -5,6 +5,7 @@ import { LoginContext } from "../context/LoginProvider";
 import Truncate from "../utils/truncate";
 import {
   Copy,
+  Fuel,
   PiggyBank,
   RefreshCcw,
   Send,
@@ -19,7 +20,7 @@ import ShowQR from "../components/QR/ShowQR";
 import { SignClientContext } from "../context/SignClientProvider";
 import useDappStore from "../store/walletConnect";
 import Link from "next/link";
-import { Chains, Tokens } from "../data/TempData";
+import { Chains, getChain, NFTS, Tokens, Transactions } from "../data/TempData";
 import {
   Tooltip,
   TooltipContent,
@@ -34,6 +35,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAccount } from "wagmi";
+import Image from "next/image";
+import moment from "moment";
 
 export default function App() {
   const { toast } = useToast();
@@ -181,7 +184,7 @@ export default function App() {
             </SelectContent>
           </Select>
         </div>
-        <div className="border border-accent flex flex-col gap-4 w-full max-h-full h-24 px-4 py-0 overflow-y-scroll flex-grow">
+        <div className="border border-accent flex flex-col gap-4 w-full max-h-full h-24 px-4 pb-4 overflow-y-scroll flex-grow">
           <TabsContent value="Tokens" className="p-0 mt-0 flex flex-col gap-4">
             <div className="flex flex-col">
               {Tokens.map((token, t) => {
@@ -246,10 +249,87 @@ export default function App() {
             </div>
           </TabsContent>
           <TabsContent value="NFTs" className="p-0 mt-0">
-            NFTs
+            <div className="grid grid-cols-3 gap-y-6 gap-4">
+              {NFTS.map((nft, n) => {
+                return (
+                  <div className="flex flex-col gap-2" key={n}>
+                    <Image
+                      className="w-full"
+                      src={nft.logoURI}
+                      width={30}
+                      height={30}
+                      alt={nft.name}
+                    />
+
+                    <div className="flex flex-row justify-between items-center w-full text-lg">
+                      <div className="flex flex-row gap-2 justify-start items-center">
+                        <div>{nft.name}</div>
+                        <div>{nft.id}</div>
+                      </div>
+                      <div className="text-lg font-bold">
+                        {(Math.random() * 10).toFixed(2)} ETH
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </TabsContent>
           <TabsContent value="Transactions" className="p-0 mt-0">
-            Transactions
+            <div className="flex flex-col gap-4 text-sm">
+              {Transactions.map((transaction, t) => {
+                return (
+                  <div
+                    className="flex flex-col gap-1 bg-white text-black"
+                    key={t}
+                  >
+                    <div className="flex flex-col gap-1 bg-white text-black px-4 pt-4">
+                      <div className="flex flex-row justify-between items-center w-full">
+                        <div className="flex flex-row gap-2 justify-start items-center">
+                          <div>{Truncate(transaction.from, 12, "...")}</div>
+                          <div>{">"}</div>
+                          <div>{Truncate(transaction.to, 12, "...")}</div>
+                        </div>
+                        <div className="text-lg font-bold">
+                          {(Math.random() * 10).toFixed(2)} ETH
+                        </div>
+                      </div>
+
+                      <div className="flex flex-row justify-between items-center w-full">
+                        <div>Date & Time:</div>
+                        <div>
+                          {moment(transaction["date&time"]).format("LLL")}
+                        </div>
+                      </div>
+                      <div className="flex flex-row justify-between items-center w-full">
+                        <div>Chain:</div>
+                        <div>
+                          <img
+                            src={getChain(parseInt(transaction.chainId))?.icon}
+                            width={20}
+                            height={20}
+                            alt={getChain(parseInt(transaction.chainId))?.name}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex flex-row justify-between items-center w-full">
+                        <div>Value:</div>
+                        <div>{transaction.value}ETH</div>
+                      </div>
+                    </div>
+                    <div className="flex flex-row justify-end items-end">
+                      <div className="flex flex-row justify-end items-end border-l border-black border-t gap-2 px-2 py-2 w-fit">
+                        <div>
+                          <Fuel size={20} />
+                        </div>
+                        <div>{transaction.gas}</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </TabsContent>
         </div>
       </Tabs>
