@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Address } from "viem";
 import SignClient from "@walletconnect/sign-client";
-import { useAccount } from "wagmi";
+import { useAccount } from "./LoginProvider"
 import useDappStore, { Dapp } from "../store/walletConnect";
 
 interface SignClientContextProps {
