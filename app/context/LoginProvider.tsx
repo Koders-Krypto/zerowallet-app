@@ -1,8 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { useWalletInfo } from "@web3modal/wagmi/react";
-import { useAccount } from "wagmi";
+import { useWalletInfo as useDefaultWalletInfo } from "@web3modal/wagmi/react";
+import { useAccount as useDefaultAccount} from "wagmi";
 import { usePathname, useRouter } from "next/navigation";
 
 interface LoginContextProps {
@@ -19,6 +19,7 @@ const LoginContext = createContext<LoginContextProps>({
   setAccountInfo: () => {},
 });
 
+
 // Create the provider component
 export const LoginProvider = ({
   children,
@@ -28,10 +29,11 @@ export const LoginProvider = ({
   const pathname = usePathname();
   const router = useRouter();
 
-  const wallet  = useWalletInfo();
-  const account = useAccount();
+  const wallet  = useDefaultWalletInfo();
+  const account = useDefaultAccount();
   const [walletInfo, setWalletInfo] = useState<any>(wallet.walletInfo);
   const [accountInfo, setAccountInfo] = useState<any>(account);
+
 
 
   useEffect(() => {
@@ -63,6 +65,16 @@ export const LoginProvider = ({
 };
 
 // Custom hook to use the login context
-export const useLoginContext = () => {
+export const useLoginProvider = () => {
   return useContext(LoginContext);
 };
+
+export const useWalletInfo = () => {
+  return useContext(LoginContext);
+};
+
+export const useAccount = () => {
+  return useContext(LoginContext).accountInfo;
+};
+
+

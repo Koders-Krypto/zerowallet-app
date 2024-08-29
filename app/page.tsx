@@ -1,10 +1,9 @@
 "use client";
 import Image from "next/image";
 
-import { useWalletInfo, useWeb3Modal } from "@web3modal/wagmi/react";
+import {  useWeb3Modal } from "@web3modal/wagmi/react";
 import { LogOut } from "lucide-react";
 import { useDisconnect } from "wagmi";
-import { useAccount } from "wagmi";
 import Truncate from "./utils/truncate";
 import Typewriter from "typewriter-effect";
 import { connectPassKey, connectValidator } from "./logic/passkey";
@@ -12,12 +11,12 @@ import { WebAuthnMode } from "@zerodev/passkey-validator";
 import { storePasskey } from "./utils/storage";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useState } from "react";
-import { useLoginContext } from "./context/LoginProvider";
+import { useLoginProvider, useWalletInfo, useAccount } from "./context/LoginProvider";
 import { getSmartAccountClient } from "./logic/permissionless";
 
 
 const WalletConnectButton = (props: any) => {
-  const {walletInfo, setWalletInfo, setAccountInfo} = useLoginContext()
+  const {walletInfo, setWalletInfo, setAccountInfo} = useLoginProvider()
 
   return (
     <Dialog open={props.open} onOpenChange={props.setOpen}>
@@ -109,13 +108,15 @@ const WalletConnectButton = (props: any) => {
 
 export default function Home() {
   const { address, isConnecting, isDisconnected } = useAccount();
-  const {walletInfo, setWalletInfo} = useLoginContext()
+  const { setWalletInfo } = useLoginProvider()
+  const { walletInfo } = useWalletInfo()
 
   const { open, close } = useWeb3Modal();
   const { disconnect } = useDisconnect();
 
   const [passkeyOpen, setPasskeyOpen] = useState(false);
 
+  console.log()
 
   return (
     <div className="flex flex-col gap-12 md:gap-16 justify-center items-center min-h-[90vh] md:min-h-[95vh] text-center pt-12 md:pt-0 px-6">
