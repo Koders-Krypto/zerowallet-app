@@ -88,7 +88,7 @@ const Networks = [
     chainId: 1666600000,
     name: "harmony",
     symbol: "ONE",
-    logo: "/chains/harmony.svg",
+    logo: "/chains/harmony.png",
   },
   {
     chainId: 1285,

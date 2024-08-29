@@ -6,18 +6,20 @@ import {
   useAccount as useDefaultAccount,
   useDisconnect as useDefaultDisconnect,
   useEnsName,
+  useEnsAvatar,
 } from "wagmi";
 import { usePathname, useRouter } from "next/navigation";
 import { loadPasskey, removePasskey } from "../utils/storage";
 import { connectValidator } from "../logic/passkey";
 import { getSmartAccountClient } from "../logic/permissionless";
-
+import { normalize } from "viem/ens";
 interface LoginContextProps {
   walletInfo: any;
   accountInfo: any;
   setWalletInfo: (info: any) => void;
   setAccountInfo: (info: any) => void;
   ensname: any;
+  ensavatar: any;
 }
 // Create the context
 export const LoginContext = createContext<LoginContextProps>({
@@ -26,6 +28,7 @@ export const LoginContext = createContext<LoginContextProps>({
   setWalletInfo: () => {},
   setAccountInfo: () => {},
   ensname: undefined,
+  ensavatar: undefined,
 });
 
 // Create the provider component
@@ -42,12 +45,15 @@ export const LoginProvider = ({
   const [walletInfo, setWalletInfo] = useState<any>(wallet.walletInfo);
   const [accountInfo, setAccountInfo] = useState<any>(account);
   const [ensname, setEnsname] = useState<any>(undefined);
+  const [ensavatar, setEnsavatar] = useState<any>(undefined);
 
   const { data: _ensname } = useEnsName({ address: accountInfo?.address });
+  const { data: _ensavatar } = useEnsAvatar({ name: normalize(_ensname!) });
 
   useEffect(() => {
     setEnsname(_ensname);
-  }, [_ensname]);
+    setEnsavatar(_ensavatar);
+  }, [_ensavatar, _ensname]);
 
   useEffect(() => {
     (async () => {
@@ -93,6 +99,7 @@ export const LoginProvider = ({
         setWalletInfo,
         setAccountInfo,
         ensname,
+        ensavatar,
       }}
     >
       {children}

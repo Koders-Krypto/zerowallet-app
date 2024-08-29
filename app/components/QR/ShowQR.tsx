@@ -32,11 +32,14 @@ export default function GenerateQR(props: any) {
         </DialogHeader>
         <div className="flex flex-col justify-center items-center gap-4 w-full">
           <div className="bg-transparent">
-            <QRCode value={props.address} size={180} />
+            <QRCode value={props.address} size={192} />
           </div>
-          <p className="text-white text-sm">
-            {Truncate(props.address, 20, "...")}
-          </p>
+          <div className="flex flex-col justify-center items-center gap-1 w-full">
+            <p className="text-white text-sm">
+              {Truncate(props.address, 20, "...")}
+            </p>
+            <p className="text-white text-sm">{props.ensname}</p>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

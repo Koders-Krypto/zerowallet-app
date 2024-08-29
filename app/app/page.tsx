@@ -54,9 +54,13 @@ export default function App() {
   const { disconnect } = useContext(SignClientContext);
   const [selectedNetworks, setSelectedNetworks] = useState<NetworkType[]>([]);
 
-  const { ensname } = useContext(LoginContext);
-  const data = getTotalBalanceUSD(ZapperTokenData);
-  console.log(data);
+  const { ensname, ensavatar } = useContext(LoginContext);
+  const [totalBalance, setTotalBalance] = useState<number>(0);
+
+  useEffect(() => {
+    const data = getTotalBalanceUSD(ZapperTokenData);
+    setTotalBalance(data);
+  }, []);
 
   useEffect(() => {
     addAllNetworks();
@@ -78,13 +82,17 @@ export default function App() {
   return (
     <div className=" flex flex-col items-start justify-center gap-6 w-full h-full">
       <div className="w-full border border-accent flex flex-col gap-6 px-4 py-4 md:py-6">
-        <div className="w-full flex flex-col md:flex-row gap-4 justify-between items-center">
-          <div className="flex flex-row justify-start items-center w-full">
+        <div className="w-full flex flex-col md:flex-row gap-4 justify-between items-center relative">
+          <div className="flex flex-col md:flex-row gap-4 justify-start items-start md:items-center w-full">
+            {ensavatar && (
+              <img src={ensavatar} width={100} height={100} alt={ensname} />
+            )}
+
             <div className="flex flex-col justify-start items-start ml-0 gap-1">
-              <h1 className="text-4xl font-black">$10,000</h1>
-              <div className="text-xl font-bold">
-                {ensname || "No ENS Name"}
-              </div>
+              <h1 className="text-4xl font-black">
+                ${totalBalance.toFixed(0)}
+              </h1>
+              <div className="text-xl font-bold">{ensname}</div>
               <div className="flex flex-row justify-center items-center gap-2 text-sm">
                 <div>{Truncate(address, 20, "...")}</div>
                 <div
@@ -104,13 +112,14 @@ export default function App() {
                     open={openShowQR}
                     setOpen={setOpenShowQR}
                     address={address}
+                    ensname={ensname}
                   />
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="w-full flex flex-row justify-start md:justify-end">
+          <div className="w-full flex flex-row justify-end absolute right-0 top-0">
             <WalletConnectButton
               open={openWalletConnect}
               setOpen={setOpenWalletConnect}
@@ -161,7 +170,7 @@ export default function App() {
         )}
       </div>
       <Tabs defaultValue="Tokens" className="w-full flex flex-col gap-4 h-full">
-        <div className="flex flex-col md:flex-row md:justify-between items-end md:items-center gap-2">
+        <div className="flex flex-col-reverse md:flex-row md:justify-between items-end md:items-center gap-2">
           <TabsList className="rounded-none h-fit p-0 divide-x divide-accent border border-accent grid grid-cols-3 md:max-w-sm w-full gap-0 bg-black  text-white data-[state=active]:bg-white data-[state=active]:text-black">
             <TabsTrigger
               className="py-2.5 text-sm rounded-none data-[state=active]:bg-white data-[state=active]:text-black"
@@ -201,16 +210,16 @@ export default function App() {
                 );
               })}
               {selectedNetworks.length > 5 && (
-                <span className="w-6 h-6 -ml-2.5 p-px flex justify-center items-center text-sm bg-black rounded-full text-white text-center">
+                <span className="w-6 h-6 cursor-default -ml-2.5 p-px flex justify-center items-center text-sm bg-black rounded-full text-white text-center">
                   {selectedNetworks.length - 5}
                 </span>
               )}
             </div>
             <Popover>
-              <PopoverTrigger className="px-4 py-2.5 border border-accent bg-white text-black text-sm">
+              <PopoverTrigger className="px-4 py-2.5 border border-accent bg-white text-black text-sm font-bold">
                 Networks
               </PopoverTrigger>
-              <PopoverContent className="flex flex-col justify-start gap-0 w-56 p-0 rounded-none max-w-lg mr-8">
+              <PopoverContent className="flex flex-col justify-start gap-0 w-60 p-0 rounded-none max-w-lg mr-8">
                 <div className="flex flex-row justify-between items-center py-2 px-4 border-b border-accent">
                   <h3 className="font-bold">All Networks</h3>
                   <div className="text-sm">
@@ -230,9 +239,27 @@ export default function App() {
                     return (
                       <div
                         key={c}
-                        className="flex flex-row justify-start items-center gap-2 py-2"
+                        className="flex flex-row justify-between items-center gap-2 py-2"
                       >
+                        <div className="flex flex-row justify-start items-center gap-2">
+                          <Image
+                            className="rounded-full bg-white p-px"
+                            src={network.logo}
+                            width={25}
+                            height={25}
+                            alt={network.name}
+                          />
+                          <div className="grid gap-1.5 leading-none">
+                            <label
+                              htmlFor={network.name}
+                              className="text-sm truncate capitalize font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
+                              {network.name.replaceAll("-", " ")}
+                            </label>
+                          </div>
+                        </div>
                         <Checkbox
+                          className="rounded-full h-5 w-5"
                           onCheckedChange={() =>
                             setSelectedNetworks((prevSelectedNetworks) =>
                               prevSelectedNetworks.some(
@@ -249,14 +276,6 @@ export default function App() {
                           )}
                           id={network.name.toString()}
                         />
-                        <div className="grid gap-1.5 leading-none">
-                          <label
-                            htmlFor={network.name}
-                            className="text-sm capitalize font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                          >
-                            {network.name.replaceAll("-", " ")}
-                          </label>
-                        </div>
                       </div>
                     );
                   })}
@@ -331,7 +350,7 @@ export default function App() {
             </div>
           </TabsContent>
           <TabsContent value="NFTs" className="p-0 mt-0">
-            <div className="grid grid-cols-3 gap-y-6 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-y-6 gap-4">
               {NFTS.map((nft, n) => {
                 return (
                   <div className="flex flex-col gap-2" key={n}>
@@ -343,12 +362,12 @@ export default function App() {
                       alt={nft.name}
                     />
 
-                    <div className="flex flex-row justify-between items-center w-full text-lg">
+                    <div className="flex flex-col md:flex-row justify-between items-center w-full text-base md:text-lg">
                       <div className="flex flex-row gap-2 justify-start items-center">
-                        <div>{nft.name}</div>
+                        <div className=" line-clamp-1">{nft.name}</div>
                         <div>{nft.id}</div>
                       </div>
-                      <div className="text-lg font-bold">
+                      <div className="text-base md:text-lg font-bold">
                         {(Math.random() * 10).toFixed(2)} ETH
                       </div>
                     </div>
@@ -372,7 +391,7 @@ export default function App() {
                           <div>{">"}</div>
                           <div>{Truncate(transaction.to, 12, "...")}</div>
                         </div>
-                        <div className="text-lg font-bold">
+                        <div className="text-lg font-bold text-right">
                           {(Math.random() * 10).toFixed(2)} ETH
                         </div>
                       </div>
