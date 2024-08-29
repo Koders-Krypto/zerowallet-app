@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAccount, useEnsName } from "wagmi";
+import { LoginContext } from "../context/LoginProvider";
 import Truncate from "../utils/truncate";
 import {
   Copy,
@@ -33,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAccount } from "wagmi";
 
 export default function App() {
   const { toast } = useToast();
@@ -42,7 +43,7 @@ export default function App() {
   const { connectedDapps } = useDappStore();
   const { disconnect } = useContext(SignClientContext);
 
-  const { data: ensname } = useEnsName({ address });
+  const { ensname } = useContext(LoginContext);
 
   return (
     <div className=" flex flex-col items-start justify-center gap-6 w-full h-full">
