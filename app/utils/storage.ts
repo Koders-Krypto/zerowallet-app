@@ -29,5 +29,5 @@ export const removePasskey = () => {
 export const loadPasskey = (): any => {
 
     const accountInfo = localStorage.getItem('passkey');
-    return accountInfo ? JSON.parse(accountInfo) : {};
+    return accountInfo ? JSON.parse(accountInfo) : undefined;
 }
