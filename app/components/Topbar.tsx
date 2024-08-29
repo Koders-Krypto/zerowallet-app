@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useDisconnect } from "wagmi";
-import { useWalletInfo, useAccount } from '../context/LoginProvider';
+import { useWalletInfo, useAccount, useDisconnect } from '../context/LoginProvider';
 import Truncate from "../utils/truncate";
 import { Power, ScanQrCode } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";

@@ -3,7 +3,6 @@ import Image from "next/image";
 
 import {  useWeb3Modal } from "@web3modal/wagmi/react";
 import { LogOut } from "lucide-react";
-import { useDisconnect } from "wagmi";
 import Truncate from "./utils/truncate";
 import Typewriter from "typewriter-effect";
 import { connectPassKey, connectValidator } from "./logic/passkey";
@@ -11,7 +10,7 @@ import { WebAuthnMode } from "@zerodev/passkey-validator";
 import { storePasskey } from "./utils/storage";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useState } from "react";
-import { useLoginProvider, useWalletInfo, useAccount } from "./context/LoginProvider";
+import { useLoginProvider, useWalletInfo, useAccount, useDisconnect } from "./context/LoginProvider";
 import { getSmartAccountClient } from "./logic/permissionless";
 
 
@@ -61,10 +60,8 @@ const WalletConnectButton = (props: any) => {
                           try {  
                             const passkey =  await connectPassKey('ZeroWallet', WebAuthnMode.Login);
                             storePasskey(passkey)
-                            const validator = await connectValidator('84532', passkey);
-                            const accountClient = await getSmartAccountClient({ chainId: '84532', validators: [{ address: validator.address, context: await validator.getEnableData()}]}) 
-                            setWalletInfo({name: 'passkey', icon: "/icons/safe.svg"})
-                            setAccountInfo({'address': accountClient.account.address})
+                            setWalletInfo({ name: 'passkey', icon: "/icons/safe.svg" });
+
                             } 
                             catch(e) {
                               console.log(e)
@@ -88,10 +85,8 @@ const WalletConnectButton = (props: any) => {
               try {  
                 const passkey =  await connectPassKey(`Zero Wallet ${new Date().toLocaleDateString('en-GB')}`, WebAuthnMode.Register)
                 storePasskey(passkey)
-                const validator = await connectValidator('84532', passkey);
-                const accountClient = await getSmartAccountClient({ chainId: '84532', validators: [{ address: validator.address, context: await validator.getEnableData()}]}) 
-                setWalletInfo({name: 'passkey', icon: "/icons/safe.svg"})
-                setAccountInfo({'address': accountClient.account.address})
+                setWalletInfo({ name: 'passkey', icon: "/icons/safe.svg" });
+
               }
               catch(e) {
                 console.log(e)

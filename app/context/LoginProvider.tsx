@@ -2,8 +2,11 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useWalletInfo as useDefaultWalletInfo } from "@web3modal/wagmi/react";
-import { useAccount as useDefaultAccount} from "wagmi";
+import { useAccount as useDefaultAccount, useDisconnect as useDefaultDisconnect} from "wagmi";
 import { usePathname, useRouter } from "next/navigation";
+import { loadPasskey, removePasskey } from "../utils/storage";
+import { connectValidator } from "../logic/passkey";
+import { getSmartAccountClient } from "../logic/permissionless";
 
 interface LoginContextProps {
   walletInfo: any;
@@ -38,12 +41,32 @@ export const LoginProvider = ({
 
   useEffect(() => {
 
-     if(walletInfo?.name != 'passkey') {
-     setWalletInfo(wallet.walletInfo)
-     if (account?.address && account?.address != accountInfo?.address) {
-      setAccountInfo(account);
+    (async () => {
+
+      const passkey = loadPasskey();
+      if (passkey) {
+        const validator = await connectValidator('84532', passkey);
+        const accountClient = await getSmartAccountClient({
+          chainId: '84532',
+          validators: [
+            {
+              address: validator.address,
+              context: await validator.getEnableData(),
+            },
+          ],
+        });
+        if ( !accountInfo?.address) {
+          setAccountInfo(accountClient.account);
+          setWalletInfo({ name: 'passkey', icon: "/icons/safe.svg" });
+        }
+      }
+      else { 
+        setWalletInfo(wallet.walletInfo);
+        if (account?.address && account?.address !== accountInfo?.address) {
+          setAccountInfo(account);
+        }
     }
-  }
+    })();
   }, [ wallet, account ]);
 
 
@@ -55,7 +78,7 @@ export const LoginProvider = ({
       router.push("/app");
     }
 
-  }, [pathname, router, walletInfo]);
+  }, [pathname, router, walletInfo, accountInfo]);
 
   return (
     <LoginContext.Provider value={{ walletInfo, accountInfo, setWalletInfo, setAccountInfo }}>
@@ -78,3 +101,15 @@ export const useAccount = () => {
 };
 
 
+export const useDisconnect = () => {
+  const { disconnect: defaultDisconnect } = useDefaultDisconnect();
+  const { setWalletInfo } = useContext(LoginContext);
+
+  const disconnect = () => {
+    defaultDisconnect();
+    removePasskey();
+    setWalletInfo(undefined);
+  };
+
+  return { disconnect };
+};
