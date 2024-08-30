@@ -125,7 +125,7 @@ export default function App() {
   }, [DefiData, tokenData]);
 
   const fetchNFTData = async (address: string) => {
-    const response = await fetch(`${GET_NFT_DATA}${address}&limit=25`, {
+    const response = await fetch(`${GET_NFT_DATA}${address}&limit=28`, {
       headers: {
         accept: "*/*",
         Authorization: Auth,
@@ -589,6 +589,7 @@ export default function App() {
                       width={30}
                       height={30}
                       alt={nft.token.name}
+                      unoptimized={true}
                     />
 
                     <div className="flex flex-row flex-wrap justify-between items-center w-full text-base md:text-lg">
