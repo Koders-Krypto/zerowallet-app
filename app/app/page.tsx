@@ -49,6 +49,7 @@ import {
 } from "../data/Zapper";
 import { Checkbox } from "@/components/ui/checkbox";
 import { get } from "http";
+import { GET_DEFI_DATA, GET_NFT_DATA, GET_TOKEN_DATA } from "../utils/urls";
 
 export default function App() {
   const { toast } = useToast();
@@ -69,27 +70,28 @@ export default function App() {
   const [NFTData, setNFTData] = useState<ZapperNFTDataTypes[]>([]);
   const [DefiData, setDefiData] = useState<ZapperDEFIDataTypes[]>([]);
 
+  const Auth = `Basic ${Buffer.from(
+    `${process.env.NEXT_PUBLIC_ZAPPER_API_KEY}:`,
+    "binary"
+  ).toString("base64")}`;
+
   useEffect(() => {
     if (address) {
       fetchTokenData(address?.toString());
       fetchNFTData(address?.toString());
       fetchDefiData(address?.toString());
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address]);
 
   const fetchTokenData = async (address: string) => {
-    const response = await fetch(
-      `https://api.zapper.xyz/v2/balances/tokens?addresses%5B%5D=${address}`,
-      {
-        headers: {
-          accept: "*/*",
-          Authorization: `Basic ${Buffer.from(
-            `${process.env.NEXT_PUBLIC_ZAPPER_API_KEY}:`,
-            "binary"
-          ).toString("base64")}`,
-        },
-      }
-    );
+    const response = await fetch(`${GET_TOKEN_DATA}${address}`, {
+      headers: {
+        accept: "*/*",
+        Authorization: Auth,
+      },
+    });
     if (response.ok) {
       const data = await response.json();
       setTokenData(data[address.toString().toLowerCase()]);
@@ -99,18 +101,12 @@ export default function App() {
     }
   };
   const fetchDefiData = async (address: string) => {
-    const response = await fetch(
-      `https://api.zapper.xyz/v2/balances/apps?addresses%5B%5D=${address}`,
-      {
-        headers: {
-          accept: "*/*",
-          Authorization: `Basic ${Buffer.from(
-            `${process.env.NEXT_PUBLIC_ZAPPER_API_KEY}:`,
-            "binary"
-          ).toString("base64")}`,
-        },
-      }
-    );
+    const response = await fetch(`${GET_DEFI_DATA}${address}`, {
+      headers: {
+        accept: "*/*",
+        Authorization: Auth,
+      },
+    });
     if (response.ok) {
       const data = await response.json();
       setDefiData(data);
@@ -130,18 +126,12 @@ export default function App() {
   }, [DefiData, tokenData]);
 
   const fetchNFTData = async (address: string) => {
-    const response = await fetch(
-      `https://api.zapper.xyz/v2/nft/user/tokens?userAddress=${address}&limit=25`,
-      {
-        headers: {
-          accept: "*/*",
-          Authorization: `Basic ${Buffer.from(
-            `${process.env.NEXT_PUBLIC_ZAPPER_API_KEY}:`,
-            "binary"
-          ).toString("base64")}`,
-        },
-      }
-    );
+    const response = await fetch(`${GET_NFT_DATA}${address}&limit=25`, {
+      headers: {
+        accept: "*/*",
+        Authorization: Auth,
+      },
+    });
     if (response.ok) {
       const data = await response.json();
       setNFTData(data.items);
