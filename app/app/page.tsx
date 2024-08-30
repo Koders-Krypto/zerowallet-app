@@ -36,17 +36,19 @@ import { useAccount } from "wagmi";
 import Image from "next/image";
 import moment from "moment";
 import {
+  getIconbySymbol,
+  getNetworkLogobyName,
   getTokensByNetwork,
   getTotalBalanceDefi,
   getTotalBalanceToken,
   Networks,
   NetworkType,
-  NFTData,
-  ZapperDEFIData,
-  ZapperTokenData,
+  ZapperDEFIDataTypes,
+  ZapperNFTDataTypes,
   ZapperTokenDataTypes,
 } from "../data/Zapper";
 import { Checkbox } from "@/components/ui/checkbox";
+import { get } from "http";
 
 export default function App() {
   const { toast } = useToast();
@@ -56,24 +58,111 @@ export default function App() {
   const { connectedDapps } = useDappStore();
   const { disconnect } = useContext(SignClientContext);
   const [selectedNetworks, setSelectedNetworks] = useState<NetworkType[]>([]);
-  const [tokensByNetwork, setTokensByNetwork] = useState<ZapperTokenDataTypes[]>([]);
+  const [tokensByNetwork, setTokensByNetwork] = useState<
+    ZapperTokenDataTypes[]
+  >([]);
   const { ensname, ensavatar } = useContext(LoginContext);
   const [totalBalance, setTotalBalance] = useState<number>(0);
 
-
-
-
+  //Zapper Data
+  const [tokenData, setTokenData] = useState<ZapperTokenDataTypes[]>([]);
+  const [NFTData, setNFTData] = useState<ZapperNFTDataTypes[]>([]);
+  const [DefiData, setDefiData] = useState<ZapperDEFIDataTypes[]>([]);
 
   useEffect(() => {
-    const totalUSDValue =
-      getTotalBalanceToken(ZapperTokenData) +
-      getTotalBalanceDefi(ZapperDEFIData);
-    setTotalBalance(totalUSDValue);
+    if (address) {
+      fetchTokenData(address?.toString());
+      fetchNFTData(address?.toString());
+      fetchDefiData(address?.toString());
+    }
+  }, [address]);
 
-    const tokensByNetwork = getTokensByNetwork(ZapperTokenData, selectedNetworks.map((network) => network.name));
-    // save it in state and use
-    setTokensByNetwork(tokensByNetwork);
-  }, [selectedNetworks]);
+  const fetchTokenData = async (address: string) => {
+    const response = await fetch(
+      `https://api.zapper.xyz/v2/balances/tokens?addresses%5B%5D=${address}`,
+      {
+        headers: {
+          accept: "*/*",
+          Authorization: `Basic ${Buffer.from(
+            `${process.env.NEXT_PUBLIC_ZAPPER_API_KEY}:`,
+            "binary"
+          ).toString("base64")}`,
+        },
+      }
+    );
+    if (response.ok) {
+      const data = await response.json();
+      setTokenData(data[address.toString().toLowerCase()]);
+    } else {
+      console.log("error");
+      setTotalBalance(0);
+    }
+  };
+  const fetchDefiData = async (address: string) => {
+    const response = await fetch(
+      `https://api.zapper.xyz/v2/balances/apps?addresses%5B%5D=${address}`,
+      {
+        headers: {
+          accept: "*/*",
+          Authorization: `Basic ${Buffer.from(
+            `${process.env.NEXT_PUBLIC_ZAPPER_API_KEY}:`,
+            "binary"
+          ).toString("base64")}`,
+        },
+      }
+    );
+    if (response.ok) {
+      const data = await response.json();
+      setDefiData(data);
+      console.log(data, "Zapper Defi Data");
+    } else {
+      console.log("error");
+      setDefiData([]);
+    }
+  };
+
+  useEffect(() => {
+    if (DefiData.length > 0 && tokenData.length > 0) {
+      const _defiData = getTotalBalanceDefi(DefiData);
+      const _tokenData = getTotalBalanceToken(tokenData);
+      setTotalBalance(_defiData + _tokenData);
+    }
+  }, [DefiData, tokenData]);
+
+  const fetchNFTData = async (address: string) => {
+    const response = await fetch(
+      `https://api.zapper.xyz/v2/nft/user/tokens?userAddress=${address}&limit=25`,
+      {
+        headers: {
+          accept: "*/*",
+          Authorization: `Basic ${Buffer.from(
+            `${process.env.NEXT_PUBLIC_ZAPPER_API_KEY}:`,
+            "binary"
+          ).toString("base64")}`,
+        },
+      }
+    );
+    if (response.ok) {
+      const data = await response.json();
+      setNFTData(data.items);
+      console.log(data, "Zapper NFT Data");
+    } else {
+      console.log("error");
+      setNFTData([]);
+    }
+  };
+
+  useEffect(() => {
+    console.log(tokenData, "Token Data");
+    if (tokenData.length > 0) {
+      const tokensByNetwork = getTokensByNetwork(
+        tokenData,
+        selectedNetworks.map((network) => network.name)
+      );
+      // save it in state and use
+      setTokensByNetwork(tokensByNetwork);
+    }
+  }, [tokenData, selectedNetworks]);
 
   useEffect(() => {
     addAllNetworks();
@@ -146,8 +235,9 @@ export default function App() {
         {connectedDapps.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 w-full text-white text-sm">
             <div
-              className={`flex flex-col gap-4 w-full overflow-y-auto ${connectedDapps.length > 4 ? "max-h-96" : ""
-                }`}
+              className={`flex flex-col gap-4 w-full overflow-y-auto ${
+                connectedDapps.length > 4 ? "max-h-96" : ""
+              }`}
             >
               {connectedDapps.map((dapp: any) => (
                 <div
@@ -265,10 +355,10 @@ export default function App() {
                             height={25}
                             alt={network.name}
                           />
-                          <div className="grid gap-1.5 leading-none">
+                          <div className="grid gap-1.5">
                             <label
                               htmlFor={network.name}
-                              className="text-sm truncate capitalize font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                              className="text-sm truncate capitalize font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                             >
                               {network.name.replaceAll("-", " ")}
                             </label>
@@ -282,8 +372,8 @@ export default function App() {
                                 (item) => item.name === network.name
                               )
                                 ? prevSelectedNetworks.filter(
-                                  (item) => item.name !== network.name
-                                )
+                                    (item) => item.name !== network.name
+                                  )
                                 : [...prevSelectedNetworks, network]
                             )
                           }
@@ -304,25 +394,37 @@ export default function App() {
         <div className="border border-accent flex flex-col gap-4 w-full max-h-full h-24 px-4 pb-4 overflow-y-scroll flex-grow">
           <TabsContent value="Tokens" className="p-0 mt-0 flex flex-col gap-4">
             <div className="flex flex-col">
-              {tokensByNetwork.map((token, t) => {
+              {tokensByNetwork?.map((token, t) => {
                 return (
                   <div
                     key={t}
-                    className="grid grid-cols-2 md:grid-cols-9 gap-y-4 md:gap-4 py-3.5 items-center border-b border-accent"
+                    className="grid grid-cols-2 md:grid-cols-9 gap-y-4 md:gap-8 py-3.5 items-center border-b border-accent"
                   >
                     <div className="flex flex-row justify-start items-center gap-2 md:col-span-5">
-                      <div className="bg-black rounded-full p-1">
+                      <div className="bg-black rounded-full p-1 relative">
                         <img
-                          className="rounded-full"
-                          src={''}
+                          className="rounded-full bg-white"
+                          src={
+                            getIconbySymbol(token.token.symbol) ||
+                            "/tokens/default.png"
+                          }
                           width={30}
                           height={30}
                           alt={token.token.name}
                         />
+                        <div className="absolute right-0 top-0 text-white text-sm">
+                          <Image
+                            className="rounded-full bg-white p-px shadow-md"
+                            src={getNetworkLogobyName(token.token.network)}
+                            width={15}
+                            height={15}
+                            alt={token.token.name}
+                          />
+                        </div>
                       </div>
                       <div>{token.token.name}</div>
                     </div>
-                    <div className="md:col-span-2 text-center">
+                    <div className="md:col-span-2 text-right">
                       {token.token.balance.toFixed(4)} {token.token.symbol}
                     </div>
                     <div className="col-span-2 grid grid-cols-3 place-items-center gap-2">
@@ -384,7 +486,7 @@ export default function App() {
                       alt={nft.token.name}
                     />
 
-                    <div className="flex flex-col md:flex-row justify-between items-center w-full text-base md:text-lg">
+                    <div className="flex flex-row flex-wrap justify-between items-center w-full text-base md:text-lg">
                       <div className="flex flex-row gap-2 justify-start items-center">
                         <div className=" line-clamp- w-24 truncate">
                           #{nft.token.tokenId}
