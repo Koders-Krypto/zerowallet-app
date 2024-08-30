@@ -37,10 +37,12 @@ import { useAccount } from "wagmi";
 import Image from "next/image";
 import moment from "moment";
 import {
-  getTotalBalanceUSD,
+  getTotalBalanceDefi,
+  getTotalBalanceToken,
   Networks,
   NetworkType,
-  sortByNetwork,
+  NFTData,
+  ZapperDEFIData,
   ZapperTokenData,
 } from "../data/Zapper";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -56,10 +58,11 @@ export default function App() {
 
   const { ensname, ensavatar } = useContext(LoginContext);
   const [totalBalance, setTotalBalance] = useState<number>(0);
-
   useEffect(() => {
-    const data = getTotalBalanceUSD(ZapperTokenData);
-    setTotalBalance(data);
+    const totalUSDValue =
+      getTotalBalanceToken(ZapperTokenData) +
+      getTotalBalanceDefi(ZapperDEFIData);
+    setTotalBalance(totalUSDValue);
   }, []);
 
   useEffect(() => {
@@ -85,20 +88,24 @@ export default function App() {
         <div className="w-full flex flex-col md:flex-row gap-4 justify-between items-center relative">
           <div className="flex flex-col md:flex-row gap-4 justify-start items-start md:items-center w-full">
             {ensavatar && (
-              <img src={ensavatar} width={100} height={100} alt={ensname} />
+              <img src={ensavatar} width={120} height={120} alt={ensname} />
             )}
 
             <div className="flex flex-col justify-start items-start ml-0 gap-1">
-              <h1 className="text-4xl font-black">
-                ${totalBalance.toFixed(0)}
-              </h1>
-              <div className="text-xl font-bold">{ensname}</div>
+              <div className="flex flex-col-reverse justify-start items-start gap-1">
+                <h1 className="text-4xl font-black">
+                  ${totalBalance.toFixed(0)}
+                </h1>
+                <span className="text-accent text-sm">Networth</span>
+              </div>
+              {ensname && <div className="text-xl font-bold">{ensname}</div>}
               <div className="flex flex-row justify-center items-center gap-2 text-sm">
                 <div>{Truncate(address, 20, "...")}</div>
                 <div
                   onClick={() => {
                     CopytoClipboard(address || "");
                     toast({
+                      success: true,
                       title: "Copy Address",
                       description: "Adderess copied to clipboard successfully!",
                     });
@@ -196,7 +203,7 @@ export default function App() {
               {selectedNetworks.slice(0, 5).map((snetwork, s) => {
                 return (
                   <div
-                    className=" w-6 h-6 bg-white rounded-full -ml-2.5"
+                    className=" w-7 h-7 bg-white rounded-full -ml-2.5"
                     key={s}
                   >
                     <Image
@@ -210,7 +217,7 @@ export default function App() {
                 );
               })}
               {selectedNetworks.length > 5 && (
-                <span className="w-6 h-6 cursor-default -ml-2.5 p-px flex justify-center items-center text-sm bg-black rounded-full text-white text-center">
+                <span className="w-7 h-7 cursor-default -ml-2.5 p-px flex justify-center items-center text-sm bg-black rounded-full text-white text-center">
                   {selectedNetworks.length - 5}
                 </span>
               )}
@@ -350,25 +357,32 @@ export default function App() {
             </div>
           </TabsContent>
           <TabsContent value="NFTs" className="p-0 mt-0">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-y-6 gap-4">
-              {NFTS.map((nft, n) => {
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-4">
+              {NFTData.map((nft, n) => {
                 return (
-                  <div className="flex flex-col gap-2" key={n}>
+                  <div
+                    className="flex flex-col justify-between items-center gap-2"
+                    key={n}
+                  >
                     <Image
-                      className="w-full"
-                      src={nft.logoURI}
+                      className="w-full h-full"
+                      src={
+                        nft.token.medias[0]?.originalUrl ||
+                        "/nfts/NFT-Default.png"
+                      }
                       width={30}
                       height={30}
-                      alt={nft.name}
+                      alt={nft.token.name}
                     />
 
                     <div className="flex flex-col md:flex-row justify-between items-center w-full text-base md:text-lg">
                       <div className="flex flex-row gap-2 justify-start items-center">
-                        <div className=" line-clamp-1">{nft.name}</div>
-                        <div>{nft.id}</div>
+                        <div className=" line-clamp- w-24 truncate">
+                          #{nft.token.tokenId}
+                        </div>
                       </div>
                       <div className="text-base md:text-lg font-bold">
-                        {(Math.random() * 10).toFixed(2)} ETH
+                        {nft.token.collection.floorPriceEth || 0} ETH
                       </div>
                     </div>
                   </div>
