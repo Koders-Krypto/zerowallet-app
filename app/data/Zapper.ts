@@ -81,6 +81,57 @@ export interface DisplayProps {
   statsItems: any[];
 }
 
+const TokensIcons = [
+  {
+    name: "Ethereum",
+    symbol: "ETH",
+    icon: "/tokens/ethereum.webp",
+  },
+  {
+    name: "Wrapped ETH",
+    symbol: "ETH",
+    icon: "/tokens/weth.png",
+  },
+  {
+    name: "Polygon",
+    symbol: "MATIC",
+    icon: "/tokens/polygon.png",
+  },
+  {
+    name: "Optimism",
+    symbol: "OP",
+    icon: "/tokens/optimism.svg",
+  },
+  {
+    name: "Gnosis",
+    symbol: "GNO",
+    icon: "/tokens/gno.webp",
+  },
+  {
+    name: "USDT",
+    symbol: "USDT",
+    icon: "/tokens/usdt.svg",
+  },
+  {
+    name: "USDC",
+    symbol: "USDC",
+    icon: "/tokens/usdc.svg",
+  },
+  {
+    name: "DAI",
+    symbol: "DAI",
+    icon: "/tokens/dai.svg",
+  },
+];
+
+const getIconbySymbol = (symbol: string) => {
+  const token = TokensIcons.find((token) => token.symbol === symbol);
+  if (token) {
+    return token.icon;
+  }
+  return "";
+};
+
 const Networks = [
   {
     chainId: 1,
@@ -6791,4 +6842,5 @@ export {
   getTotalBalanceToken,
   getTotalBalanceDefi,
   NFTData,
+  getIconbySymbol,
 };
