@@ -50,7 +50,7 @@ export default function App() {
   const { toast } = useToast();
   const [openWalletConnect, setOpenWalletConnect] = useState(false);
   const [openShowQR, setOpenShowQR] = useState(false);
-  const { address, isConnecting, isDisconnected } = useAccount();
+  const { address } = useAccount();
   const { connectedDapps } = useDappStore();
   const { disconnect } = useContext(SignClientContext);
   const [selectedNetworks, setSelectedNetworks] = useState<NetworkType[]>([]);
