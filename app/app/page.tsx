@@ -44,6 +44,7 @@ import {
   NFTData,
   ZapperDEFIData,
   ZapperTokenData,
+  ZapperTokenDataTypes,
 } from "../data/Zapper";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -55,7 +56,7 @@ export default function App() {
   const { connectedDapps } = useDappStore();
   const { disconnect } = useContext(SignClientContext);
   const [selectedNetworks, setSelectedNetworks] = useState<NetworkType[]>([]);
-
+  const [tokensByNetwork, setTokensByNetwork] = useState<ZapperTokenDataTypes[]>([]);
   const { ensname, ensavatar } = useContext(LoginContext);
   const [totalBalance, setTotalBalance] = useState<number>(0);
 
@@ -71,6 +72,7 @@ export default function App() {
 
     const tokensByNetwork = getTokensByNetwork(ZapperTokenData, selectedNetworks.map((network) => network.name));
     // save it in state and use
+    setTokensByNetwork(tokensByNetwork);
   }, [selectedNetworks]);
 
   useEffect(() => {
@@ -302,7 +304,7 @@ export default function App() {
         <div className="border border-accent flex flex-col gap-4 w-full max-h-full h-24 px-4 pb-4 overflow-y-scroll flex-grow">
           <TabsContent value="Tokens" className="p-0 mt-0 flex flex-col gap-4">
             <div className="flex flex-col">
-              {Tokens.map((token, t) => {
+              {tokensByNetwork.map((token, t) => {
                 return (
                   <div
                     key={t}
@@ -312,16 +314,16 @@ export default function App() {
                       <div className="bg-black rounded-full p-1">
                         <img
                           className="rounded-full"
-                          src={token.logoURI}
+                          src={''}
                           width={30}
                           height={30}
-                          alt={token.name}
+                          alt={token.token.name}
                         />
                       </div>
-                      <div>{token.name}</div>
+                      <div>{token.token.name}</div>
                     </div>
                     <div className="md:col-span-2 text-center">
-                      {(Math.random() * 10).toFixed(2)} {token.symbol}
+                      {token.token.balance.toFixed(4)} {token.token.symbol}
                     </div>
                     <div className="col-span-2 grid grid-cols-3 place-items-center gap-2">
                       <TooltipProvider>
