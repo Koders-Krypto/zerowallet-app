@@ -19,7 +19,6 @@ import ShowQR from "../components/QR/ShowQR";
 import { SignClientContext } from "../context/SignClientProvider";
 import useDappStore from "../store/walletConnect";
 import Link from "next/link";
-import { getChain, Tokens, Transactions } from "../data/TempData";
 import {
   Tooltip,
   TooltipContent,
@@ -46,10 +45,12 @@ import {
   ZapperDEFIDataTypes,
   ZapperNFTDataTypes,
   ZapperTokenDataTypes,
-} from "../data/Zapper";
+} from "../utils/Zapper";
 import { Checkbox } from "@/components/ui/checkbox";
 import { get } from "http";
 import { GET_DEFI_DATA, GET_NFT_DATA, GET_TOKEN_DATA } from "../utils/urls";
+import { formatNumberCommas } from "../utils/commas";
+import { parse } from "path";
 
 export default function App() {
   const { toast } = useToast();
@@ -69,6 +70,7 @@ export default function App() {
   const [tokenData, setTokenData] = useState<ZapperTokenDataTypes[]>([]);
   const [NFTData, setNFTData] = useState<ZapperNFTDataTypes[]>([]);
   const [DefiData, setDefiData] = useState<ZapperDEFIDataTypes[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const Auth = `Basic ${Buffer.from(
     `${process.env.NEXT_PUBLIC_ZAPPER_API_KEY}:`,
@@ -119,6 +121,7 @@ export default function App() {
 
   useEffect(() => {
     if (DefiData.length > 0 && tokenData.length > 0) {
+      setLoading(false);
       const _defiData = getTotalBalanceDefi(DefiData);
       const _tokenData = getTotalBalanceToken(tokenData);
       setTotalBalance(_defiData + _tokenData);
@@ -183,11 +186,11 @@ export default function App() {
             <div className="flex flex-col justify-start items-start ml-0 gap-1">
               <div className="flex flex-col-reverse justify-start items-start gap-1">
                 <h1 className="text-4xl font-black">
-                  ${totalBalance.toFixed(0)}
+                  ${formatNumberCommas(Number(totalBalance.toFixed(0)))}
                 </h1>
                 <span className="text-accent text-sm">Networth</span>
               </div>
-              {ensname && <div className="text-xl font-bold">{ensname}</div>}
+              {ensname && <div className="text-lg font-medium">{ensname}</div>}
               <div className="flex flex-row justify-center items-center gap-2 text-sm">
                 <div>{Truncate(address, 20, "...")}</div>
                 <div
@@ -267,25 +270,31 @@ export default function App() {
       </div>
       <Tabs defaultValue="Tokens" className="w-full flex flex-col gap-4 h-full">
         <div className="flex flex-col-reverse md:flex-row md:justify-between items-end md:items-center gap-2">
-          <TabsList className="rounded-none h-fit p-0 divide-x divide-accent border border-accent grid grid-cols-3 md:max-w-sm w-full gap-0 bg-black  text-white data-[state=active]:bg-white data-[state=active]:text-black">
+          <TabsList className="rounded-none h-fit p-0 divide-x divide-accent border border-accent grid grid-cols-3 md:max-w-md w-full gap-0 bg-black  text-white data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:font-bold">
             <TabsTrigger
-              className="py-2.5 text-sm rounded-none data-[state=active]:bg-white data-[state=active]:text-black"
+              className="py-3 text-sm rounded-none data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:font-bold"
               value="Tokens"
             >
               Tokens
             </TabsTrigger>
             <TabsTrigger
-              className="py-2.5 text-sm rounded-none data-[state=active]:bg-white data-[state=active]:text-black"
+              className="py-3 text-sm rounded-none data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:font-bold"
+              value="Defi"
+            >
+              DeFi
+            </TabsTrigger>
+            <TabsTrigger
+              className="py-3 text-sm rounded-none data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:font-bold"
               value="NFTs"
             >
               NFTs
             </TabsTrigger>
-            <TabsTrigger
+            {/* <TabsTrigger
               className="py-2.5 text-sm rounded-none data-[state=active]:bg-white data-[state=active]:text-black"
               value="Transactions"
             >
               Transactions
-            </TabsTrigger>
+            </TabsTrigger> */}
           </TabsList>
           <div className="flex flex-row justify-start items-center gap-3">
             <div className="flex flex-row justify-start items-center">
@@ -333,9 +342,20 @@ export default function App() {
                 <div className="overflow-y-scroll px-4 py-0 h-60">
                   {Networks.map((network, c) => {
                     return (
-                      <div
+                      <button
                         key={c}
-                        className="flex flex-row justify-between items-center gap-2 py-2"
+                        className="flex flex-row justify-between items-center gap-2 py-2 w-full"
+                        onClick={() =>
+                          setSelectedNetworks((prevSelectedNetworks) =>
+                            prevSelectedNetworks.some(
+                              (item) => item.name === network.name
+                            )
+                              ? prevSelectedNetworks.filter(
+                                  (item) => item.name !== network.name
+                                )
+                              : [...prevSelectedNetworks, network]
+                          )
+                        }
                       >
                         <div className="flex flex-row justify-start items-center gap-2">
                           <Image
@@ -346,33 +366,19 @@ export default function App() {
                             alt={network.name}
                           />
                           <div className="grid gap-1.5">
-                            <label
-                              htmlFor={network.name}
-                              className="text-sm truncate capitalize font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                            >
+                            <h3 className="text-sm truncate w-full capitalize font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                               {network.name.replaceAll("-", " ")}
-                            </label>
+                            </h3>
                           </div>
                         </div>
                         <Checkbox
                           className="rounded-full h-5 w-5"
-                          onCheckedChange={() =>
-                            setSelectedNetworks((prevSelectedNetworks) =>
-                              prevSelectedNetworks.some(
-                                (item) => item.name === network.name
-                              )
-                                ? prevSelectedNetworks.filter(
-                                    (item) => item.name !== network.name
-                                  )
-                                : [...prevSelectedNetworks, network]
-                            )
-                          }
                           checked={selectedNetworks.some(
                             (item) => item.name === network.name
                           )}
                           id={network.name.toString()}
                         />
-                      </div>
+                      </button>
                     );
                   })}
                 </div>
@@ -381,16 +387,49 @@ export default function App() {
           </div>
         </div>
 
-        <div className="border border-accent flex flex-col gap-4 w-full max-h-full h-24 px-4 pb-4 overflow-y-scroll flex-grow">
+        <div className="border border-accent flex flex-col gap-2 w-full max-h-full h-24 px-4 pb-4 overflow-y-scroll flex-grow">
           <TabsContent value="Tokens" className="p-0 mt-0 flex flex-col gap-4">
             <div className="flex flex-col">
+              {tokensByNetwork.length === 0 && (
+                <div className="flex flex-col justify-center items-center gap-2 py-4 md:h-[55vh] text-3xl">
+                  <div className="flex flex-col gap-4 justify-center items-center font-bold">
+                    <h2>
+                      {" "}
+                      {loading
+                        ? "Loading..."
+                        : selectedNetworks.length === 0
+                        ? "No Networks Selected"
+                        : "No Tokens Found"}
+                    </h2>
+                    {selectedNetworks.length > 0 && loading === false && (
+                      <div className="flex flex-col gap-2 justify-center items-center text-sm">
+                        <div>On following chains</div>
+                        <div className="flex flex-row flex-wrap max-w-md justify-center items-center gap-4 mt-2">
+                          {selectedNetworks.map((network) => {
+                            return (
+                              <Image
+                                className="rounded-full bg-white p-px"
+                                key={network.name}
+                                src={network.logo}
+                                width={30}
+                                height={30}
+                                alt={network.name}
+                              />
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
               {tokensByNetwork?.map((token, t) => {
                 return (
                   <div
                     key={t}
                     className="grid grid-cols-2 md:grid-cols-9 gap-y-4 md:gap-8 py-3.5 items-center border-b border-accent"
                   >
-                    <div className="flex flex-row justify-start items-center gap-2 md:col-span-5">
+                    <div className="flex flex-row justify-start items-center gap-3 md:col-span-3">
                       <div className="bg-black rounded-full p-1 relative">
                         <img
                           className="rounded-full bg-white"
@@ -412,10 +451,25 @@ export default function App() {
                           />
                         </div>
                       </div>
-                      <div>{token.token.name}</div>
+                      <div className="font-semibold w-full truncate">
+                        {token.token.name}
+                      </div>
                     </div>
-                    <div className="md:col-span-2 text-right">
-                      {token.token.balance.toFixed(4)} {token.token.symbol}
+                    <div className="md:col-span-1 text-right">
+                      $
+                      {(
+                        Number(token.token.price) * token.token.balance
+                      ).toFixed(0)}
+                    </div>
+                    <div className="md:col-span-3 text-right">
+                      {token.token.balance < 0.1 ? (
+                        <span>
+                          {Truncate(token.token.balance.toString(), 12, "...")}
+                        </span>
+                      ) : (
+                        <span>{token.token.balance.toFixed(0)}</span>
+                      )}{" "}
+                      {token.token.symbol}
                     </div>
                     <div className="col-span-2 grid grid-cols-3 place-items-center gap-2">
                       <TooltipProvider>
@@ -457,7 +511,73 @@ export default function App() {
               })}
             </div>
           </TabsContent>
+          <TabsContent value="Defi" className="p-0 mt-0 flex flex-col gap-4">
+            <div className="flex flex-col">
+              {DefiData.length === 0 && (
+                <div className="flex flex-col justify-center items-center gap-2 py-4 md:h-[55vh] text-3xl">
+                  <div className="flex flex-col gap-4 justify-center items-center font-bold">
+                    <h2>
+                      {" "}
+                      {loading
+                        ? "Loading..."
+                        : selectedNetworks.length === 0
+                        ? "No Networks Selected"
+                        : "No Positions Found"}
+                    </h2>
+                  </div>
+                </div>
+              )}
+              {DefiData?.map((defi, t) => {
+                return (
+                  <div
+                    key={t}
+                    className="grid grid-cols-2 gap-y-4 md:gap-8 py-3.5 items-center border-b border-accent first:pt-1"
+                  >
+                    <div className="flex flex-row justify-start items-center gap-3">
+                      <div className="bg-black rounded-full p-1 relative">
+                        <img
+                          className="rounded-full bg-white"
+                          src={defi.appImage || "/defi/default.png"}
+                          width={30}
+                          height={30}
+                          alt={defi.appName}
+                        />
+                      </div>
+                      <div className="flex flex-row justify-start items-center gap-3 w-full">
+                        <div className="font-semibold truncate">
+                          {defi.appName}
+                        </div>
+                        <div className="flex flex-row gap-2 justify-start items-center text-xs">
+                          {" "}
+                          {defi.products.map((product, p) => {
+                            return (
+                              <div
+                                className="bg-white px-1.5 py-0.5 rounded-full text-black"
+                                key={p}
+                              >
+                                {product.label}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                    <div className=" text-right">
+                      ${defi.balanceUSD.toFixed(2)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </TabsContent>
           <TabsContent value="NFTs" className="p-0 mt-0">
+            {NFTData.length <= 0 && (
+              <div className="flex flex-row justify-center items-center h-[55vh]">
+                <div className="flex flex-col gap-4 justify-center items-center font-bold text-xl">
+                  No NFTs Found
+                </div>
+              </div>
+            )}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-4">
               {NFTData.map((nft, n) => {
                 return (
@@ -492,8 +612,8 @@ export default function App() {
             </div>
           </TabsContent>
           <TabsContent value="Transactions" className="p-0 mt-0">
-            <div className="flex flex-col gap-4 text-sm">
-              {Transactions.map((transaction, t) => {
+            <div className="flex flex-col justify-center items-center gap-4 text-sm h-[55vh]">
+              {/* {Transactions.map((transaction, t) => {
                 return (
                   <div
                     className="flex flex-col gap-1 bg-white text-black"
@@ -544,7 +664,8 @@ export default function App() {
                     </div>
                   </div>
                 );
-              })}
+              })} */}
+              <h3 className="font-bold text-2xl">No Transactions Found</h3>
             </div>
           </TabsContent>
         </div>
