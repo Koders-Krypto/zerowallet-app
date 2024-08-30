@@ -8,7 +8,6 @@ import {
   Fuel,
   PiggyBank,
   RefreshCcw,
-  Send,
   SendHorizonal,
   Trash,
 } from "lucide-react";
@@ -20,7 +19,7 @@ import ShowQR from "../components/QR/ShowQR";
 import { SignClientContext } from "../context/SignClientProvider";
 import useDappStore from "../store/walletConnect";
 import Link from "next/link";
-import { Chains, getChain, NFTS, Tokens, Transactions } from "../data/TempData";
+import { getChain, Tokens, Transactions } from "../data/TempData";
 import {
   Tooltip,
   TooltipContent,
