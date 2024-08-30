@@ -548,7 +548,6 @@ export default function App() {
                           {defi.appName}
                         </div>
                         <div className="flex flex-row gap-2 justify-start items-center text-xs">
-                          {" "}
                           {defi.products.map((product, p) => {
                             return (
                               <div
