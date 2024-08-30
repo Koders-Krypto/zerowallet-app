@@ -1,8 +1,12 @@
 "use client";
 import Image from "next/image";
-import { useWalletInfo, useAccount, useDisconnect } from '../context/LoginProvider';
+import {
+  useWalletInfo,
+  useAccount,
+  useDisconnect,
+} from "../context/LoginProvider";
 import Truncate from "../utils/truncate";
-import { Power, ScanQrCode } from "lucide-react";
+import { Power, ScanQrCode, Settings2 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -91,11 +95,15 @@ export default function Topbar() {
                   <p>{link.name}</p>
                 </div>
               ))}
+
               <WalletConnectButton open={open} setOpen={setOpen} />
               <WalletButton
                 walletInfo={walletInfo}
                 address={address}
-                disconnect={ () => { setWalletInfo(undefined); disconnect() }}
+                disconnect={() => {
+                  setWalletInfo(undefined);
+                  disconnect();
+                }}
                 router={router}
               />
             </nav>
@@ -163,7 +171,10 @@ export default function Topbar() {
           <WalletButton
             walletInfo={walletInfo}
             address={address}
-            disconnect={ () => { setWalletInfo(undefined); disconnect() }}
+            disconnect={() => {
+              setWalletInfo(undefined);
+              disconnect();
+            }}
             router={router}
           />
         </div>

@@ -30,10 +30,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
 import { useAccount } from "wagmi";
 import Image from "next/image";
-import moment from "moment";
 import {
   getIconbySymbol,
   getNetworkLogobyName,
@@ -47,10 +45,8 @@ import {
   ZapperTokenDataTypes,
 } from "../utils/Zapper";
 import { Checkbox } from "@/components/ui/checkbox";
-import { get } from "http";
 import { GET_DEFI_DATA, GET_NFT_DATA, GET_TOKEN_DATA } from "../utils/urls";
 import { formatNumberCommas } from "../utils/commas";
-import { parse } from "path";
 
 export default function App() {
   const { toast } = useToast();
@@ -427,7 +423,7 @@ export default function App() {
                 return (
                   <div
                     key={t}
-                    className="grid grid-cols-2 md:grid-cols-9 gap-y-4 md:gap-8 py-3.5 items-center border-b border-accent"
+                    className="grid grid-cols-2 md:grid-cols-9 gap-4 md:gap-8 py-5 md:py-3.5 items-center border-b border-accent"
                   >
                     <div className="flex flex-row justify-start items-center gap-3 md:col-span-3">
                       <div className="bg-black rounded-full p-1 relative">
@@ -461,7 +457,7 @@ export default function App() {
                         Number(token.token.price) * token.token.balance
                       ).toFixed(0)}
                     </div>
-                    <div className="md:col-span-3 text-right">
+                    <div className="md:col-span-3 text-left md:text-right">
                       {token.token.balance < 0.1 ? (
                         <span>
                           {Truncate(token.token.balance.toString(), 12, "...")}
@@ -471,7 +467,7 @@ export default function App() {
                       )}{" "}
                       {token.token.symbol}
                     </div>
-                    <div className="col-span-2 grid grid-cols-3 place-items-center gap-2">
+                    <div className="md:col-span-2 grid grid-cols-3 place-items-center gap-2">
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
@@ -531,7 +527,7 @@ export default function App() {
                 return (
                   <div
                     key={t}
-                    className="grid grid-cols-2 gap-y-4 md:gap-8 py-3.5 items-center border-b border-accent first:pt-1"
+                    className="grid grid-cols-1 md:grid-cols-2 gap-y-4 md:gap-8 py-3.5 items-center border-b border-accent first:pt-1"
                   >
                     <div className="flex flex-row justify-start items-center gap-3">
                       <div className="bg-black rounded-full p-1 relative">

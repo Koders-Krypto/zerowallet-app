@@ -1,8 +1,13 @@
 "use client";
 import Image from "next/image";
-import { useWalletInfo, useAccount, useLoginProvider, useDisconnect } from "../../context/LoginProvider";
+import {
+  useWalletInfo,
+  useAccount,
+  useLoginProvider,
+  useDisconnect,
+} from "../../context/LoginProvider";
 import Truncate from "../../utils/truncate";
-import { Power, ScanQrCode } from "lucide-react";
+import { Power, ScanQrCode, Settings, Settings2 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -89,15 +94,25 @@ export default function Topbar() {
                   <p>{link.name}</p>
                 </div>
               ))}
-
+              <div
+                className={`flex flex-row gap-4 items-center justify-start pr-4 py-4 bg-black text-white ${
+                  pathname === "/app/settings" ? "font-bold" : "font-light"
+                }`}
+                onClick={() => {
+                  setDrawerOpen(false);
+                  router.push("/app/settings");
+                }}
+              >
+                <Settings />
+                <p>Settings</p>
+              </div>
               <WalletButton
                 walletInfo={walletInfo}
                 address={address}
-                disconnect={ ()=> {
+                disconnect={() => {
                   disconnect();
                   setWalletInfo(undefined);
-                }
-                }
+                }}
                 router={router}
               />
             </nav>
@@ -112,11 +127,10 @@ export default function Topbar() {
           <WalletButton
             walletInfo={walletInfo}
             address={address}
-            disconnect={ ()=> {
+            disconnect={() => {
               disconnect();
               setWalletInfo(undefined);
-            } 
-            }       
+            }}
             router={router}
           />
         </div>
