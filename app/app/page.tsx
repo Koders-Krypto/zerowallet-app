@@ -36,6 +36,7 @@ import { useAccount } from "wagmi";
 import Image from "next/image";
 import moment from "moment";
 import {
+  getTokensByNetwork,
   getTotalBalanceDefi,
   getTotalBalanceToken,
   Networks,
@@ -57,12 +58,20 @@ export default function App() {
 
   const { ensname, ensavatar } = useContext(LoginContext);
   const [totalBalance, setTotalBalance] = useState<number>(0);
+
+
+
+
+
   useEffect(() => {
     const totalUSDValue =
       getTotalBalanceToken(ZapperTokenData) +
       getTotalBalanceDefi(ZapperDEFIData);
     setTotalBalance(totalUSDValue);
-  }, []);
+
+    const tokensByNetwork = getTokensByNetwork(ZapperTokenData, selectedNetworks.map((network) => network.name));
+    // save it in state and use
+  }, [selectedNetworks]);
 
   useEffect(() => {
     addAllNetworks();
@@ -135,9 +144,8 @@ export default function App() {
         {connectedDapps.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 w-full text-white text-sm">
             <div
-              className={`flex flex-col gap-4 w-full overflow-y-auto ${
-                connectedDapps.length > 4 ? "max-h-96" : ""
-              }`}
+              className={`flex flex-col gap-4 w-full overflow-y-auto ${connectedDapps.length > 4 ? "max-h-96" : ""
+                }`}
             >
               {connectedDapps.map((dapp: any) => (
                 <div
@@ -272,8 +280,8 @@ export default function App() {
                                 (item) => item.name === network.name
                               )
                                 ? prevSelectedNetworks.filter(
-                                    (item) => item.name !== network.name
-                                  )
+                                  (item) => item.name !== network.name
+                                )
                                 : [...prevSelectedNetworks, network]
                             )
                           }
