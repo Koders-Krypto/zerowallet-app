@@ -73,7 +73,7 @@ export interface TokenDefi {
   balanceUSD: number;
 }
 
-export interface DataProps {}
+export interface DataProps { }
 
 export interface DisplayProps {
   label: string;
@@ -6828,6 +6828,10 @@ function getTotalBalanceDefi(data: ZapperDEFIDataTypes[]) {
   }, 0);
 }
 
+function getTokensByNetwork(data: ZapperTokenDataTypes[], network: string[]) {
+  return data.filter((item) => network.includes(item.network));
+}
+
 function getNetworksbyNames(data: string[]) {
   return data.map((name) => {
     return Networks.find((network) => network.name === name);
@@ -6841,6 +6845,7 @@ export {
   sortByNetwork,
   getTotalBalanceToken,
   getTotalBalanceDefi,
+  getTokensByNetwork,
   NFTData,
   getIconbySymbol,
 };
