@@ -176,7 +176,13 @@ export default function App() {
         <div className="w-full flex flex-col md:flex-row gap-4 justify-between items-center relative">
           <div className="flex flex-col md:flex-row gap-4 justify-start items-start md:items-center w-full">
             {ensavatar && (
-              <img src={ensavatar} width={120} height={120} alt={ensname} />
+              <img
+                className="rounded-full"
+                src={ensavatar}
+                width={120}
+                height={120}
+                alt={ensname}
+              />
             )}
 
             <div className="flex flex-col justify-start items-start ml-0 gap-1">
