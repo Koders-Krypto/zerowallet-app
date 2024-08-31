@@ -51,7 +51,7 @@ export default function PieChartComponent(props: any) {
   }, [props.data, config, data]);
 
   return (
-    <Card className="flex flex-col gap-1 focus:outline-0 px-4 rounded-none bg-white">
+    <Card className="flex flex-col gap-1 focus:outline-0 px-0 rounded-none bg-white text-black mt-2 ">
       <CardHeader className="items-center pb-0">
         <CardTitle className="flex flex-row gap-2 justify-center items-center font-bold">
           {props.title}
