@@ -1,7 +1,5 @@
 "use client";
-
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { GET_DEFI_DATA, GET_NFT_DATA, GET_TOKEN_DATA } from "../utils/urls";
 import {
   getTokensByNetwork,
   getTotalBalanceDefi,

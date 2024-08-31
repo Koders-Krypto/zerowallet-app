@@ -67,6 +67,7 @@ export default function App() {
 
   useEffect(() => {
     addAllNetworks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function addAllNetworks() {
@@ -382,7 +383,7 @@ export default function App() {
                           {Truncate(token.token.balance.toString(), 12, "...")}
                         </span>
                       ) : (
-                        <span>{token.token.balance.toFixed(0)}</span>
+                        <span>{token.token.balance.toFixed(2)}</span>
                       )}{" "}
                       {token.token.symbol}
                     </div>

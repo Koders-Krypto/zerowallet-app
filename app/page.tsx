@@ -2,10 +2,10 @@
 import Image from "next/image";
 
 import { useWeb3Modal } from "@web3modal/wagmi/react";
-import { LogOut } from "lucide-react";
+import { LogOut, Wallet } from "lucide-react";
 import Truncate from "./utils/truncate";
 import Typewriter from "typewriter-effect";
-import { connectPassKey, connectValidator } from "./logic/passkey";
+import { connectPassKey } from "./logic/passkey";
 import { WebAuthnMode } from "@zerodev/passkey-validator";
 import { storePasskey } from "./utils/storage";
 import {
@@ -23,7 +23,6 @@ import {
   useAccount,
   useDisconnect,
 } from "./context/LoginProvider";
-import { getSmartAccountClient } from "./logic/permissionless";
 
 const WalletConnectButton = (props: any) => {
   const { walletInfo, setWalletInfo, setAccountInfo } = useLoginProvider();
@@ -88,9 +87,9 @@ const WalletConnectButton = (props: any) => {
             />
             <p className="font-bold ">Login Now </p>
           </button>
-          <h3 className="text-base text-white">OR</h3>
+          <h3 className="text-base text-white">(OR)</h3>
           <button
-            className="border-accent py-2 text-lg text-white w-full"
+            className="py-2 text-lg text-white w-full border border-accent"
             onClick={async () => {
               try {
                 const passkey = await connectPassKey(
@@ -187,9 +186,10 @@ export default function Home() {
           ) : (
             <div className="flex flex-col gap-2 items-center justify-center w-full">
               <button
-                className="w-full bg-white text-black px-6 py-2.5"
+                className="w-full bg-white text-black px-6 py-2.5 font-bold flex flex-row gap-2 items-center justify-center"
                 onClick={() => open()}
               >
+                <Wallet />
                 Connect Wallet
               </button>
               <div>(OR)</div>

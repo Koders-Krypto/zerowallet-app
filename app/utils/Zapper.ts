@@ -311,6 +311,11 @@ const TokensIcons = [
     symbol: "WLD",
     icon: "/tokens/worldcoin.png",
   },
+  {
+    name: "Gitcoin",
+    symbol: "GTC",
+    icon: "/tokens/gitcoin.svg",
+  },
 ];
 
 const getIconbySymbol = (symbol: string) => {

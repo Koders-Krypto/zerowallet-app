@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/sheet";
 import { MenuIcon } from "lucide-react";
 import Links from "../../data/Links.json";
-import Icons from "../../utils/Icons";
+import Icons from "../../utils/icons";
 
 export default function Topbar() {
   const [open, setOpen] = useState(false);
