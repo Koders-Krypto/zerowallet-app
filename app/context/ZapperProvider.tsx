@@ -104,6 +104,7 @@ export const ZapperProvider = ({
     };
 
     useEffect(() => {
+        console.log(accountInfo, "Account Info");
         if (accountInfo.address) {
             fetchTokenData(accountInfo.address.toString());
             fetchNFTData(accountInfo.address.toString());
