@@ -2,6 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --chart-1: 0, 0%, 10%; /* Very Dark Gray */
+  --chart-2: 0, 0%, 15%; /* Dark Gray */
+  --chart-3: 0, 0%, 20%; /* Medium Dark Gray */
+  --chart-4: 0, 0%, 25%; /* Darker Gray */
+  --chart-5: 0, 0%, 30%; /* Gray */
+  --chart-6: 0, 0%, 35%; /* Medium Gray */
+  --chart-7: 0, 0%, 40%; /* Medium Light Gray */
+  --chart-8: 0, 0%, 45%; /* Light Gray */
+  --chart-9: 0, 0%, 50%; /* Lighter Gray */
+  --chart-10: 0, 0%, 55%; /* Very Light Gray */
+  --chart-11: 0, 0%, 10%; /* Very Dark Gray */
+  --chart-12: 0, 0%, 15%; /* Dark Gray */
+  --chart-13: 0, 0%, 20%; /* Medium Dark Gray */
+  --chart-14: 0, 0%, 25%; /* Darker Gray */
+  --chart-15: 0, 0%, 30%; /* Gray */
+  --foreground: 240 10% 3%; /* Gray */
+}
+
 .bg-gradient {
   background: rgb(0, 0, 0);
   background: linear-gradient(

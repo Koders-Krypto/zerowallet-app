@@ -47,6 +47,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { GET_DEFI_DATA, GET_NFT_DATA, GET_TOKEN_DATA } from "../utils/urls";
 import { formatNumberCommas } from "../utils/commas";
+import PieChartComponent from "../components/PieChart/PieChart";
 
 export default function App() {
   const { toast } = useToast();
@@ -67,6 +68,7 @@ export default function App() {
   const [NFTData, setNFTData] = useState<ZapperNFTDataTypes[]>([]);
   const [DefiData, setDefiData] = useState<ZapperDEFIDataTypes[]>([]);
   const [loading, setLoading] = useState(true);
+  const [DefiTotal, setDefiTotal] = useState(0);
 
   const Auth = `Basic ${Buffer.from(
     `${process.env.NEXT_PUBLIC_ZAPPER_API_KEY}:`,
@@ -119,6 +121,7 @@ export default function App() {
     if (DefiData.length > 0 && tokenData.length > 0) {
       setLoading(false);
       const _defiData = getTotalBalanceDefi(DefiData);
+      setDefiTotal(_defiData);
       const _tokenData = getTotalBalanceToken(tokenData);
       setTotalBalance(_defiData + _tokenData);
     }
@@ -463,7 +466,7 @@ export default function App() {
                         Number(token.token.price) * token.token.balance
                       ).toFixed(0)}
                     </div>
-                    <div className="md:col-span-3 text-left md:text-right">
+                    <div className="md:col-span-3 text-left md:text-right uppercase">
                       {token.token.balance < 0.1 ? (
                         <span>
                           {Truncate(token.token.balance.toString(), 12, "...")}
@@ -513,8 +516,11 @@ export default function App() {
               })}
             </div>
           </TabsContent>
-          <TabsContent value="Defi" className="p-0 mt-0 flex flex-col gap-4">
-            <div className="flex flex-col">
+          <TabsContent
+            value="Defi"
+            className="p-0 mt-0 flex flex-col-reverse md:grid md:grid-cols-3 justify-between items-start gap-4"
+          >
+            <div className="flex flex-col col-span-2">
               {DefiData.length === 0 && (
                 <div className="flex flex-col justify-center items-center gap-2 py-4 md:h-[55vh] text-3xl">
                   <div className="flex flex-col gap-4 justify-center items-center font-bold">
@@ -529,47 +535,53 @@ export default function App() {
                   </div>
                 </div>
               )}
-              {DefiData?.map((defi, t) => {
-                return (
-                  <div
-                    key={t}
-                    className="grid grid-cols-1 md:grid-cols-2 gap-y-4 md:gap-8 py-3.5 items-center border-b border-accent first:pt-1"
-                  >
-                    <div className="flex flex-row justify-start items-center gap-3">
-                      <div className="bg-black rounded-full p-1 relative">
-                        <img
-                          className="rounded-full bg-white"
-                          src={defi.appImage || "/defi/default.png"}
-                          width={30}
-                          height={30}
-                          alt={defi.appName}
-                        />
+              {DefiData.length > 0 &&
+                DefiData?.map((defi, t) => {
+                  return (
+                    <div
+                      key={t}
+                      className="flex flex-row justify-between items-center gap-4 gap-y-4 md:gap-8 py-3.5 border-b border-accent first:pt-1"
+                    >
+                      <div className="flex flex-row justify-start items-center gap-3">
+                        <div className="bg-black rounded-full p-1 relative">
+                          <img
+                            className="rounded-full bg-white"
+                            src={defi.appImage || "/defi/default.png"}
+                            width={30}
+                            height={30}
+                            alt={defi.appName}
+                          />
+                        </div>
+                        <div className="flex flex-row justify-start items-center gap-3 w-full">
+                          <div className="font-semibold truncate">
+                            {defi.appName}
+                          </div>
+                          <div className="flex flex-row flex-wrap gap-2 justify-start items-center text-xs">
+                            {defi.products.slice(0, 2).map((product, p) => {
+                              return (
+                                <div
+                                  className="bg-white px-1.5 py-0.5 rounded-full truncate text-black"
+                                  key={p}
+                                >
+                                  {product.label}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex flex-row justify-start items-center gap-3 w-full">
-                        <div className="font-semibold truncate">
-                          {defi.appName}
-                        </div>
-                        <div className="flex flex-row gap-2 justify-start items-center text-xs">
-                          {defi.products.map((product, p) => {
-                            return (
-                              <div
-                                className="bg-white px-1.5 py-0.5 rounded-full text-black"
-                                key={p}
-                              >
-                                {product.label}
-                              </div>
-                            );
-                          })}
-                        </div>
+                      <div className=" text-right">
+                        ${defi.balanceUSD.toFixed(2)}
                       </div>
                     </div>
-                    <div className=" text-right">
-                      ${defi.balanceUSD.toFixed(2)}
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
             </div>
+            <PieChartComponent
+              title="DeFi Positions"
+              total={DefiTotal}
+              data={DefiData}
+            />
           </TabsContent>
           <TabsContent value="NFTs" className="p-0 mt-0">
             {NFTData.length <= 0 && (
