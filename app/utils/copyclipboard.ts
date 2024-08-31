@@ -20,7 +20,6 @@ export function CopytoClipboard(text: string) {
     try {
       const successful = document.execCommand("copy");
       const msg = successful ? "successful" : "unsuccessful";
-      console.log("Fallback: Copying text command was " + msg);
     } catch (err) {
       console.error("Fallback: Oops, unable to copy", err);
     }

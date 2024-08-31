@@ -46,10 +46,6 @@ export default function PieChartComponent(props: any) {
     }
   }, [props.data]);
 
-  React.useEffect(() => {
-    console.log(props.data, config, data, "Data Pie");
-  }, [props.data, config, data]);
-
   return (
     <Card className="flex flex-col gap-1 focus:outline-0 px-0 rounded-none bg-white text-black mt-2 ">
       <CardHeader className="items-center pb-0">
