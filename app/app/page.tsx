@@ -35,9 +35,8 @@ import {
   getIconbySymbol,
   getNetworkLogobyName,
   Networks,
-} from "../utils/Zapper";
+} from "../utils/zapper";
 import { Checkbox } from "@/components/ui/checkbox";
-import { GET_DEFI_DATA, GET_NFT_DATA, GET_TOKEN_DATA } from "../utils/urls";
 import { formatNumberCommas } from "../utils/commas";
 import PieChartComponent from "../components/PieChart/PieChart";
 import { ZapperContext } from "../context/ZapperProvider";

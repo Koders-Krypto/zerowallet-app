@@ -8,7 +8,7 @@ import {
   ZapperDEFIDataTypes,
   ZapperNFTDataTypes,
   ZapperTokenDataTypes,
-} from "../utils/Zapper";
+} from "../utils/zapper";
 import { LoginContext } from "./LoginProvider";
 
 interface ZapperContextProps {

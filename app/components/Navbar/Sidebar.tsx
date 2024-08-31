@@ -10,7 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import Icons from "../../utils/Icons";
+import Icons from "../../utils/icons";
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
