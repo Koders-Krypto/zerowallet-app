@@ -7,39 +7,24 @@ import {
   useDisconnect,
 } from "../../context/LoginProvider";
 import Truncate from "../../utils/truncate";
-import { Power, ScanQrCode, Settings, Settings2 } from "lucide-react";
+import { Power, Settings } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-
 import * as React from "react";
-
-import { useMediaQuery } from "usehooks-ts";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogClose,
-} from "@/components/ui/dialog";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { MenuIcon } from "lucide-react";
 import Links from "../../data/Links.json";
-import Icons from "../../utils/icons";
+import Icons from "@/app/utils/icons";
 
 export default function Topbar() {
-  const [open, setOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const isDesktop = useMediaQuery("(min-width: 768px)");
+
   const router = useRouter();
   const pathname = usePathname();
   const { address, isConnecting, isDisconnected } = useAccount();

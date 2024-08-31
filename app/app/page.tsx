@@ -31,15 +31,16 @@ import {
 } from "@/components/ui/popover";
 import { useAccount } from "wagmi";
 import Image from "next/image";
+
+import { Checkbox } from "@/components/ui/checkbox";
+import { formatNumberCommas } from "../utils/commas";
+import PieChartComponent from "../components/PieChart/PieChart";
+import { ZapperContext } from "../context/ZapperProvider";
 import {
   getIconbySymbol,
   getNetworkLogobyName,
   Networks,
 } from "../utils/zapper";
-import { Checkbox } from "@/components/ui/checkbox";
-import { formatNumberCommas } from "../utils/commas";
-import PieChartComponent from "../components/PieChart/PieChart";
-import { ZapperContext } from "../context/ZapperProvider";
 
 export default function App() {
   const { toast } = useToast();
