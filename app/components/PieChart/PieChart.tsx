@@ -16,6 +16,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { TrendingUp } from "lucide-react";
+import Truncate from "@/app/utils/truncate";
 
 export default function PieChartComponent(props: any) {
   const [data, setData] = React.useState<any[]>([]);
@@ -86,7 +87,12 @@ export default function PieChartComponent(props: any) {
                           y={viewBox.cy}
                           className="bg-white text-white text-3xl font-bold"
                         >
-                          ${props.total.toFixed(0).toLocaleString()}
+                          $
+                          {Truncate(
+                            props.total.toFixed(0).toLocaleString(),
+                            6,
+                            "..."
+                          )}
                         </tspan>
                         <tspan
                           x={viewBox.cx}

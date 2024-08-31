@@ -1,26 +1,38 @@
 "use client";
 import Image from "next/image";
 
-import {  useWeb3Modal } from "@web3modal/wagmi/react";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { LogOut } from "lucide-react";
 import Truncate from "./utils/truncate";
 import Typewriter from "typewriter-effect";
 import { connectPassKey, connectValidator } from "./logic/passkey";
 import { WebAuthnMode } from "@zerodev/passkey-validator";
 import { storePasskey } from "./utils/storage";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useState } from "react";
-import { useLoginProvider, useWalletInfo, useAccount, useDisconnect } from "./context/LoginProvider";
+import {
+  useLoginProvider,
+  useWalletInfo,
+  useAccount,
+  useDisconnect,
+} from "./context/LoginProvider";
 import { getSmartAccountClient } from "./logic/permissionless";
 
-
 const WalletConnectButton = (props: any) => {
-  const {walletInfo, setWalletInfo, setAccountInfo} = useLoginProvider()
+  const { walletInfo, setWalletInfo, setAccountInfo } = useLoginProvider();
 
   return (
     <Dialog open={props.open} onOpenChange={props.setOpen}>
       <DialogTrigger asChild>
-        <button className="flex flex-row gap-2 items-center justify-center border border-accent px-6 py-2.5 w-full "
+        <button
+          className="flex flex-row gap-2 items-center justify-center border border-accent px-6 py-2.5 w-full "
           onClick={() => props.setOpen(true)}
         >
           <Image
@@ -43,9 +55,7 @@ const WalletConnectButton = (props: any) => {
             />
             <div className="flex flex-col justify-start items-start text-left">
               <DialogTitle>
-                <h3 className="text-base text-white">
-                  Use a smart Account
-                </h3>
+                <h3 className="text-base text-white">Use a smart Account</h3>
               </DialogTitle>
               <DialogDescription className="text-xs text-accent dark:text-accent w-full md:max-w-xs">
                 Login or Create a new passkey to get started with Smart Accounts
@@ -54,46 +64,47 @@ const WalletConnectButton = (props: any) => {
           </div>
         </DialogHeader>
         <div className="flex flex-col justify-start items-center  gap-2 w-full">
-          <button className="flex flex-row gap-2 items-center justify-center border border-accent px-6 py-2.5 w-full bg-white "
-                        onClick={ async () => {
-                          // Handle the passkey auth here
-                          try {  
-                            const passkey =  await connectPassKey('ZeroWallet', WebAuthnMode.Login);
-                            storePasskey(passkey)
-                            setWalletInfo({ name: 'passkey', icon: "/icons/safe.svg" });
-
-                            } 
-                            catch(e) {
-                              console.log(e)
-                            }
-                          }}
+          <button
+            className="flex flex-row gap-2 items-center justify-center border border-accent px-6 py-2.5 w-full bg-white "
+            onClick={async () => {
+              // Handle the passkey auth here
+              try {
+                const passkey = await connectPassKey(
+                  "ZeroWallet",
+                  WebAuthnMode.Login
+                );
+                storePasskey(passkey);
+                setWalletInfo({ name: "passkey", icon: "/icons/safe.svg" });
+              } catch (e) {
+                console.log(e);
+              }
+            }}
           >
-          <Image
-            src={"/icons/passkey.svg"}
-            alt="Wallet Icon"
-            width={30}
-            height={30}
-          />
+            <Image
+              src={"/icons/passkey.svg"}
+              alt="Wallet Icon"
+              width={30}
+              height={30}
+            />
             <p className="font-bold ">Login Now </p>
-
           </button>
-                <h3 className="text-base text-white">
-                  OR
-                </h3>
-          <button className="border-accent py-2 text-lg text-white w-full"
-            onClick={ async () => {
-              try {  
-                const passkey =  await connectPassKey(`Zero Wallet ${new Date().toLocaleDateString('en-GB')}`, WebAuthnMode.Register)
-                storePasskey(passkey)
-                setWalletInfo({ name: 'passkey', icon: "/icons/safe.svg" });
-
+          <h3 className="text-base text-white">OR</h3>
+          <button
+            className="border-accent py-2 text-lg text-white w-full"
+            onClick={async () => {
+              try {
+                const passkey = await connectPassKey(
+                  `Zero Wallet ${new Date().toLocaleDateString("en-GB")}`,
+                  WebAuthnMode.Register
+                );
+                storePasskey(passkey);
+                setWalletInfo({ name: "passkey", icon: "/icons/safe.svg" });
+              } catch (e) {
+                console.log(e);
               }
-              catch(e) {
-                console.log(e)
-              }
-              }}
+            }}
           >
-            Create New 
+            Create New
           </button>
         </div>
       </DialogContent>
@@ -103,15 +114,15 @@ const WalletConnectButton = (props: any) => {
 
 export default function Home() {
   const { address, isConnecting, isDisconnected } = useAccount();
-  const { setWalletInfo } = useLoginProvider()
-  const { walletInfo } = useWalletInfo()
+  const { setWalletInfo } = useLoginProvider();
+  const { walletInfo } = useWalletInfo();
 
   const { open, close } = useWeb3Modal();
   const { disconnect } = useDisconnect();
 
   const [passkeyOpen, setPasskeyOpen] = useState(false);
 
-  console.log()
+  console.log();
 
   return (
     <div className="flex flex-col gap-12 md:gap-16 justify-center items-center min-h-[90vh] md:min-h-[95vh] text-center pt-12 md:pt-0 px-6">
@@ -123,6 +134,7 @@ export default function Home() {
           width={280}
           height={280}
         />
+
         <div className="flex flex-col items-center justify-center gap-3">
           <h1 className="text-2xl md:text-4xl font-bold">
             <Typewriter
@@ -164,11 +176,12 @@ export default function Home() {
                 <p className="">{Truncate(address, 12, "...")}</p>
               </div>
               <div className="flex justify-end items-center">
-                <LogOut onClick={() => {
-                  disconnect() 
-                  setWalletInfo(undefined)
-                  
-                  }} />
+                <LogOut
+                  onClick={() => {
+                    disconnect();
+                    setWalletInfo(undefined);
+                  }}
+                />
               </div>
             </div>
           ) : (
@@ -180,7 +193,10 @@ export default function Home() {
                 Connect Wallet
               </button>
               <div>(OR)</div>
-              <WalletConnectButton open={passkeyOpen} setOpen={setPasskeyOpen} />
+              <WalletConnectButton
+                open={passkeyOpen}
+                setOpen={setPasskeyOpen}
+              />
             </div>
           )}
         </div>

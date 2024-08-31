@@ -5,7 +5,6 @@ import { LoginContext } from "../context/LoginProvider";
 import Truncate from "../utils/truncate";
 import {
   Copy,
-  Fuel,
   PiggyBank,
   RefreshCcw,
   SendHorizonal,
@@ -35,14 +34,7 @@ import Image from "next/image";
 import {
   getIconbySymbol,
   getNetworkLogobyName,
-  getTokensByNetwork,
-  getTotalBalanceDefi,
-  getTotalBalanceToken,
   Networks,
-  NetworkType,
-  ZapperDEFIDataTypes,
-  ZapperNFTDataTypes,
-  ZapperTokenDataTypes,
 } from "../utils/Zapper";
 import { Checkbox } from "@/components/ui/checkbox";
 import { GET_DEFI_DATA, GET_NFT_DATA, GET_TOKEN_DATA } from "../utils/urls";
@@ -61,8 +53,17 @@ export default function App() {
 
   //Zapper Data
 
-  const { tokenData, NFTData, DefiData, isZapperLoading, DefiTotal, totalBalance, selectedNetworks, setSelectedNetworks, tokensByNetwork } = useContext(ZapperContext);
-
+  const {
+    tokenData,
+    NFTData,
+    DefiData,
+    isZapperLoading,
+    DefiTotal,
+    totalBalance,
+    selectedNetworks,
+    setSelectedNetworks,
+    tokensByNetwork,
+  } = useContext(ZapperContext);
 
   useEffect(() => {
     addAllNetworks();
@@ -141,8 +142,9 @@ export default function App() {
         {connectedDapps.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 w-full text-white text-sm">
             <div
-              className={`flex flex-col gap-4 w-full overflow-y-auto ${connectedDapps.length > 4 ? "max-h-96" : ""
-                }`}
+              className={`flex flex-col gap-4 w-full overflow-y-auto ${
+                connectedDapps.length > 4 ? "max-h-96" : ""
+              }`}
             >
               {connectedDapps.map((dapp: any) => (
                 <div
@@ -263,8 +265,8 @@ export default function App() {
                               (item) => item.name === network.name
                             )
                               ? prevSelectedNetworks.filter(
-                                (item) => item.name !== network.name
-                              )
+                                  (item) => item.name !== network.name
+                                )
                               : [...prevSelectedNetworks, network]
                           )
                         }
@@ -310,28 +312,29 @@ export default function App() {
                       {isZapperLoading
                         ? "Loading..."
                         : selectedNetworks.length === 0
-                          ? "No Networks Selected"
-                          : "No Tokens Found"}
+                        ? "No Networks Selected"
+                        : "No Tokens Found"}
                     </h2>
-                    {selectedNetworks.length > 0 && isZapperLoading === false && (
-                      <div className="flex flex-col gap-2 justify-center items-center text-sm">
-                        <div>On following chains</div>
-                        <div className="flex flex-row flex-wrap max-w-md justify-center items-center gap-4 mt-2">
-                          {selectedNetworks.map((network) => {
-                            return (
-                              <Image
-                                className="rounded-full bg-white p-px"
-                                key={network.name}
-                                src={network.logo}
-                                width={30}
-                                height={30}
-                                alt={network.name}
-                              />
-                            );
-                          })}
+                    {selectedNetworks.length > 0 &&
+                      isZapperLoading === false && (
+                        <div className="flex flex-col gap-2 justify-center items-center text-sm">
+                          <div>On following chains</div>
+                          <div className="flex flex-row flex-wrap max-w-md justify-center items-center gap-4 mt-2">
+                            {selectedNetworks.map((network) => {
+                              return (
+                                <Image
+                                  className="rounded-full bg-white p-px"
+                                  key={network.name}
+                                  src={network.logo}
+                                  width={30}
+                                  height={30}
+                                  alt={network.name}
+                                />
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
                   </div>
                 </div>
               )}
@@ -371,7 +374,7 @@ export default function App() {
                       $
                       {(
                         Number(token.token.price) * token.token.balance
-                      ).toFixed(0)}
+                      ).toFixed(2)}
                     </div>
                     <div className="md:col-span-3 text-left md:text-right uppercase">
                       {token.token.balance < 0.1 ? (
@@ -436,8 +439,8 @@ export default function App() {
                       {isZapperLoading
                         ? "Loading..."
                         : selectedNetworks.length === 0
-                          ? "No Networks Selected"
-                          : "No Positions Found"}
+                        ? "No Networks Selected"
+                        : "No Positions Found"}
                     </h2>
                   </div>
                 </div>
