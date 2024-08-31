@@ -1,4 +1,4 @@
-export default function Icons(props: { path: string; className: string }) {
+export default function icons(props: { path: string; className: string }) {
   switch (props.path) {
     case "/app":
       return (
