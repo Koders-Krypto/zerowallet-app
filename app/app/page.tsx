@@ -48,6 +48,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { GET_DEFI_DATA, GET_NFT_DATA, GET_TOKEN_DATA } from "../utils/urls";
 import { formatNumberCommas } from "../utils/commas";
 import PieChartComponent from "../components/PieChart/PieChart";
+import { ZapperContext } from "../context/ZapperProvider";
 
 export default function App() {
   const { toast } = useToast();
@@ -56,105 +57,12 @@ export default function App() {
   const { address } = useAccount();
   const { connectedDapps } = useDappStore();
   const { disconnect } = useContext(SignClientContext);
-  const [selectedNetworks, setSelectedNetworks] = useState<NetworkType[]>([]);
-  const [tokensByNetwork, setTokensByNetwork] = useState<
-    ZapperTokenDataTypes[]
-  >([]);
   const { ensname, ensavatar } = useContext(LoginContext);
-  const [totalBalance, setTotalBalance] = useState<number>(0);
 
   //Zapper Data
-  const [tokenData, setTokenData] = useState<ZapperTokenDataTypes[]>([]);
-  const [NFTData, setNFTData] = useState<ZapperNFTDataTypes[]>([]);
-  const [DefiData, setDefiData] = useState<ZapperDEFIDataTypes[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [DefiTotal, setDefiTotal] = useState(0);
 
-  const Auth = `Basic ${Buffer.from(
-    `${process.env.NEXT_PUBLIC_ZAPPER_API_KEY}:`,
-    "binary"
-  ).toString("base64")}`;
+  const { tokenData, NFTData, DefiData, isZapperLoading, DefiTotal, totalBalance, selectedNetworks, setSelectedNetworks, tokensByNetwork } = useContext(ZapperContext);
 
-  useEffect(() => {
-    if (address) {
-      fetchTokenData(address?.toString());
-      fetchNFTData(address?.toString());
-      fetchDefiData(address?.toString());
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [address]);
-
-  const fetchTokenData = async (address: string) => {
-    const response = await fetch(`${GET_TOKEN_DATA}${address}`, {
-      headers: {
-        accept: "*/*",
-        Authorization: Auth,
-      },
-    });
-    if (response.ok) {
-      const data = await response.json();
-      setTokenData(data[address.toString().toLowerCase()]);
-    } else {
-      console.log("error");
-      setTotalBalance(0);
-    }
-  };
-  const fetchDefiData = async (address: string) => {
-    const response = await fetch(`${GET_DEFI_DATA}${address}`, {
-      headers: {
-        accept: "*/*",
-        Authorization: Auth,
-      },
-    });
-    if (response.ok) {
-      const data = await response.json();
-      setDefiData(data);
-      console.log(data, "Zapper Defi Data");
-    } else {
-      console.log("error");
-      setDefiData([]);
-    }
-  };
-
-  useEffect(() => {
-    if (DefiData.length > 0 && tokenData.length > 0) {
-      setLoading(false);
-      const _defiData = getTotalBalanceDefi(DefiData);
-      setDefiTotal(_defiData);
-      const _tokenData = getTotalBalanceToken(tokenData);
-      setTotalBalance(_defiData + _tokenData);
-    }
-  }, [DefiData, tokenData]);
-
-  const fetchNFTData = async (address: string) => {
-    const response = await fetch(`${GET_NFT_DATA}${address}&limit=28`, {
-      headers: {
-        accept: "*/*",
-        Authorization: Auth,
-      },
-    });
-    if (response.ok) {
-      const data = await response.json();
-      setNFTData(data.items);
-      console.log(data, "Zapper NFT Data");
-    } else {
-      console.log("error");
-      setNFTData([]);
-    }
-  };
-
-  useEffect(() => {
-    console.log(tokenData, "Token Data");
-    if (tokenData.length > 0) {
-      const tokensByNetwork = getTokensByNetwork(
-        tokenData,
-        selectedNetworks.map((network) => network.name)
-      );
-      // save it in state and use
-      setTokensByNetwork(tokensByNetwork);
-    }
-  }, [tokenData, selectedNetworks]);
 
   useEffect(() => {
     addAllNetworks();
@@ -233,9 +141,8 @@ export default function App() {
         {connectedDapps.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 w-full text-white text-sm">
             <div
-              className={`flex flex-col gap-4 w-full overflow-y-auto ${
-                connectedDapps.length > 4 ? "max-h-96" : ""
-              }`}
+              className={`flex flex-col gap-4 w-full overflow-y-auto ${connectedDapps.length > 4 ? "max-h-96" : ""
+                }`}
             >
               {connectedDapps.map((dapp: any) => (
                 <div
@@ -356,8 +263,8 @@ export default function App() {
                               (item) => item.name === network.name
                             )
                               ? prevSelectedNetworks.filter(
-                                  (item) => item.name !== network.name
-                                )
+                                (item) => item.name !== network.name
+                              )
                               : [...prevSelectedNetworks, network]
                           )
                         }
@@ -400,13 +307,13 @@ export default function App() {
                   <div className="flex flex-col gap-4 justify-center items-center font-bold">
                     <h2>
                       {" "}
-                      {loading
+                      {isZapperLoading
                         ? "Loading..."
                         : selectedNetworks.length === 0
-                        ? "No Networks Selected"
-                        : "No Tokens Found"}
+                          ? "No Networks Selected"
+                          : "No Tokens Found"}
                     </h2>
-                    {selectedNetworks.length > 0 && loading === false && (
+                    {selectedNetworks.length > 0 && isZapperLoading === false && (
                       <div className="flex flex-col gap-2 justify-center items-center text-sm">
                         <div>On following chains</div>
                         <div className="flex flex-row flex-wrap max-w-md justify-center items-center gap-4 mt-2">
@@ -526,11 +433,11 @@ export default function App() {
                   <div className="flex flex-col gap-4 justify-center items-center font-bold">
                     <h2>
                       {" "}
-                      {loading
+                      {isZapperLoading
                         ? "Loading..."
                         : selectedNetworks.length === 0
-                        ? "No Networks Selected"
-                        : "No Positions Found"}
+                          ? "No Networks Selected"
+                          : "No Positions Found"}
                     </h2>
                   </div>
                 </div>
