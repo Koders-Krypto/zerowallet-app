@@ -40,7 +40,7 @@ import {
   getIconbySymbol,
   getNetworkLogobyName,
   Networks,
-} from "../utils/zapper";
+} from "../utils/Zapper";
 
 export default function App() {
   const { toast } = useToast();

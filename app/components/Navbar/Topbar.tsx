@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/sheet";
 import { MenuIcon } from "lucide-react";
 import Links from "../../data/Links.json";
-import Icons from "@/app/utils/icons";
+import Icons from "@/app/utils/Icons";
 
 export default function Topbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
