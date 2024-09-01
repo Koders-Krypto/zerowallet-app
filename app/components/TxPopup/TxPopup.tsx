@@ -31,8 +31,10 @@ export default function TxPopup() {
     value,
     chainId,
     transactionDapp,
+    contractTransaction,
     showTransactionModal,
     setShowTransactionModal,
+    setApproveTransaction
   } = useContext(SignClientContext);
   return (
     <Dialog open={showTransactionModal} onOpenChange={setShowTransactionModal}>
@@ -107,7 +109,7 @@ export default function TxPopup() {
             <div>{value}</div>
           </div>
 
-          <button className="w-full bg-white text-black py-2">Sign</button>
+          <button onClick={() => setApproveTransaction(true)} className="w-full bg-white text-black py-2">Sign</button>
         </div>
       </DialogContent>
     </Dialog>
