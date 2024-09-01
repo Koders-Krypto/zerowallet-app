@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Address } from "viem";
 import SignClient from "@walletconnect/sign-client";
-import { useAccount } from "./LoginProvider"
+import { useAccount } from "./LoginProvider";
 import useDappStore, { Dapp } from "../store/walletConnect";
 import GenericBridge from "./GenericBridge";
 import {
@@ -12,7 +12,6 @@ import {
 } from "@wagmi/core";
 import { config } from "../wallet-connect/config/index";
 import { createClient } from "@layerzerolabs/scan-client";
-
 
 export interface ContractTransaction {
   from: Address;
@@ -74,8 +73,8 @@ interface SignClientContextProps {
 }
 
 export const SignClientContext = createContext<SignClientContextProps>({
-  setPairing: () => { },
-  disconnect: () => { },
+  setPairing: () => {},
+  disconnect: () => {},
   contractTransaction: undefined,
   from: "0x0",
   to: "0x0",
@@ -87,7 +86,7 @@ export const SignClientContext = createContext<SignClientContextProps>({
   showTransactionModal: false,
   isSignature: false,
   approveTransaction: false,
-  setApproveTransaction: () => { },
+  setApproveTransaction: () => {},
   setShowTransactionModal: (show: boolean) => void {},
   transactionState: "IDLE",
 });
@@ -158,43 +157,47 @@ export const SignClientProvider = ({
     signClient.on("session_proposal", async (event) => {
       console.log("Session Proposal", event);
       interface Event {
-        id: number
+        id: number;
         params: {
-          id: number
-          expiry: number
+          id: number;
+          expiry: number;
           relays: Array<{
-            protocol: string
-            data?: string
-          }>
+            protocol: string;
+            data?: string;
+          }>;
           proposer: {
-            publicKey: string
+            publicKey: string;
             metadata: {
-              name: string
-              description: string
-              url: string
-              icons: string[]
-            }
-          }
+              name: string;
+              description: string;
+              url: string;
+              icons: string[];
+            };
+          };
           requiredNamespaces: Record<
             string,
             {
-              chains: string[]
-              methods: string[]
-              events: string[]
+              chains: string[];
+              methods: string[];
+              events: string[];
             }
-          >
-          pairingTopic?: string
-        },
-        topic: string
+          >;
+          pairingTopic?: string;
+        };
+        topic: string;
       }
-
 
       const { topic, acknowledged } = await signClient.approve({
         id: event.id,
         namespaces: {
           eip155: {
             accounts: ["eip155:17000:" + address],
-            methods: ["personal_sign", "eth_signTransaction", "eth_sign", "eth_sendTransaction"],
+            methods: [
+              "personal_sign",
+              "eth_signTransaction",
+              "eth_sign",
+              "eth_sendTransaction",
+            ],
             events: ["accountsChanged"],
           },
         },
@@ -270,7 +273,6 @@ export const SignClientProvider = ({
         setShowTransactionModal(true);
         console.log("Session Request", event);
       }
-
     });
 
     signClient.on("session_ping", (event) => {
@@ -298,7 +300,6 @@ export const SignClientProvider = ({
     });
   }, [signClient, address, addDapp, sessionProposal, getDapp]);
 
-
   // useEffect(() => {
   //   if (approveTransaction) {
   //     setShowTransactionModal(false);
@@ -315,6 +316,7 @@ export const SignClientProvider = ({
       approveTransactionChain();
       setTransactionState("SENDING_TRANSACTION");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [approveTransaction]);
 
   const getTxpoolStatus = async (txHash: string) => {
