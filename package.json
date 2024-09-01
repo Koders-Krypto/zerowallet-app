@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@layerzerolabs/lz-v2-utilities": "^2.3.34",
+    "@layerzerolabs/scan-client": "^0.0.8",
     "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-select": "^2.1.1",
     "@radix-ui/react-tabs": "^1.1.0",

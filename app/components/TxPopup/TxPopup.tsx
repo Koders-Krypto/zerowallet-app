@@ -24,15 +24,11 @@ export default function TxPopup() {
   const {
     setPairing,
     disconnect,
-    from,
-    to,
-    data,
-    gas,
-    value,
-    chainId,
+    contractTransaction,
     transactionDapp,
     showTransactionModal,
     setShowTransactionModal,
+    setApproveTransaction,
   } = useContext(SignClientContext);
   return (
     <Dialog open={showTransactionModal} onOpenChange={setShowTransactionModal}>
@@ -83,7 +79,7 @@ export default function TxPopup() {
           </div>
           <div className="flex flex-row justify-between items-center w-full">
             <div>Destination Chain:</div>
-            <div>{chainId}</div>
+            <div>{contractTransaction?.chainId}</div>
           </div>
 
           <div className="flex flex-row justify-between items-center w-full">
@@ -92,22 +88,27 @@ export default function TxPopup() {
           </div>
           <div className="flex flex-row justify-between items-center w-full">
             <div>To:</div>
-            <div>{Truncate(to, 12, "...")}</div>
+            <div>{Truncate(contractTransaction?.to, 12, "...")}</div>
           </div>
           <div className="flex flex-row justify-between items-center w-full">
             <div>Data:</div>
-            <div className="w-32 truncate">{data}</div>
+            <div className="w-32 truncate">{contractTransaction?.data}</div>
           </div>
           <div className="flex flex-row justify-between items-center w-full">
             <div>Gas:</div>
-            <div>{gas}</div>
+            <div>{contractTransaction?.gas}</div>
           </div>
           <div className="flex flex-row justify-between items-center w-full">
             <div>Value:</div>
-            <div>{value}</div>
+            <div>{contractTransaction?.value}</div>
           </div>
 
-          <button className="w-full bg-white text-black py-2">Sign</button>
+          <button
+            className="w-full bg-white text-black py-2"
+            onClick={() => setApproveTransaction(true)}
+          >
+            Sign
+          </button>
         </div>
       </DialogContent>
     </Dialog>

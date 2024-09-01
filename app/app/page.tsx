@@ -47,6 +47,7 @@ import {
 } from "@wagmi/core";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useConnect } from "wagmi";
+import { config, projectId } from "../wallet-connect/config/index";
 
 export default function App() {
   const { toast } = useToast();
@@ -59,134 +60,6 @@ export default function App() {
   const { ensname } = useContext(LoginContext);
 
   const { open } = useWeb3Modal();
-  const { connect, connectors } = useConnect();
-
-  const metadata = {
-    name: "ZeroWallet",
-    description:
-      "ZeroWallet is a LayerZero-powered crypto wallet that lets you manage gas fees on one chain while accessing dApps across all chains.",
-    url: "https://zerowallet-app.vercel.app",
-    icons: ["https://zerowallet-app.vercel.app/logo/logo-black.svg"],
-  };
-
-  const projectId = process.env.NEXT_PUBLIC_PROJECT_ID || "";
-  const chains = [holesky] as const;
-  const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata });
-  createWeb3Modal({ wagmiConfig, projectId });
-
-  const waitForTransaction = async (hash: any) => {
-    try {
-      const transactionReceipt = await waitForTransactionReceipt(wagmiConfig, {
-        confirmations: 2,
-        hash,
-      });
-      if (transactionReceipt.status === "success") {
-        return {
-          success: true,
-          data: transactionReceipt,
-        };
-      }
-      throw transactionReceipt.status;
-    } catch (e: any) {
-      throw e;
-    }
-  };
-
-  const run = async () => {
-    if (isDisconnected) {
-      await open();
-      return;
-    }
-
-    // createWeb3Modal({ wagmiConfig, projectId });
-
-    try {
-      const sepoliaEndpointID = "40161";
-      const toAddress = "0x09545c0Cd0ddfd3B5EfBA5F093B3cA20b6ba4bB9";
-      const options = "0x";
-      console.log("callign mint");
-      const result = await writeContract(wagmiConfig, {
-        abi: [
-          {
-            inputs: [
-              {
-                internalType: "address",
-                name: "to",
-                type: "address",
-              },
-              {
-                internalType: "uint256",
-                name: "amount",
-                type: "uint256",
-              },
-            ],
-            name: "mint",
-            outputs: [],
-            stateMutability: "nonpayable",
-            type: "function",
-          },
-        ],
-        address: "0x1a5d09e6cfCb329176e9AFb4b1638d4694a086F6",
-        functionName: "mint",
-        args: [address || "0x0", BigInt("100000000000000")],
-        chainId: 17000,
-      });
-
-      await waitForTransaction(result);
-    } catch (error) {
-      console.log(error);
-    }
-
-    //@ts-ignore
-    // if (!window.ethereum) {
-    //   console.error("No Ethereum provider found");
-    //   return;
-    // }
-    // //@ts-ignore
-    // const ethereumProvider = window.ethereum;
-    // const provider = new ethers.BrowserProvider(ethereumProvider);
-
-    // if (ethereumProvider == undefined) {
-    //   console.error("No Ethereum provider found");
-    //   return;
-    // }
-    // //@ts-ignore
-    // await ethereumProvider.request({ method: "eth_requestAccounts" });
-    // const signer = await provider.getSigner();
-    // // const address = await signer.getAddress();
-
-    // const erc20 = new ethers.Contract(
-    //   "0x1a5d09e6cfCb329176e9AFb4b1638d4694a086F6",
-    //   [
-    //     {
-    //       inputs: [
-    //         {
-    //           internalType: "address",
-    //           name: "to",
-    //           type: "address",
-    //         },
-    //         {
-    //           internalType: "uint256",
-    //           name: "amount",
-    //           type: "uint256",
-    //         },
-    //       ],
-    //       name: "mint",
-    //       outputs: [],
-    //       stateMutability: "nonpayable",
-    //       type: "function",
-    //     },
-    //   ],
-    //   signer
-    // );
-
-    // // Perform minting operation here
-    // // For example: await mint.someFunction();
-
-    // await erc20.mint(address, 100);
-
-    console.log("Minting completed for address:", address);
-  };
 
   return (
     <div className=" flex flex-col items-start justify-center gap-6 w-full h-full">
@@ -230,7 +103,6 @@ export default function App() {
             />
           </div>
         </div>
-        <button onClick={run}>Mint</button>
         {connectedDapps.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 w-full text-white text-sm">
             <div

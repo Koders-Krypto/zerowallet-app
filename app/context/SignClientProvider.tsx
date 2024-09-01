@@ -10,43 +10,80 @@ import {
   waitForTransaction,
   waitForTransactionReceipt,
 } from "@wagmi/core";
-import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
-import { WagmiConfig } from "wagmi";
-import { holesky } from "wagmi/chains";
+import { config } from "../wallet-connect/config/index";
+import { createClient } from "@layerzerolabs/scan-client";
 
+type TransactionState =
+  | "IDLE"
+  | "SENDING_TRANSACTION"
+  | "TRANSACTION_WAIT"
+  | "ZERO_WAIT"
+  | "SUCCESS"
+  | "ERROR";
 interface SignClientContextProps {
   setPairing: (url: string) => void;
   disconnect: (topic: string) => void;
-  from: Address;
-  to: Address;
-  data: Address;
-  gas: Address;
-  value: Address;
-  chainId: number;
+  contractTransaction: ContractTransaction | undefined;
   transactionDapp: Dapp | null;
   showTransactionModal: boolean;
   isSignature: boolean;
   approveTransaction: boolean;
   setApproveTransaction: (approve: boolean) => void;
   setShowTransactionModal: (show: boolean) => void;
+  transactionState: TransactionState;
+}
+
+export type Message = {
+  srcUaAddress: string;
+  dstUaAddress: string;
+  srcChainId: number;
+  dstChainId: number;
+  dstTxHash?: string;
+  dstTxError?: string;
+  srcTxHash: string;
+  srcBlockHash: string;
+  srcBlockNumber: string;
+  srcUaNonce: number;
+  status: MessageStatus;
+};
+
+enum MessageStatus {
+  INFLIGHT = "INFLIGHT",
+  DELIVERED = "DELIVERED",
+  FAILED = "FAILED",
+  PAYLOAD_STORED = "PAYLOAD_STORED",
+  BLOCKED = "BLOCKED",
+  CONFIRMING = "CONFIRMING",
 }
 
 export const SignClientContext = createContext<SignClientContextProps>({
   setPairing: () => {},
   disconnect: () => {},
-  from: "0x0",
-  to: "0x0",
-  data: "0x0",
-  gas: "0x0",
-  value: "0x0",
-  chainId: 0,
+  contractTransaction: undefined,
   transactionDapp: null,
   showTransactionModal: false,
   isSignature: false,
   approveTransaction: false,
   setApproveTransaction: () => {},
   setShowTransactionModal: (show: boolean) => void {},
+  transactionState: "IDLE",
 });
+
+// setData(event.params.request.params[0].data);
+// setFrom(event.params.request.params[0].from);
+// setTo(event.params.request.params[0].to);
+// setGas(event.params.request.params[0].gas);
+// setValue(event.params.request.params[0].value);
+// setChainId(parseInt(event.params.chainId));
+
+export interface ContractTransaction {
+  from: Address;
+  to: Address;
+  data: Address;
+  gas: Address;
+  value: Address;
+  chainId: number;
+}
 
 export const SignClientProvider = ({
   children,
@@ -55,30 +92,18 @@ export const SignClientProvider = ({
 }) => {
   const [showTransactionModal, setShowTransactionModal] =
     useState<boolean>(false);
-  const [from, setFrom] = useState<Address>("0x0");
-  const [to, setTo] = useState<Address>("0x0");
-  const [data, setData] = useState<Address>("0x0");
-  const [gas, setGas] = useState<Address>("0x0");
   const [signClient, setSignClient] = useState<SignClient | null>(null);
   const [sessionProposal, setSessionProposal] = useState<any[]>([]);
-  const [value, setValue] = useState<Address>("0x0");
-  const [chainId, setChainId] = useState<number>(0);
+  const [contractTransaction, setContractTransaction] = useState<
+    ContractTransaction | undefined
+  >(undefined);
   const [transactionDapp, setTransactionDapp] = useState<Dapp | null>(null);
   const [isSignature, setIsSignature] = useState<boolean>(false);
   const { address } = useAccount();
   const [approveTransaction, setApproveTransaction] = useState<boolean>(false);
-
-  const metadata = {
-    name: "ZeroWallet",
-    description:
-      "ZeroWallet is a LayerZero-powered crypto wallet that lets you manage gas fees on one chain while accessing dApps across all chains.",
-    url: "https://zerowallet-app.vercel.app",
-    icons: ["https://zerowallet-app.vercel.app/logo/logo-black.svg"],
-  };
-
-  const projectId = process.env.NEXT_PUBLIC_PROJECT_ID || "";
-  const chains = [holesky] as const;
-  const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata });
+  const [message, setMessage] = useState<Message | undefined>(undefined);
+  const [transactionState, setTransactionState] =
+    useState<TransactionState>("IDLE");
 
   // Use Zustand store
   const { addDapp, removeDapp, getDapp } = useDappStore();
@@ -154,7 +179,7 @@ export const SignClientProvider = ({
         id: event.id,
         namespaces: {
           eip155: {
-            accounts: ["eip155:1:" + address],
+            accounts: ["eip155:17000:" + address],
             methods: [
               "personal_sign",
               "eth_signTransaction",
@@ -218,13 +243,16 @@ export const SignClientProvider = ({
       if (event.params.request.method === "personal_sign") {
         setIsSignature(true);
         setShowTransactionModal(true);
+        true;
       } else {
-        setData(event.params.request.params[0].data);
-        setFrom(event.params.request.params[0].from);
-        setTo(event.params.request.params[0].to);
-        setGas(event.params.request.params[0].gas);
-        setValue(event.params.request.params[0].value);
-        setChainId(parseInt(event.params.chainId));
+        setContractTransaction({
+          from: event.params.request.params[0].from,
+          to: event.params.request.params[0].to,
+          data: event.params.request.params[0].data,
+          gas: event.params.request.params[0].gas,
+          value: event.params.request.params[0].value,
+          chainId: parseInt(event.params.chainId),
+        });
         setShowTransactionModal(true);
         console.log("Session Request", event);
       }
@@ -256,50 +284,104 @@ export const SignClientProvider = ({
   }, [signClient, address, addDapp, sessionProposal, getDapp]);
 
   useEffect(() => {
+    console.log("approveTransaction", approveTransaction);
     if (approveTransaction) {
-      setShowTransactionModal(false);
-      setApproveTransaction(false);
+      // setShowTransactionModal(false);
+      // setApproveTransaction(false);
       approveTransactionChain();
+      setTransactionState("SENDING_TRANSACTION");
     }
   }, [approveTransaction]);
 
+  //   const approveTransactionChain = async () => {
+  //     console.log("approveTransactionChain");
+
+  //     try {
+  //       //   const sepoliaEndpointID = "40161";
+  //       const holeskyEndpointID = "17000";
+  //       const toAddress = "0x00030100110100000000000000000000000001c9c380";
+  //       const options = "0x00030100110100000000000000000000000001c9c380";
+  //       const result = await writeContract(config, {
+  //         abi: GenericBridge,
+  //         address: "0x09545c0Cd0ddfd3B5EfBA5F093B3cA20b6ba4bB9",
+  //         functionName: "sendAmount",
+  //         args: [holeskyEndpointID, "100000000000000", toAddress, data, options],
+  //       });
+
+  //       await waitForTransaction(result);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+
+  const getTxpoolStatus = async (txHash: string) => {
+    try {
+      const client = createClient("testnet");
+      const { messages } = await client.getMessagesBySrcTxHash(txHash);
+      const _message: Message = messages[0] as Message;
+      setMessage(_message);
+      if (
+        !_message ||
+        (_message.status !== "DELIVERED" &&
+          _message.status !== "FAILED" &&
+          _message.status !== "BLOCKED")
+      ) {
+        setTimeout(() => {
+          getTxpoolStatus(txHash);
+        }, 60 * 1000);
+      } else if (_message.status === "FAILED") {
+        // await handleFailedMessage(txHash);
+      }
+      6;
+    } catch (e) {
+      setTimeout(() => {
+        getTxpoolStatus(txHash);
+      }, 60 * 1000);
+    }
+  };
+
   const approveTransactionChain = async () => {
-    // Create Web3Modal
-    createWeb3Modal({ wagmiConfig, projectId });
+    if (!contractTransaction) return;
+
+    console.log("approveTransactionChain 232");
 
     try {
-      const sepoliaEndpointID = "40161";
-      const toAddress = "0x09545c0Cd0ddfd3B5EfBA5F093B3cA20b6ba4bB9";
-      const options = "0x";
-      const result = await writeContract(wagmiConfig, {
+      //   const sepoliaEndpointID = "40161";
+      const holeskyEndpointID = "40217";
+      const toAddress = contractTransaction.to;
+      const nativeFee = "3630993850786210";
+      const options = "0x000301001101000000000000000000000000000493e0";
+
+      //@ts-ignore
+      const result = await writeContract(config, {
         abi: GenericBridge,
-        address: "0xdfa96d5E31177F182fc95790Be712D238d0d3b83",
+        address: "0x09545c0Cd0ddfd3B5EfBA5F093B3cA20b6ba4bB9",
         functionName: "sendAmount",
         args: [
-          sepoliaEndpointID,
-          ,
-          "100000000000000",
+          holeskyEndpointID,
+          nativeFee,
           toAddress,
-          data,
+          contractTransaction.data,
           options,
         ],
+        value: BigInt(nativeFee),
       });
 
+      setTransactionState("TRANSACTION_WAIT");
       await waitForTransaction(result);
+      setTransactionState("ZERO_WAIT");
+
+      await getTxpoolStatus(result);
+      setTransactionState("SUCCESS");
     } catch (error) {
+      setTransactionState("ERROR");
       console.log(error);
     }
-
-    //   function sendAmount(
-    //     uint32 _dstEid,
-    //     uint256 fee,
-    //     address to,
-    //     bytes memory data,
-    //     bytes calldata _options
   };
+
   const waitForTransaction = async (hash: Address) => {
     try {
-      const transactionReceipt = await waitForTransactionReceipt(wagmiConfig, {
+      const transactionReceipt = await waitForTransactionReceipt(config, {
         confirmations: 2,
         hash,
       });
@@ -320,18 +402,14 @@ export const SignClientProvider = ({
       value={{
         setPairing,
         disconnect,
-        from,
-        to,
-        data,
-        gas,
-        value,
-        chainId,
+        contractTransaction,
         transactionDapp,
         showTransactionModal,
         isSignature,
         approveTransaction,
         setApproveTransaction,
         setShowTransactionModal,
+        transactionState,
       }}
     >
       {children}
