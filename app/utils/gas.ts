@@ -13,4 +13,8 @@ const gasChains = [
   },
 ];
 
-export default gasChains;
+function getChainById(chainId: number) {
+  return gasChains.find((chain) => chain.chainId === chainId);
+}
+
+export { gasChains, getChainById };
