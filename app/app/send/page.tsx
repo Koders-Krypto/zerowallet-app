@@ -30,10 +30,10 @@ export default function Bridge() {
   const [selectedTokenID, setSelectedTokenID] = useState<number>(0);
 
   return (
-    <div className="w-full h-full text-black border border-accent flex flex-col justify-center items-center gap-6 px-4 py-4 md:py-6">
+    <div className="w-full h-full text-black border border-accent flex flex-col justify-start md:justify-center items-start md:items-center gap-6 px-4 py-4 md:py-6">
       <div className="bg-white max-w-md w-full flex flex-col">
-        <div className="flex flex-row justify-between items-center gap-4 py-4 border-b border-accent px-6">
-          <h2 className="font-bold text-xl">Transfer Tokens</h2>
+        <div className="flex flex-row justify-between items-center gap-4 py-4 border-b border-accent px-4 md:px-6">
+          <h2 className="font-bold text-xl truncate">Transfer Tokens</h2>
           <div className="flex flex-row gap-2 items-center justify-center text-sm">
             <Fuel size={20} />
             <Select
@@ -45,7 +45,7 @@ export default function Bridge() {
                 }
               }}
             >
-              <SelectTrigger className="w-34 bg-black px-4 py-2 text-white flex flex-row gap-2 items-center justify-center text-sm focus:outline-none focus:ring-offset-0 focus:ring-0 focus:ring-accent">
+              <SelectTrigger className=" w-32 bg-black px-4 py-2 text-white flex flex-row gap-2 items-center justify-center text-sm focus:outline-none focus:ring-offset-0 focus:ring-0 focus:ring-accent">
                 <SelectValue placeholder="Gas Chain" />
               </SelectTrigger>
               <SelectContent>
@@ -70,7 +70,7 @@ export default function Bridge() {
             </Select>
           </div>
         </div>
-        <div className="flex flex-col gap-4 px-6 pb-4 pt-2">
+        <div className="flex flex-col gap-4 px-4 md:px-6 pb-4 pt-2">
           <div className="flex flex-col gap-2">
             <div className="flex flex-row justify-end items-center text-sm">
               <div className="flex flex-row justify-center items-center gap-1">
@@ -78,7 +78,7 @@ export default function Bridge() {
                 <button className="font-bold">Max</button>
               </div>
             </div>
-            <div className="grid grid-cols-3">
+            <div className="grid grid-cols-2 md:grid-cols-3">
               <Select
                 value={selectedTransferChainID.toString()}
                 onValueChange={(e) => {
@@ -94,7 +94,7 @@ export default function Bridge() {
                     <SelectItem key={chain.chainId} value={c.toString()}>
                       <div className="flex flex-row justify-center items-center gap-2 w-auto">
                         <Image
-                          className="bg-white rounded-full p-1"
+                          className="bg-white rounded-full p-px"
                           src={chain.icon}
                           alt={chain.name}
                           width={20}
@@ -120,7 +120,7 @@ export default function Bridge() {
                       <SelectItem key={t} value={t.toString()}>
                         <div className="flex flex-row justify-center items-center gap-2 w-auto">
                           <Image
-                            className="bg-white rounded-full p-1"
+                            className="bg-white rounded-full p-px"
                             src={stoken.icon}
                             alt={stoken.name}
                             width={20}
@@ -137,7 +137,7 @@ export default function Bridge() {
               <input
                 type="number"
                 placeholder={"0.01 ETH"}
-                className="w-full h-full pr-2 py-3 bg-transparent text-black border-y border-accent border-r text-right focus:outline-none"
+                className="w-full h-full pr-2 py-3 bg-transparent text-black border-y-0 border-b md:border-y border-accent border-r md:border-l-0 border-l text-right focus:outline-none col-span-2 md:col-span-1"
               />
             </div>
           </div>
