@@ -17,7 +17,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
-import { BadgeInfo, ChevronsRight, Wallet2 } from "lucide-react";
+import {
+  BadgeInfo,
+  ChevronsRight,
+  Plus,
+  PlusSquareIcon,
+  Wallet2,
+} from "lucide-react";
 
 export default function Savings() {
   const [fromChain, setFromChain] = useState<number>(0);
@@ -41,8 +47,8 @@ export default function Savings() {
         <h3 className="font-bold text-2xl">Vaults</h3>
         <Dialog>
           <DialogTrigger>
-            <button className="bg-white text-black py-2 px-6 font-medium text-lg">
-              Create Vault
+            <button className="bg-white text-black py-2 px-6 font-medium text-lg flex flex-row justify-center items-center gap-2">
+              <PlusSquareIcon /> Create Vault
             </button>
           </DialogTrigger>
           <DialogContent className="bg-black dark:bg-white flex flex-col justify-start items-start gap-4 rounded-none sm:rounded-none max-w-lg mx-auto border border-accent">
