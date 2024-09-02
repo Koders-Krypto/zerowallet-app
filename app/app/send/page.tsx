@@ -1,5 +1,5 @@
 "use client";
-import { gasChains, getChainById } from "@/app/utils/gas";
+
 import {
   Select,
   SelectContent,
@@ -11,9 +11,10 @@ import {
 import { Fuel, SendHorizonal } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
-import { getChain } from "@/app/logic/permissionless";
 
-interface GasChain {
+import { gasChainsTokens, getChainById } from "@/app/utils/tokens";
+
+interface GasChainType {
   name: string;
   address: string;
   chainId: number;
@@ -21,9 +22,12 @@ interface GasChain {
 }
 
 export default function Bridge() {
-  const [selectedGasChain, setSelectedGasChain] = useState<GasChain>(
-    gasChains[0]
+  const [selectedGasChain, setSelectedGasChain] = useState<GasChainType>(
+    gasChainsTokens[0]
   );
+  const [selectedTransferChainID, setSelectedTransferChainID] =
+    useState<number>(0);
+  const [selectedTokenID, setSelectedTokenID] = useState<number>(0);
 
   return (
     <div className="w-full h-full text-black border border-accent flex flex-col justify-center items-center gap-6 px-4 py-4 md:py-6">
@@ -33,7 +37,7 @@ export default function Bridge() {
           <div className="flex flex-row gap-2 items-center justify-center text-sm">
             <Fuel size={20} />
             <Select
-              defaultValue={selectedGasChain?.chainId.toString()}
+              value={selectedGasChain?.chainId.toString()}
               onValueChange={(e) => {
                 const _data = getChainById(parseInt(e));
                 if (_data) {
@@ -45,7 +49,7 @@ export default function Bridge() {
                 <SelectValue placeholder="Gas Chain" />
               </SelectTrigger>
               <SelectContent>
-                {gasChains.map((chain) => (
+                {gasChainsTokens.map((chain) => (
                   <SelectItem
                     key={chain.chainId}
                     value={chain.chainId.toString()}
@@ -75,16 +79,19 @@ export default function Bridge() {
               </div>
             </div>
             <div className="grid grid-cols-3">
-              <Select>
+              <Select
+                value={selectedTransferChainID.toString()}
+                onValueChange={(e) => {
+                  setSelectedTokenID(0);
+                  setSelectedTransferChainID(parseInt(e));
+                }}
+              >
                 <SelectTrigger className="bg-black text-white px-4 w-full py-3 h-full border-r border-accent focus:outline-none focus:ring-offset-0 focus:ring-0">
-                  <SelectValue placeholder="Token" />
+                  <SelectValue placeholder="Chain" />
                 </SelectTrigger>
                 <SelectContent>
-                  {gasChains.map((chain) => (
-                    <SelectItem
-                      key={chain.chainId}
-                      value={chain.chainId.toString()}
-                    >
+                  {gasChainsTokens.map((chain, c) => (
+                    <SelectItem key={chain.chainId} value={c.toString()}>
                       <div className="flex flex-row justify-center items-center gap-2 w-auto">
                         <Image
                           className="bg-white rounded-full p-1"
@@ -99,28 +106,31 @@ export default function Bridge() {
                   ))}
                 </SelectContent>
               </Select>
-              <Select>
+              <Select
+                key={selectedTransferChainID}
+                value={selectedTokenID.toString()}
+                onValueChange={(e) => setSelectedTokenID(parseInt(e))}
+              >
                 <SelectTrigger className="bg-black text-white px-4 w-full py-3 h-full border-r border-accent focus:outline-none focus:ring-offset-0 focus:ring-0">
                   <SelectValue placeholder="Token" />
                 </SelectTrigger>
                 <SelectContent>
-                  {gasChains.map((chain) => (
-                    <SelectItem
-                      key={chain.chainId}
-                      value={chain.chainId.toString()}
-                    >
-                      <div className="flex flex-row justify-center items-center gap-2 w-auto">
-                        <Image
-                          className="bg-white rounded-full p-1"
-                          src={chain.icon}
-                          alt={chain.name}
-                          width={20}
-                          height={20}
-                        />
-                        <h3>{chain.name}</h3>
-                      </div>
-                    </SelectItem>
-                  ))}
+                  {gasChainsTokens[selectedTransferChainID].tokens.map(
+                    (stoken, t) => (
+                      <SelectItem key={t} value={t.toString()}>
+                        <div className="flex flex-row justify-center items-center gap-2 w-auto">
+                          <Image
+                            className="bg-white rounded-full p-1"
+                            src={stoken.icon}
+                            alt={stoken.name}
+                            width={20}
+                            height={20}
+                          />
+                          <h3>{stoken.name}</h3>
+                        </div>
+                      </SelectItem>
+                    )
+                  )}
                 </SelectContent>
               </Select>
 
