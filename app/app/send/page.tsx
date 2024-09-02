@@ -32,7 +32,7 @@ export default function Bridge() {
   return (
     <div className="w-full h-full text-black border border-accent flex flex-col justify-start md:justify-center items-start md:items-center gap-6 px-4 py-4 md:py-6">
       <div className="bg-white max-w-md w-full flex flex-col">
-        <div className="flex flex-row justify-between items-center gap-4 py-4 border-b border-accent px-4 md:px-6">
+        <div className="flex flex-row justify-between items-center gap-2 py-4 border-b border-accent px-4 md:px-6">
           <h2 className="font-bold text-xl truncate">Transfer Tokens</h2>
           <div className="flex flex-row gap-2 items-center justify-center text-sm">
             <Fuel size={20} />
