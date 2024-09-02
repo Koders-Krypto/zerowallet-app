@@ -395,7 +395,7 @@ export default function App() {
                             <SendHorizonal size={25} />
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Send</p>
+                            <p>Transfer</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>

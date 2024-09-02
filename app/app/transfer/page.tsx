@@ -56,7 +56,7 @@ export default function Bridge() {
                   >
                     <div className="flex flex-row justify-center items-center gap-2">
                       <Image
-                        className="bg-white rounded-full p-1"
+                        className="bg-white rounded-full"
                         src={chain.icon}
                         alt={chain.name}
                         width={20}
