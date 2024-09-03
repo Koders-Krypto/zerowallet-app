@@ -1,17 +1,20 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { Address } from "viem";
+import { Address, erc20Abi } from "viem";
 import SignClient from "@walletconnect/sign-client";
 import { useAccount } from "./LoginProvider";
 import useDappStore, { Dapp } from "../store/walletConnect";
 import GenericBridge from "./GenericBridge";
 import {
   writeContract,
+  readContract,
   waitForTransaction,
   waitForTransactionReceipt,
 } from "@wagmi/core";
 import { config } from "../wallet-connect/config/index";
 import { createClient } from "@layerzerolabs/scan-client";
+import { ethers } from "ethers";
+import { Options } from "@layerzerolabs/lz-v2-utilities";
 
 export interface ContractTransaction {
   from: Address;
@@ -73,8 +76,8 @@ interface SignClientContextProps {
 }
 
 export const SignClientContext = createContext<SignClientContextProps>({
-  setPairing: () => {},
-  disconnect: () => {},
+  setPairing: () => { },
+  disconnect: () => { },
   contractTransaction: undefined,
   from: "0x0",
   to: "0x0",
@@ -86,7 +89,7 @@ export const SignClientContext = createContext<SignClientContextProps>({
   showTransactionModal: false,
   isSignature: false,
   approveTransaction: false,
-  setApproveTransaction: () => {},
+  setApproveTransaction: () => { },
   setShowTransactionModal: (show: boolean) => void {},
   transactionState: "IDLE",
 });
@@ -191,7 +194,7 @@ export const SignClientProvider = ({
         id: event.id,
         namespaces: {
           eip155: {
-            accounts: ["eip155:17000:" + address],
+            accounts: ["eip155:97:" + address],
             methods: [
               "personal_sign",
               "eth_signTransaction",
@@ -384,6 +387,14 @@ export const SignClientProvider = ({
     }
   };
 
+  function getFunctionCallBytecode(contractABI: any, functionName: string, params: any) {
+    // Create a contract instance with a dummy address (we don't need it for encoding)
+    const contract = new ethers.Interface(contractABI)
+    // Encode the function call
+    const bytecode = contract.encodeFunctionData(functionName, params)
+    return bytecode
+  }
+
   const waitForTransaction = async (hash: Address) => {
     try {
       const transactionReceipt = await waitForTransactionReceipt(config, {
@@ -401,6 +412,47 @@ export const SignClientProvider = ({
       throw e;
     }
   };
+
+  const transferTokens = async (tokenA: Address, chainId: string, toAddress: Address, amount: Address) => {
+    try {
+      const endpointId = chainId //"40217";
+
+      const data = getFunctionCallBytecode(erc20Abi, 'approve', [GenericBridge, ethers.parseEther(amount)])
+
+      const options = Options.newOptions().addExecutorLzReceiveOption(600000, 2).toHex() as `0x${string}`
+
+      let nativeFeeResult: any = await readContract(config, {
+        abi: GenericBridge,
+        address: "0x09545c0Cd0ddfd3B5EfBA5F093B3cA20b6ba4bB9",
+        functionName: "quoteAmount",
+        args: [
+          endpointId,
+          toAddress,
+          data,
+          options
+        ],
+      });
+
+
+      const result = await writeContract(config, {
+        abi: GenericBridge,
+        address: "0x09545c0Cd0ddfd3B5EfBA5F093B3cA20b6ba4bB9",
+        functionName: "sendAmount",
+        args: [
+          endpointId,
+          nativeFeeResult.nativeFee,
+          toAddress,
+          data,
+          options,
+        ],
+        value: BigInt(nativeFeeResult.nativeFee),
+      });
+      await waitForTransaction(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <SignClientContext.Provider
       value={{
@@ -420,8 +472,7 @@ export const SignClientProvider = ({
         approveTransaction,
         setApproveTransaction,
         setShowTransactionModal,
-      }}
-    >
+      }}>
       {children}
     </SignClientContext.Provider>
   );
