@@ -32,7 +32,7 @@ export default function Bridge() {
   return (
     <div className="w-full h-full text-white border border-accent flex flex-col justify-start md:justify-center items-start md:items-center gap-6 px-4 py-4 md:py-6">
       <div className="bg-transparent border border-accent max-w-md w-full flex flex-col">
-        <div className="flex flex-row justify-between items-center gap-2 py-4 border-b border-accent px-4 md:px-6">
+        <div className="flex flex-row justify-between items-center gap-2 py-3.5 border-b border-accent px-4 md:px-6">
           <h2 className="font-bold text-xl truncate">Transfer Tokens</h2>
           <div className="flex flex-row gap-2 items-center justify-center text-sm">
             <Fuel size={20} />
@@ -70,9 +70,9 @@ export default function Bridge() {
             </Select>
           </div>
         </div>
-        <div className="flex flex-col gap-4 px-4 md:px-6 pb-4 pt-2">
+        <div className="flex flex-col gap-4 px-4 md:px-6 pb-6 pt-7 relative">
           <div className="flex flex-col gap-2">
-            <div className="flex flex-row justify-end items-center text-sm">
+            <div className="flex flex-row justify-end items-center text-sm absolute top-1.5 right-6">
               <div className="flex flex-row justify-center items-center gap-1">
                 <div>0.001 ETH</div>
                 <button className="font-bold">Max</button>
@@ -95,7 +95,7 @@ export default function Bridge() {
                       <SelectItem key={chain.chainId} value={c.toString()}>
                         <div className="flex flex-row justify-center items-center gap-2 w-auto">
                           <Image
-                            className="bg-white rounded-full p-px"
+                            className="bg-white rounded-full"
                             src={chain.icon}
                             alt={chain.name}
                             width={20}
@@ -121,7 +121,7 @@ export default function Bridge() {
                         <SelectItem key={t} value={t.toString()}>
                           <div className="flex flex-row justify-center items-center gap-2 w-auto">
                             <Image
-                              className="bg-white rounded-full p-px"
+                              className="bg-white rounded-full"
                               src={stoken.icon}
                               alt={stoken.name}
                               width={20}
@@ -148,8 +148,8 @@ export default function Bridge() {
             placeholder="Recipient address (0x0)"
             className="w-full h-full pl-4 py-3 bg-transparent text-black focus:outline-none border border-accent"
           />
-          <div className="border border-accent p-2 flex flex-col text-sm gap-1">
-            <div className="flex flex-row justify-between items-center">
+          <div className="border border-accent px-4 py-3 flex flex-col text-sm gap-0 divide-y divide-accent">
+            <div className="flex flex-row justify-between items-center pb-2">
               <h4>Gas Chain</h4>
               <h5 className="flex flex-row justify-center items-center gap-1">
                 <Image
@@ -161,16 +161,16 @@ export default function Bridge() {
                 {selectedGasChain?.name}
               </h5>
             </div>
-            <div className="flex flex-row justify-between items-center">
+            <div className="flex flex-row justify-between items-center py-2">
               <h4>Token</h4>
               <h5>ETH</h5>
             </div>
-            <div className="flex flex-row justify-between items-center">
+            <div className="flex flex-row justify-between items-center pt-2">
               <h4>Recipient Address</h4>
               <h5>0x0</h5>
             </div>
           </div>
-          <button className="w-full bg-white hover:bg-transparent hover:text-white border border-accent text-black py-4 text-lg font-bold flex flex-row justify-center items-center gap-2">
+          <button className="w-full bg-white hover:bg-transparent hover:text-white border border-accent text-black py-3.5 text-lg font-bold flex flex-row justify-center items-center gap-2">
             Transfer <SendHorizonal size={20} />
           </button>
         </div>
