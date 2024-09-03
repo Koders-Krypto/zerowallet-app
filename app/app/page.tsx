@@ -417,7 +417,7 @@ export default function App() {
                             <PiggyBank size={25} />
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Savings</p>
+                            <p>Investments</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>

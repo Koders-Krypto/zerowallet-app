@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@layerzerolabs/lz-v2-utilities": "^2.3.40",
     "@layerzerolabs/scan-client": "^0.0.8",
     "@radix-ui/react-checkbox": "^1.1.1",
     "@radix-ui/react-dialog": "^1.1.1",
@@ -50,8 +51,7 @@
     "viem": "^2.20.0",
     "vite-plugin-node-polyfills": "^0.22.0",
     "wagmi": "^2.12.7",
-    "zustand": "^4.5.5",
-    "@layerzerolabs/lz-v2-utilities": "^2.3.34"
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@types/node": "^20",

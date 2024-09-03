@@ -388,7 +388,7 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@layerzerolabs/lz-v2-utilities@^2.3.34":
+"@layerzerolabs/lz-v2-utilities@^2.3.40":
   version "2.3.40"
   resolved "https://registry.yarnpkg.com/@layerzerolabs/lz-v2-utilities/-/lz-v2-utilities-2.3.40.tgz#23cb32850943293bd6600fb853f4182d010cfcdf"
   integrity sha512-wYG/DZl6T+gc0zdEFZITWLvJfMZxZ4HPZIT2AoALnGETvGFADturFA2gNELfnzSTibLjRSSi6JH8eshaMyewMg==

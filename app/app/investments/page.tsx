@@ -26,7 +26,7 @@ import {
   Zap,
 } from "lucide-react";
 
-export default function Savings() {
+export default function Investments() {
   const [fromChain, setFromChain] = useState<number>(0);
   const [fromToken, setFromToken] = useState<number>(0);
   const [frequency, setFrequency] = useState<number>(0);
@@ -45,27 +45,28 @@ export default function Savings() {
   return (
     <div className="flex flex-col gap-6 justify-start p-4 items-start border border-accent w-full h-full">
       <div className="flex flex-row justify-between items-center w-full">
-        <h3 className="font-bold text-2xl">Vaults</h3>
+        <h3 className="font-bold text-2xl">Your Investments</h3>
         <Dialog>
           <DialogTrigger>
-            <button className="bg-white text-black py-2 px-6 font-medium text-lg flex flex-row justify-center items-center gap-2 border border-accent hover:border-accent hover:bg-transparent hover:text-white">
-              <PlusSquareIcon /> Create Vault
+            <button className="bg-black text-white py-2 px-6 font-medium text-lg flex flex-row justify-center items-center gap-2 border border-accent hover:border-accent hover:bg-transparent hover:text-white">
+              <PlusSquareIcon /> Create Investment
             </button>
           </DialogTrigger>
           <DialogContent className="bg-black dark:bg-white flex flex-col justify-start items-start gap-4 rounded-none sm:rounded-none max-w-lg mx-auto border border-accent">
             <DialogHeader>
               <DialogTitle className="text-white text-xl">
-                Create Vault
+                Create a Investment
               </DialogTitle>
               <DialogDescription className="text-base">
-                Create a new vault to store your assets and earn yield.
+                Create a new investment plan to store your assets and earn
+                yield.
               </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col border border-accent divide-y divide-accent gap-px">
               <div className=" px-4 py-3 flex flex-col gap-2 w-full text-base">
                 <div className="flex flex-row justify-between items-center text-sm">
                   <div className="flex flex-row justify-start items-center gap-1 text-accent">
-                    <div className="text-accent">Allocate</div>
+                    <div className="text-accent">Invest</div>
                     <BadgeInfo size={14} />
                   </div>
                 </div>
@@ -147,37 +148,11 @@ export default function Savings() {
                 <div className="flex flex-row justify-between items-center gap-2 w-full">
                   <input
                     type="number"
-                    placeholder="0.01"
+                    disabled
+                    placeholder=""
                     className="bg-transparent focus:outline-none w-full text-white text-4xl"
                   />
                   <div className="flex flex-row justify-center items-center gap-2">
-                    <Select
-                      value={fromChain.toString()}
-                      onValueChange={(e) => {
-                        setFromChain(parseInt(e));
-                        setFromToken(0);
-                      }}
-                    >
-                      <SelectTrigger className=" w-28 bg-white px-2 py-2 border border-accent text-black flex flex-row gap-2 items-center justify-center text-sm rounded-full focus:outline-none focus:ring-offset-0 focus:ring-0 focus:ring-accent">
-                        <SelectValue placeholder="From Chain" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {gasChainsTokens.map((from, f) => (
-                          <SelectItem key={f} value={f.toString()}>
-                            <div className="flex flex-row justify-center items-center gap-2">
-                              <Image
-                                className="bg-white rounded-full"
-                                src={from.icon}
-                                alt={from.name}
-                                width={25}
-                                height={25}
-                              />
-                              <h3 className="truncate">{from.name}</h3>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
                     <Select
                       value={fromToken.toString()}
                       onValueChange={(e) => {
@@ -209,7 +184,7 @@ export default function Savings() {
               </div>
               <div className=" px-4 py-3 flex flex-col gap-2 w-full text-base">
                 <div className="flex flex-row justify-start items-center gap-1 text-accent text-sm">
-                  <div className="text-accent">Time</div>
+                  <div className="text-accent">Every</div>
                   <BadgeInfo size={14} />
                 </div>
                 <div className="flex flex-row justify-between items-center gap-2 w-full">
@@ -241,24 +216,80 @@ export default function Savings() {
                   </div>
                 </div>
               </div>
-              <div className=" px-4 py-3 flex flex-col gap-2 w-full text-base">
-                <div className="flex flex-row justify-start items-center gap-1 text-accent text-sm">
-                  <div className="text-accent">Frequency</div>
-                  <BadgeInfo size={14} />
+              <div className="flex flex-row divide-x divide-accent">
+                <div className=" px-4 py-3 flex flex-col gap-2 w-full text-base">
+                  <div className="flex flex-row justify-start items-center gap-1 text-accent text-sm">
+                    <div className="text-accent">Start Time</div>
+                    <BadgeInfo size={14} />
+                  </div>
+                  <div className="flex flex-row justify-between items-center gap-2 w-full">
+                    <input
+                      type="number"
+                      placeholder="1"
+                      className="bg-transparent focus:outline-none w-full text-white text-4xl"
+                    />
+                    <div className="flex flex-row justify-center items-center gap-2">
+                      <Select
+                        value={frequency.toString()}
+                        onValueChange={(e) => {
+                          setFrequency(parseInt(e));
+                        }}
+                      >
+                        <SelectTrigger className=" w-24 bg-white px-2 py-2 border border-accent text-black flex flex-row gap-2 items-center justify-center text-sm rounded-full focus:outline-none focus:ring-offset-0 focus:ring-0 focus:ring-accent">
+                          <SelectValue placeholder="Frequency" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Frequency.map((frequency, fre) => {
+                            return (
+                              <SelectItem key={fre} value={fre.toString()}>
+                                {frequency.label}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                 </div>
-
-                <div className="flex flex-row justify-between items-center gap-2 w-full">
-                  <input
-                    type="number"
-                    placeholder="1"
-                    className="bg-transparent focus:outline-none w-full text-white text-4xl"
-                  />
+                <div className=" px-4 py-3 flex flex-col gap-2 w-full text-base">
+                  <div className="flex flex-row justify-start items-center gap-1 text-accent text-sm">
+                    <div className="text-accent">End Time</div>
+                    <BadgeInfo size={14} />
+                  </div>
+                  <div className="flex flex-row justify-between items-center gap-2 w-full">
+                    <input
+                      type="number"
+                      placeholder="1"
+                      className="bg-transparent focus:outline-none w-full text-white text-4xl"
+                    />
+                    <div className="flex flex-row justify-center items-center gap-2">
+                      <Select
+                        value={frequency.toString()}
+                        onValueChange={(e) => {
+                          setFrequency(parseInt(e));
+                        }}
+                      >
+                        <SelectTrigger className=" w-24 bg-white px-2 py-2 border border-accent text-black flex flex-row gap-2 items-center justify-center text-sm rounded-full focus:outline-none focus:ring-offset-0 focus:ring-0 focus:ring-accent">
+                          <SelectValue placeholder="Frequency" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Frequency.map((frequency, fre) => {
+                            return (
+                              <SelectItem key={fre} value={fre.toString()}>
+                                {frequency.label}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <button className="bg-transparent py-3 w-full bg-white text-black hover:border-t hover:border-accent hover:bg-transparent hover:text-white text-lg">
-                Create
-              </button>
             </div>
+            <button className="bg-transparent py-3 w-full bg-white text-black hover:border-t hover:border-accent hover:bg-transparent hover:text-white text-lg">
+              Create
+            </button>
           </DialogContent>
         </Dialog>
       </div>
@@ -318,6 +349,14 @@ export default function Savings() {
                   <div className="bg-red-600 h-3 w-3 rounded-full"></div>
                   <h5>Active</h5>
                 </h5>
+              </div>
+              <div className="grid grid-cols-2 gap-4 w-full">
+                <button className="border border-accent px-6 py-2.5">
+                  Disable
+                </button>
+                <button className="border border-accent px-6 py-2.5 bg-white text-black">
+                  Withdraw
+                </button>
               </div>
             </div>
           </div>

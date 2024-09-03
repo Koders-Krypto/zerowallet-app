@@ -56,7 +56,7 @@ export default function icons(props: { path: string; className: string }) {
           <path d="M16 16h5v5" />
         </svg>
       );
-    case "/app/savings":
+    case "/app/investments":
       return (
         <svg
           xmlns="http://www.w3.org/2000/svg"
