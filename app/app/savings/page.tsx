@@ -132,7 +132,7 @@ export default function Savings() {
                 </div>
                 <div className="flex flex-row justify-between items-center text-sm">
                   <div className="text-accent">$0.00</div>
-                  <div className="flex flex-row justify-center items-center gap-1 text-accent">
+                  <div className="flex flex-row justify-center items-center gap-2 text-accent">
                     <Wallet2 size={16} />
                     <h5>0.00</h5>
                   </div>
@@ -263,7 +263,7 @@ export default function Savings() {
       </div>
       <div className="grid grid-cols-3 gap-4 text-black w-full">
         <div className="bg-white w-full flex flex-col gap-0">
-          <div className="flex flex-row justify-between items-center px-4 py-3 border-b border-accent">
+          <div className="flex flex-row justify-between items-center px-6 py-4 border-b border-accent">
             <h2 className=" text-xl font-semibold">Vault #1</h2>
             <div>
               <Image
@@ -274,7 +274,7 @@ export default function Savings() {
               />
             </div>
           </div>
-          <div className="px-4 py-4 flex flex-col justify-start items-start">
+          <div className="px-6 py-4 flex flex-col justify-start items-start">
             <div className="flex flex-col justify-between items-start gap-4 w-full">
               <div className="flex flex-row justify-between items-center gap-3 w-full">
                 <div className="flex flex-row justify-start items-center gap-2">
@@ -309,7 +309,7 @@ export default function Savings() {
               </div>
               <div className="flex flex-row justify-between items-center w-full">
                 <h4 className="font-semibold">Status</h4>
-                <h5 className="flex flex-row justify-center items-center gap-1">
+                <h5 className="flex flex-row justify-center items-center gap-2">
                   <div className="bg-red-600 h-3 w-3 rounded-full"></div>
                   <h5>Active</h5>
                 </h5>
@@ -318,7 +318,7 @@ export default function Savings() {
           </div>
         </div>
         <div className="bg-white w-full flex flex-col gap-0">
-          <div className="flex flex-row justify-between items-center px-4 py-3 border-b border-accent">
+          <div className="flex flex-row justify-between items-center px-6 py-4 border-b border-accent">
             <h2 className=" text-xl font-semibold">Vault #1</h2>
             <div>
               <Image
@@ -329,7 +329,7 @@ export default function Savings() {
               />
             </div>
           </div>
-          <div className="px-4 py-4 flex flex-col justify-start items-start">
+          <div className="px-6 py-4 flex flex-col justify-start items-start">
             <div className="flex flex-col justify-between items-start gap-4 w-full">
               <div className="flex flex-row justify-between items-center gap-3 w-full">
                 <div className="flex flex-row justify-start items-center gap-2">
@@ -364,7 +364,7 @@ export default function Savings() {
               </div>
               <div className="flex flex-row justify-between items-center w-full">
                 <h4 className="font-semibold">Status</h4>
-                <h5 className="flex flex-row justify-center items-center gap-1">
+                <h5 className="flex flex-row justify-center items-center gap-2">
                   <div className="bg-red-600 h-3 w-3 rounded-full"></div>
                   <h5>Inactive</h5>
                 </h5>
@@ -373,7 +373,7 @@ export default function Savings() {
           </div>
         </div>
         <div className="bg-white w-full flex flex-col gap-0">
-          <div className="flex flex-row justify-between items-center px-4 py-3 border-b border-accent">
+          <div className="flex flex-row justify-between items-center px-6 py-4 border-b border-accent">
             <h2 className=" text-xl font-semibold">Vault #3</h2>
             <div>
               <Image
@@ -384,7 +384,7 @@ export default function Savings() {
               />
             </div>
           </div>
-          <div className="px-4 py-4 flex flex-col justify-start items-start">
+          <div className="px-6 py-4 flex flex-col justify-start items-start">
             <div className="flex flex-col justify-between items-start gap-4 w-full">
               <div className="flex flex-row justify-between items-center gap-3 w-full">
                 <div className="flex flex-row justify-start items-center gap-2">
@@ -419,7 +419,7 @@ export default function Savings() {
               </div>
               <div className="flex flex-row justify-between items-center w-full">
                 <h4 className="font-semibold">Status</h4>
-                <h5 className="flex flex-row justify-center items-center gap-1">
+                <h5 className="flex flex-row justify-center items-center gap-2">
                   <div className="bg-green-600 h-3 w-3 rounded-full"></div>
                   <h5>Active</h5>
                 </h5>
