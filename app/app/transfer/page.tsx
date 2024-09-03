@@ -30,8 +30,8 @@ export default function Bridge() {
   const [selectedTokenID, setSelectedTokenID] = useState<number>(0);
 
   return (
-    <div className="w-full h-full text-black border border-accent flex flex-col justify-start md:justify-center items-start md:items-center gap-6 px-4 py-4 md:py-6">
-      <div className="bg-white max-w-md w-full flex flex-col">
+    <div className="w-full h-full text-white border border-accent flex flex-col justify-start md:justify-center items-start md:items-center gap-6 px-4 py-4 md:py-6">
+      <div className="bg-transparent border border-accent max-w-md w-full flex flex-col">
         <div className="flex flex-row justify-between items-center gap-2 py-4 border-b border-accent px-4 md:px-6">
           <h2 className="font-bold text-xl truncate">Transfer Tokens</h2>
           <div className="flex flex-row gap-2 items-center justify-center text-sm">
@@ -45,7 +45,7 @@ export default function Bridge() {
                 }
               }}
             >
-              <SelectTrigger className=" w-32 bg-black px-4 py-2 text-white flex flex-row gap-2 items-center justify-center text-sm focus:outline-none focus:ring-offset-0 focus:ring-0 focus:ring-accent">
+              <SelectTrigger className=" w-32 bg-black px-4 py-2 text-white flex flex-row gap-2 items-center justify-center text-sm focus:outline-none focus:ring-offset-0 focus:ring-0 focus:ring-accent border border-accent">
                 <SelectValue placeholder="Gas Chain" />
               </SelectTrigger>
               <SelectContent>
@@ -79,61 +79,62 @@ export default function Bridge() {
               </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3">
-              <Select
-                value={selectedTransferChainID.toString()}
-                onValueChange={(e) => {
-                  setSelectedTokenID(0);
-                  setSelectedTransferChainID(parseInt(e));
-                }}
-              >
-                <SelectTrigger className="bg-black text-white px-4 w-full py-3 h-full border-r border-accent focus:outline-none focus:ring-offset-0 focus:ring-0">
-                  <SelectValue placeholder="Chain" />
-                </SelectTrigger>
-                <SelectContent>
-                  {gasChainsTokens.map((chain, c) => (
-                    <SelectItem key={chain.chainId} value={c.toString()}>
-                      <div className="flex flex-row justify-center items-center gap-2 w-auto">
-                        <Image
-                          className="bg-white rounded-full p-px"
-                          src={chain.icon}
-                          alt={chain.name}
-                          width={20}
-                          height={20}
-                        />
-                        <h3>{chain.name}</h3>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select
-                key={selectedTransferChainID}
-                value={selectedTokenID.toString()}
-                onValueChange={(e) => setSelectedTokenID(parseInt(e))}
-              >
-                <SelectTrigger className="bg-black text-white px-4 w-full py-3 h-full border-r border-accent focus:outline-none focus:ring-offset-0 focus:ring-0">
-                  <SelectValue placeholder="Token" />
-                </SelectTrigger>
-                <SelectContent>
-                  {gasChainsTokens[selectedTransferChainID].tokens.map(
-                    (stoken, t) => (
-                      <SelectItem key={t} value={t.toString()}>
+              <div className="flex flex-row col-span-2 divide-x divide-accent border-r border-accent">
+                <Select
+                  value={selectedTransferChainID.toString()}
+                  onValueChange={(e) => {
+                    setSelectedTokenID(0);
+                    setSelectedTransferChainID(parseInt(e));
+                  }}
+                >
+                  <SelectTrigger className="bg-black text-white px-4 w-full py-3 h-full border-r-0 border-accent focus:outline-none focus:ring-offset-0 focus:ring-0">
+                    <SelectValue placeholder="Chain" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {gasChainsTokens.map((chain, c) => (
+                      <SelectItem key={chain.chainId} value={c.toString()}>
                         <div className="flex flex-row justify-center items-center gap-2 w-auto">
                           <Image
                             className="bg-white rounded-full p-px"
-                            src={stoken.icon}
-                            alt={stoken.name}
+                            src={chain.icon}
+                            alt={chain.name}
                             width={20}
                             height={20}
                           />
-                          <h3>{stoken.name}</h3>
+                          <h3>{chain.name}</h3>
                         </div>
                       </SelectItem>
-                    )
-                  )}
-                </SelectContent>
-              </Select>
-
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select
+                  key={selectedTransferChainID}
+                  value={selectedTokenID.toString()}
+                  onValueChange={(e) => setSelectedTokenID(parseInt(e))}
+                >
+                  <SelectTrigger className="bg-black text-white px-4 w-full py-3 h-full border-l-0 border-accent focus:outline-none focus:ring-offset-0 focus:ring-0">
+                    <SelectValue placeholder="Token" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {gasChainsTokens[selectedTransferChainID].tokens.map(
+                      (stoken, t) => (
+                        <SelectItem key={t} value={t.toString()}>
+                          <div className="flex flex-row justify-center items-center gap-2 w-auto">
+                            <Image
+                              className="bg-white rounded-full p-px"
+                              src={stoken.icon}
+                              alt={stoken.name}
+                              width={20}
+                              height={20}
+                            />
+                            <h3>{stoken.name}</h3>
+                          </div>
+                        </SelectItem>
+                      )
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
               <input
                 type="number"
                 placeholder={"0.01 ETH"}
@@ -169,7 +170,7 @@ export default function Bridge() {
               <h5>0x0</h5>
             </div>
           </div>
-          <button className="w-full bg-black text-white py-4 text-lg font-bold flex flex-row justify-center items-center gap-2">
+          <button className="w-full bg-white hover:bg-transparent hover:text-white border border-accent text-black py-4 text-lg font-bold flex flex-row justify-center items-center gap-2">
             Transfer <SendHorizonal size={20} />
           </button>
         </div>

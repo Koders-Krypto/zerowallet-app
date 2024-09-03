@@ -23,6 +23,7 @@ import {
   Plus,
   PlusSquareIcon,
   Wallet2,
+  Zap,
 } from "lucide-react";
 
 export default function Savings() {
@@ -47,7 +48,7 @@ export default function Savings() {
         <h3 className="font-bold text-2xl">Vaults</h3>
         <Dialog>
           <DialogTrigger>
-            <button className="bg-white text-black py-2 px-6 font-medium text-lg flex flex-row justify-center items-center gap-2">
+            <button className="bg-white text-black py-2 px-6 font-medium text-lg flex flex-row justify-center items-center gap-2 border border-accent hover:border-accent hover:bg-transparent hover:text-white">
               <PlusSquareIcon /> Create Vault
             </button>
           </DialogTrigger>
@@ -254,15 +255,15 @@ export default function Savings() {
                   />
                 </div>
               </div>
-              <button className="bg-transparent py-3 w-full bg-white text-black text-lg">
+              <button className="bg-transparent py-3 w-full bg-white text-black hover:border-t hover:border-accent hover:bg-transparent hover:text-white text-lg">
                 Create
               </button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
-      <div className="grid grid-cols-3 gap-4 text-black w-full">
-        <div className="bg-white w-full flex flex-col gap-0">
+      <div className="grid grid-cols-3 gap-4 text-white w-full">
+        <div className=" w-full flex flex-col gap-0 border border-accent">
           <div className="flex flex-row justify-between items-center px-6 py-4 border-b border-accent">
             <h2 className=" text-xl font-semibold">Vault #1</h2>
             <div>
@@ -284,10 +285,12 @@ export default function Savings() {
                     width={30}
                     height={30}
                   />
-                  <div>{gasChainsTokens[0].tokens[0].name}</div>
+                  <div className="font-semibold">
+                    {gasChainsTokens[0].tokens[0].name}
+                  </div>
                 </div>
                 <div>
-                  <ChevronsRight />
+                  <Zap />
                 </div>
                 <div className="flex flex-row justify-start items-center gap-2">
                   <Image
@@ -296,7 +299,9 @@ export default function Savings() {
                     width={30}
                     height={30}
                   />
-                  <div>{gasChainsTokens[1].tokens[2].name}</div>
+                  <div className="font-semibold">
+                    {gasChainsTokens[1].tokens[2].name}
+                  </div>
                 </div>
               </div>
               <div className="flex flex-row justify-between items-center w-full">
@@ -311,116 +316,6 @@ export default function Savings() {
                 <h4 className="font-semibold">Status</h4>
                 <h5 className="flex flex-row justify-center items-center gap-2">
                   <div className="bg-red-600 h-3 w-3 rounded-full"></div>
-                  <h5>Active</h5>
-                </h5>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white w-full flex flex-col gap-0">
-          <div className="flex flex-row justify-between items-center px-6 py-4 border-b border-accent">
-            <h2 className=" text-xl font-semibold">Vault #1</h2>
-            <div>
-              <Image
-                src={gasChainsTokens[0].icon}
-                alt="Wallet Icon"
-                width={30}
-                height={30}
-              />
-            </div>
-          </div>
-          <div className="px-6 py-4 flex flex-col justify-start items-start">
-            <div className="flex flex-col justify-between items-start gap-4 w-full">
-              <div className="flex flex-row justify-between items-center gap-3 w-full">
-                <div className="flex flex-row justify-start items-center gap-2">
-                  <Image
-                    src={gasChainsTokens[0].tokens[0].icon}
-                    alt="From Token"
-                    width={30}
-                    height={30}
-                  />
-                  <div>{gasChainsTokens[0].tokens[0].name}</div>
-                </div>
-                <div>
-                  <ChevronsRight />
-                </div>
-                <div className="flex flex-row justify-start items-center gap-2">
-                  <Image
-                    src={gasChainsTokens[0].tokens[2].icon}
-                    alt="From Token"
-                    width={30}
-                    height={30}
-                  />
-                  <div>{gasChainsTokens[1].tokens[2].name}</div>
-                </div>
-              </div>
-              <div className="flex flex-row justify-between items-center w-full">
-                <h4 className="font-semibold">Time</h4>
-                <h5>1 hour</h5>
-              </div>
-              <div className="flex flex-row justify-between items-center w-full">
-                <h4 className="font-semibold">Frequency</h4>
-                <h5>1 once</h5>
-              </div>
-              <div className="flex flex-row justify-between items-center w-full">
-                <h4 className="font-semibold">Status</h4>
-                <h5 className="flex flex-row justify-center items-center gap-2">
-                  <div className="bg-red-600 h-3 w-3 rounded-full"></div>
-                  <h5>Inactive</h5>
-                </h5>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white w-full flex flex-col gap-0">
-          <div className="flex flex-row justify-between items-center px-6 py-4 border-b border-accent">
-            <h2 className=" text-xl font-semibold">Vault #3</h2>
-            <div>
-              <Image
-                src={gasChainsTokens[0].icon}
-                alt="Wallet Icon"
-                width={30}
-                height={30}
-              />
-            </div>
-          </div>
-          <div className="px-6 py-4 flex flex-col justify-start items-start">
-            <div className="flex flex-col justify-between items-start gap-4 w-full">
-              <div className="flex flex-row justify-between items-center gap-3 w-full">
-                <div className="flex flex-row justify-start items-center gap-2">
-                  <Image
-                    src={gasChainsTokens[0].tokens[0].icon}
-                    alt="From Token"
-                    width={30}
-                    height={30}
-                  />
-                  <div>{gasChainsTokens[0].tokens[0].name}</div>
-                </div>
-                <div>
-                  <ChevronsRight />
-                </div>
-                <div className="flex flex-row justify-start items-center gap-2">
-                  <Image
-                    src={gasChainsTokens[0].tokens[2].icon}
-                    alt="From Token"
-                    width={30}
-                    height={30}
-                  />
-                  <div>{gasChainsTokens[1].tokens[2].name}</div>
-                </div>
-              </div>
-              <div className="flex flex-row justify-between items-center w-full">
-                <h4 className="font-semibold">Time</h4>
-                <h5>1 hour</h5>
-              </div>
-              <div className="flex flex-row justify-between items-center w-full">
-                <h4 className="font-semibold">Frequency</h4>
-                <h5>1 once</h5>
-              </div>
-              <div className="flex flex-row justify-between items-center w-full">
-                <h4 className="font-semibold">Status</h4>
-                <h5 className="flex flex-row justify-center items-center gap-2">
-                  <div className="bg-green-600 h-3 w-3 rounded-full"></div>
                   <h5>Active</h5>
                 </h5>
               </div>

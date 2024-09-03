@@ -60,7 +60,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={mulish.className + " bg-gradient"}>
-        <div className="bg-gradient text-white max-w-screen-2xl mx-auto">
+        <div className=" text-white max-w-screen-2xl mx-auto">
           <div className=" flex flex-col items-center justify-center w-full">
             <Web3ModalProvider initialState={initialState}>
               <LoginProvider>{children}</LoginProvider>
