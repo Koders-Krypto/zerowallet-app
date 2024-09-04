@@ -279,7 +279,7 @@ const TokensIcons = [
   {
     name: "Uniswap",
     symbol: "UNI",
-    icon: "/tokens/uni.svg",
+    icon: "/tokens/uni.png",
   },
   {
     name: "Wrapped BTC",

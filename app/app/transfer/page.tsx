@@ -31,7 +31,7 @@ export default function Bridge() {
 
   return (
     <div className="w-full h-full text-white border border-accent flex flex-col justify-start md:justify-center items-start md:items-center gap-6 px-4 py-4 md:py-6">
-      <div className="bg-transparent border border-accent max-w-md w-full flex flex-col">
+      <div className="bg-transparent border border-accent max-w-lg w-full flex flex-col">
         <div className="flex flex-row justify-between items-center gap-2 py-3.5 border-b border-accent px-4 md:px-6">
           <h2 className="font-bold text-xl truncate">Transfer Tokens</h2>
           <div className="flex flex-row gap-2 items-center justify-center text-sm">
@@ -151,7 +151,7 @@ export default function Bridge() {
           <div className="border border-accent px-4 py-3 flex flex-col text-sm gap-0 divide-y divide-accent">
             <div className="flex flex-row justify-between items-center pb-2">
               <h4>Gas Chain</h4>
-              <h5 className="flex flex-row justify-center items-center gap-1">
+              <h5 className="flex flex-row justify-center items-center gap-1.5">
                 <Image
                   src={selectedGasChain.icon}
                   alt={selectedGasChain.name}

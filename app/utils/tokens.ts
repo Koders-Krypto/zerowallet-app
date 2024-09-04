@@ -64,7 +64,7 @@ const gasChainsTokens = [
       {
         name: "UNI",
         address: "0x0000000000000000000000000000000000000005",
-        icon: "/tokens/uni.svg",
+        icon: "/tokens/uni.png",
         decimals: 6,
       },
     ],
@@ -75,4 +75,7 @@ function getChainById(chainId: number) {
   return gasChainsTokens.find((chain) => chain.chainId === chainId);
 }
 
-export { gasChainsTokens, getChainById };
+const findChainIndexByChainId = (chainId: number) => {
+  return gasChainsTokens.findIndex((chain) => chain.chainId === chainId);
+};
+export { gasChainsTokens, getChainById, findChainIndexByChainId };
