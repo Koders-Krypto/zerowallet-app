@@ -40,6 +40,7 @@ import { useAccount, useLoginProvider } from "../../context/LoginProvider";
 import useAccountStore from "@/app/store/account/account.store";
 import { chain, formatTime } from "@/app/logic/utils";
 import { getAllJobs, scheduleJob } from "@/app/logic/jobsAPI";
+import { WaitForUserOperationReceiptTimeoutError } from "permissionless";
 
 type Investment = {
   address: string;
@@ -79,7 +80,7 @@ export default function Investments() {
     
       if(investmentAdded) {
         console.log('asd')
-      const investments = await getAllSessions(chainId)
+      const investments = await getAllSessions(chainId.toString())
       setNextSessionId(investments.length);
       setInvestments(investments.filter((investment: Investment) => investment.account.toLowerCase() === address?.toLowerCase()))
       setInvestmentAdded(false);
@@ -349,15 +350,24 @@ export default function Investments() {
             <button className="bg-transparent py-3 w-full bg-white text-black hover:border-t hover:border-accent hover:bg-transparent hover:text-white text-lg"
             onClick={async () => {
 
-              const sessionKeyCall = await buildAddSessionKey(chainId, 
+              try{ 
+                const sessionKeyCall = await buildAddSessionKey(chainId.toString(), 
                 address, BigInt(investValue),
                 getChainById(Number(fromChain))?.tokens[fromToken].address!,
                 getChainById(Number(fromChain))?.tokens[targetToken].address!,
                 getChainById(Number(fromChain))?.tokens[targetToken].vault!);
-              await sendTransaction(chainId, sessionKeyCall.to, sessionKeyCall.value, sessionKeyCall.data, validator, address);
+              await sendTransaction(chainId.toString(), sessionKeyCall.to, sessionKeyCall.value, sessionKeyCall.data, validator, address);
+              } catch(error) {
+
+                if (error instanceof WaitForUserOperationReceiptTimeoutError) {
+                  console.error("User operation timed out:", error.message);
+                } else {
+                  
+                  throw error;
+                }
+              }
               await scheduleJob(nextSessionId.toString());
               setInvestmentAdded(true);
-
             }}
             >
               Create
@@ -367,12 +377,12 @@ export default function Investments() {
       </div>
       <div className="grid grid-cols-3 gap-4 text-white w-full">
         
-       { investments.map(( investment, index) => <div className=" w-full flex flex-col gap-0 border border-accent">
+       { investments.map(( investment, index) => <div key={index} className=" w-full flex flex-col gap-0 border border-accent">
           <div className="flex flex-row justify-between items-center px-4 py-3 border-b border-accent">
             <h2 className=" text-xl font-semibold">Investment { index + 1 }</h2>
             <div>
               <Image
-                src={ getChainById(Number(chainId))?.icon }
+                src={ getChainById(Number(chainId))?.icon! }
                 alt="Wallet Icon"
                 width={30}
                 height={30}
@@ -384,13 +394,13 @@ export default function Investments() {
               <div className="flex flex-row justify-between items-center gap-3 w-full">
                 <div className="flex flex-row justify-start items-center gap-2">
                   <Image
-                    src={ getTokenInfo(Number(chainId), investment.token)?.icon}
+                    src={ getTokenInfo(Number(chainId), investment.token)?.icon!}
                     alt="From Token"
                     width={30}
                     height={30}
                   />
                   <div className="font-semibold">
-                    { getTokenInfo(Number(chainId), investment.token)?.name }
+                    { getTokenInfo(Number(chainId), investment.token)?.name! }
                   </div>
                 </div>
                 <div>
@@ -398,7 +408,7 @@ export default function Investments() {
                 </div>
                 <div className="flex flex-row justify-start items-center gap-2">
                   <Image
-                    src={getTokenInfo(Number(chainId), investment.targetToken)?.icon}
+                    src={getTokenInfo(Number(chainId), investment.targetToken)?.icon!}
                     alt="From Token"
                     width={30}
                     height={30}

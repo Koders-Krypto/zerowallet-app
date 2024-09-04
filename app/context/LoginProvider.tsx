@@ -66,7 +66,7 @@ export const LoginProvider = ({
     (async () => {
       const passkey = loadPasskey();
       if (passkey) {
-        const _validator = await connectValidator(chainId, passkey);
+        const _validator = await connectValidator(chainId.toString(), passkey);
 
         setValidator(_validator);
       }
@@ -78,9 +78,9 @@ export const LoginProvider = ({
     (async () => {
       const passkey = loadPasskey();
       if (passkey) {
-        const _validator = await connectValidator(chainId, passkey);
+        const _validator = await connectValidator(chainId.toString(), passkey);
         const accountClient = await getSmartAccountClient({
-          chainId: chainId,
+          chainId: chainId.toString(),
           validators: (await getModules(_validator)).validators,
           executors: (await getModules(_validator)).executors
         });

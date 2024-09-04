@@ -148,7 +148,7 @@ const getTokenInfo = (chainId: number, token: string) =>
       }
      catch(e) {
          console.log('Error getting token info')
-         return {};
+        //  return {};
      }
       
   }
