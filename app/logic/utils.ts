@@ -98,11 +98,24 @@ return data.data;
 }
 
 
-export function formatTime(seconds: number) {
-  const days = Math.floor(seconds / (3600 * 24));
-  const hours = Math.floor((seconds % (3600 * 24)) / 3600);
+export function formatTime(seconds: number): string {
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   const remainingSeconds = seconds % 60;
 
-  return `${days ? days + " days, " : ""} ${hours ? hours + " hours, "  : ""} ${ minutes ? minutes + " minutes, " : ""} ${remainingSeconds + " seconds"}`;
+  const formattedDays = days ? `${days} day${days > 1 ? 's' : ''}` : '';
+  const formattedHours = hours ? `${hours} hour${hours > 1 ? 's' : ''}` : '';
+  const formattedMinutes = minutes ? `${minutes} min${minutes > 1 ? 's' : ''}` : '';
+  const formattedSeconds = remainingSeconds ? `${remainingSeconds} sec${remainingSeconds > 1 ? 's' : ''}` : '';
+
+  return [formattedDays, formattedHours, formattedMinutes, formattedSeconds]
+    .filter(Boolean)
+    .join(', ');
 }
+
+
+export function fixDecimal(number: string, decimals: number) {
+
+    return parseFloat(number).toFixed(decimals).replace(/\.?0+$/, '');;
+  }

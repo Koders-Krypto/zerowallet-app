@@ -63,7 +63,6 @@ export const LoginProvider = ({
 
   useEffect(() => {
 
-    console.log(chainId);
     (async () => {
       const passkey = loadPasskey();
       if (passkey) {
@@ -72,7 +71,7 @@ export const LoginProvider = ({
         setValidator(_validator);
       }
     })();
-  }, [ chainId ]);
+  }, [  chainId ]);
 
   useEffect(() => {
 
@@ -86,6 +85,7 @@ export const LoginProvider = ({
           executors: (await getModules(_validator)).executors
         });
         if (!accountInfo?.address) {
+          setValidator(_validator);
           setAccountInfo(accountClient.account);
           setWalletInfo({ name: "passkey", icon: "/icons/safe.svg" });
         }

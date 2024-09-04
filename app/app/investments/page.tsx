@@ -1,5 +1,5 @@
 "use client";
-import { gasChainsTokens } from "@/app/utils/tokens";
+import { gasChainsTokens, getChainById, getTokenInfo } from "@/app/utils/tokens";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BadgeInfo,
   CalendarIcon,
@@ -35,13 +35,57 @@ import {
 } from "@/components/ui/popover";
 import { format, set } from "date-fns";
 import { cn } from "@/lib/utils";
+import { buildAddSessionKey, getAllSessions, sendTransaction } from "@/app/logic/module";
+import { useAccount, useLoginProvider } from "../../context/LoginProvider";
+import useAccountStore from "@/app/store/account/account.store";
+import { chain, formatTime } from "@/app/logic/utils";
+import { getAllJobs, scheduleJob } from "@/app/logic/jobsAPI";
+
+type Investment = {
+  address: string;
+  token: string;
+  targetToken: string;
+  vault: string;
+  account: string;
+  validAfter: number;       
+  validUntil: number;        
+  limitAmount: bigint;       
+  limitUsed: bigint;         
+  lastUsed: number;         
+  refreshInterval: bigint;   
+};
 
 export default function Investments() {
-  const [fromChain, setFromChain] = useState<number>(0);
+
+  const { chainId } = useAccountStore();
+  const [investValue, setInvestValue] = useState<number>(0);
+  const [investmentAdded, setInvestmentAdded] = useState(true);
+  const [fromChain, setFromChain] = useState<number>(chainId);
   const [fromToken, setFromToken] = useState<number>(0);
+  const [targetToken, setTargetToken] = useState<number>(0);
   const [frequency, setFrequency] = useState<number>(0);
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
+  const [investments, setInvestments] = useState<Investment[]>([]);
+  const [nextSessionId, setNextSessionId] = useState<number>(0);
+
+  const { address } = useAccount();
+  const { validator } = useLoginProvider();
+
+  
+  useEffect(() => {
+
+    (async () => {
+    
+      if(investmentAdded) {
+        console.log('asd')
+      const investments = await getAllSessions(chainId)
+      setNextSessionId(investments.length);
+      setInvestments(investments.filter((investment: Investment) => investment.account.toLowerCase() === address?.toLowerCase()))
+      setInvestmentAdded(false);
+      }      
+    })();
+  }, [ chainId, address, investmentAdded ]);
 
   const Frequency = [
     {
@@ -85,8 +129,10 @@ export default function Investments() {
                 <div className="flex flex-row justify-between items-center gap-2 w-full">
                   <input
                     type="number"
-                    placeholder="0.01"
+                    // placeholder={0.01}
+                    value={investValue}
                     className="bg-transparent focus:outline-none w-full text-white text-4xl"
+                    onChange={(e)=> setInvestValue(parseInt(e.target.value))}
                   />
                   <div className="flex flex-row justify-center items-center gap-2">
                     <Select
@@ -101,7 +147,7 @@ export default function Investments() {
                       </SelectTrigger>
                       <SelectContent>
                         {gasChainsTokens.map((from, f) => (
-                          <SelectItem key={f} value={f.toString()}>
+                          <SelectItem key={f} value={from.chainId.toString()}>
                             <div className="flex flex-row justify-center items-center gap-2">
                               <Image
                                 className="bg-white rounded-full"
@@ -126,7 +172,7 @@ export default function Investments() {
                         <SelectValue placeholder="From Chain" />
                       </SelectTrigger>
                       <SelectContent>
-                        {gasChainsTokens[fromChain].tokens.map((from, f) => (
+                        {getChainById(Number(fromChain))?.tokens.map((from, f) => (
                           <SelectItem key={f} value={f.toString()}>
                             <div className="flex flex-row justify-center items-center gap-2">
                               <Image
@@ -144,6 +190,7 @@ export default function Investments() {
                     </Select>
                   </div>
                 </div>
+              
                 <div className="flex flex-row justify-between items-center text-sm">
                   <div className="text-accent">$0.00</div>
                   <div className="flex flex-row justify-center items-center gap-2 text-accent">
@@ -152,6 +199,8 @@ export default function Investments() {
                   </div>
                 </div>
               </div>
+
+
               <div className=" px-4 py-3 flex flex-col gap-2 w-full text-base">
                 <div className="flex flex-row justify-start items-center gap-1 text-accent text-sm">
                   <div className="text-accent">Buy</div>
@@ -166,16 +215,16 @@ export default function Investments() {
                   />
                   <div className="flex flex-row justify-center items-center gap-2">
                     <Select
-                      value={fromToken.toString()}
+                      value={targetToken.toString()}
                       onValueChange={(e) => {
-                        setFromToken(parseInt(e));
+                        setTargetToken(parseInt(e));
                       }}
                     >
                       <SelectTrigger className=" w-24 bg-white px-2 py-2 border border-accent text-black flex flex-row gap-2 items-center justify-center text-sm rounded-full focus:outline-none focus:ring-offset-0 focus:ring-0 focus:ring-accent">
                         <SelectValue placeholder="From Chain" />
                       </SelectTrigger>
                       <SelectContent>
-                        {gasChainsTokens[fromChain].tokens.map((from, f) => (
+                        {getChainById(Number(fromChain))?.tokens.map((from, f) => (
                           <SelectItem key={f} value={f.toString()}>
                             <div className="flex flex-row justify-center items-center gap-2">
                               <Image
@@ -194,6 +243,8 @@ export default function Investments() {
                   </div>
                 </div>
               </div>
+
+
               <div className=" px-4 py-3 flex flex-col gap-2 w-full text-base">
                 <div className="flex flex-row justify-start items-center gap-1 text-accent text-sm">
                   <div className="text-accent">Every</div>
@@ -295,19 +346,33 @@ export default function Investments() {
                 </div>
               </div>
             </div>
-            <button className="bg-transparent py-3 w-full bg-white text-black hover:border-t hover:border-accent hover:bg-transparent hover:text-white text-lg">
+            <button className="bg-transparent py-3 w-full bg-white text-black hover:border-t hover:border-accent hover:bg-transparent hover:text-white text-lg"
+            onClick={async () => {
+
+              const sessionKeyCall = await buildAddSessionKey(chainId, 
+                address, BigInt(investValue),
+                getChainById(Number(fromChain))?.tokens[fromToken].address!,
+                getChainById(Number(fromChain))?.tokens[targetToken].address!,
+                getChainById(Number(fromChain))?.tokens[targetToken].vault!);
+              await sendTransaction(chainId, sessionKeyCall.to, sessionKeyCall.value, sessionKeyCall.data, validator, address);
+              await scheduleJob(nextSessionId.toString());
+              setInvestmentAdded(true);
+
+            }}
+            >
               Create
             </button>
           </DialogContent>
         </Dialog>
       </div>
       <div className="grid grid-cols-3 gap-4 text-white w-full">
-        <div className=" w-full flex flex-col gap-0 border border-accent">
+        
+       { investments.map(( investment, index) => <div className=" w-full flex flex-col gap-0 border border-accent">
           <div className="flex flex-row justify-between items-center px-4 py-3 border-b border-accent">
-            <h2 className=" text-xl font-semibold">Vault #1</h2>
+            <h2 className=" text-xl font-semibold">Investment { index + 1 }</h2>
             <div>
               <Image
-                src={gasChainsTokens[0].icon}
+                src={ getChainById(Number(chainId))?.icon }
                 alt="Wallet Icon"
                 width={30}
                 height={30}
@@ -319,13 +384,13 @@ export default function Investments() {
               <div className="flex flex-row justify-between items-center gap-3 w-full">
                 <div className="flex flex-row justify-start items-center gap-2">
                   <Image
-                    src={gasChainsTokens[0].tokens[0].icon}
+                    src={ getTokenInfo(Number(chainId), investment.token)?.icon}
                     alt="From Token"
                     width={30}
                     height={30}
                   />
                   <div className="font-semibold">
-                    {gasChainsTokens[0].tokens[0].name}
+                    { getTokenInfo(Number(chainId), investment.token)?.name }
                   </div>
                 </div>
                 <div>
@@ -333,29 +398,33 @@ export default function Investments() {
                 </div>
                 <div className="flex flex-row justify-start items-center gap-2">
                   <Image
-                    src={gasChainsTokens[0].tokens[2].icon}
+                    src={getTokenInfo(Number(chainId), investment.targetToken)?.icon}
                     alt="From Token"
                     width={30}
                     height={30}
                   />
                   <div className="font-semibold">
-                    {gasChainsTokens[1].tokens[2].name}
+                    {getTokenInfo(Number(chainId), investment.targetToken)?.name}
                   </div>
                 </div>
               </div>
               <div className="flex flex-row justify-between items-center w-full">
-                <h4 className="font-semibold">Time</h4>
-                <h5>1 hour</h5>
+                <h4 className="font-semibold">Every</h4>
+                <h5>{ formatTime(Number(investment.refreshInterval)) }</h5>
               </div>
               <div className="flex flex-row justify-between items-center w-full">
-                <h4 className="font-semibold">Frequency</h4>
-                <h5>1 once</h5>
+                <h4 className="font-semibold">Expires On</h4>
+                <>
+                <h5>{ `${(new Date(Number(investment.validUntil)*1000)).toDateString()} ${(new Date(Number(investment.validUntil)*1000)).toLocaleTimeString()}` }</h5>
+                </>
+              
               </div>
               <div className="flex flex-row justify-between items-center w-full">
                 <h4 className="font-semibold">Status</h4>
                 <h5 className="flex flex-row justify-center items-center gap-2">
-                  <div className="bg-red-600 h-3 w-3 rounded-full"></div>
-                  <h5>Active</h5>
+               
+                { investment.validUntil > Math.floor(Date.now()/1000) ?    <div className="bg-green-600 h-3 w-3 rounded-full"></div> :    <div className="bg-red-600 h-3 w-3 rounded-full"></div> }
+                  { investment.validUntil > Math.floor(Date.now()/1000) ? <h5>Active</h5> : <h5>Expired</h5> }
                 </h5>
               </div>
               <div className="grid grid-cols-2 gap-4 w-full">
@@ -368,7 +437,9 @@ export default function Investments() {
               </div>
             </div>
           </div>
-        </div>
+        </div>)
+          }
+
       </div>
     </div>
   );
