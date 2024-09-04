@@ -43,7 +43,7 @@ const WalletConnectButton = (props: any) => {
           <p className="font-bold">Login with Passkey</p>
         </button>
       </DialogTrigger>
-      <DialogContent className="bg-black dark:bg-white flex flex-col justify-center items-center gap-6 max-w-md mx-auto border border-accent ">
+      <DialogContent className="bg-black dark:bg-white flex flex-col justify-center items-start gap-6 max-w-md mx-auto border border-accent sm:rounded-none">
         <DialogHeader>
           <div className="flex flex-row justify-start items-center gap-3">
             <Image
@@ -62,7 +62,7 @@ const WalletConnectButton = (props: any) => {
             </div>
           </div>
         </DialogHeader>
-        <div className="flex flex-col justify-start items-center  gap-2 w-full">
+        <div className="flex flex-col justify-start items-center w-full">
           <button
             className="flex flex-row gap-2 items-center justify-center border border-accent px-6 py-2.5 w-full bg-white "
             onClick={async () => {
@@ -87,9 +87,9 @@ const WalletConnectButton = (props: any) => {
             />
             <p className="font-bold ">Login Now </p>
           </button>
-          <h3 className="text-base text-white">(OR)</h3>
+          <h3 className="text-base text-white py-2.5">(OR)</h3>
           <button
-            className="py-2 text-lg text-white w-full border border-accent"
+            className="py-2.5 text-lg text-white w-full border border-accent"
             onClick={async () => {
               try {
                 const passkey = await connectPassKey(
