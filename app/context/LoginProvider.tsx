@@ -13,6 +13,8 @@ import { loadPasskey, removePasskey } from "../utils/storage";
 import { connectValidator } from "../logic/passkey";
 import { getSmartAccountClient } from "../logic/permissionless";
 import { normalize } from "viem/ens";
+import useAccountStore from "../store/account/account.store";
+import { getModules } from "../logic/module";
 interface LoginContextProps {
   walletInfo: any;
   accountInfo: any;
@@ -20,6 +22,7 @@ interface LoginContextProps {
   setAccountInfo: (info: any) => void;
   ensname: any;
   ensavatar: any;
+  validator: any;
 }
 // Create the context
 export const LoginContext = createContext<LoginContextProps>({
@@ -29,6 +32,7 @@ export const LoginContext = createContext<LoginContextProps>({
   setAccountInfo: () => {},
   ensname: undefined,
   ensavatar: undefined,
+  validator: undefined,
 });
 
 // Create the provider component
@@ -40,12 +44,14 @@ export const LoginProvider = ({
   const pathname = usePathname();
   const router = useRouter();
 
+  const { chainId } = useAccountStore();
   const wallet = useDefaultWalletInfo();
   const account = useDefaultAccount();
   const [walletInfo, setWalletInfo] = useState<any>(wallet.walletInfo);
   const [accountInfo, setAccountInfo] = useState<any>(account);
   const [ensname, setEnsname] = useState<any>(undefined);
   const [ensavatar, setEnsavatar] = useState<any>(undefined);
+  const [ validator, setValidator] = useState<any>(undefined);
 
   const { data: _ensname } = useEnsName({ address: accountInfo?.address });
   const { data: _ensavatar } = useEnsAvatar({ name: normalize(_ensname!) });
@@ -56,18 +62,28 @@ export const LoginProvider = ({
   }, [_ensavatar, _ensname]);
 
   useEffect(() => {
+
+    console.log(chainId);
     (async () => {
       const passkey = loadPasskey();
       if (passkey) {
-        const validator = await connectValidator("84532", passkey);
+        const _validator = await connectValidator(chainId, passkey);
+
+        setValidator(_validator);
+      }
+    })();
+  }, [ chainId ]);
+
+  useEffect(() => {
+
+    (async () => {
+      const passkey = loadPasskey();
+      if (passkey) {
+        const _validator = await connectValidator(chainId, passkey);
         const accountClient = await getSmartAccountClient({
-          chainId: "84532",
-          validators: [
-            {
-              address: validator.address,
-              context: await validator.getEnableData(),
-            },
-          ],
+          chainId: chainId,
+          validators: (await getModules(_validator)).validators,
+          executors: (await getModules(_validator)).executors
         });
         if (!accountInfo?.address) {
           setAccountInfo(accountClient.account);
@@ -100,6 +116,7 @@ export const LoginProvider = ({
         setAccountInfo,
         ensname,
         ensavatar,
+        validator,
       }}
     >
       {children}
@@ -122,12 +139,13 @@ export const useAccount = () => {
 
 export const useDisconnect = () => {
   const { disconnect: defaultDisconnect } = useDefaultDisconnect();
-  const { setWalletInfo } = useContext(LoginContext);
+  const { setWalletInfo, setAccountInfo } = useContext(LoginContext);
 
   const disconnect = () => {
     defaultDisconnect();
     removePasskey();
     setWalletInfo(undefined);
+    setAccountInfo({});
   };
 
   return { disconnect };

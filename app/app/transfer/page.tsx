@@ -13,6 +13,13 @@ import { useState } from "react";
 import Image from "next/image";
 
 import { gasChainsTokens, getChainById } from "@/app/utils/tokens";
+import useAccountStore from "@/app/store/account/account.store";
+import { LoginContext, useAccount, useLoginProvider } from "../../context/LoginProvider";
+import { sendTransaction } from "@/app/logic/module";
+import { getJsonRpcProvider } from "@/app/logic/web3";
+import { ZeroAddress, parseEther, parseUnits } from "ethers";
+import { buildTransferToken, getTokenDecimals } from "@/app/logic/utils";
+import { Hex } from "viem";
 
 interface GasChainType {
   name: string;
@@ -28,6 +35,39 @@ export default function Bridge() {
   const [selectedTransferChainID, setSelectedTransferChainID] =
     useState<number>(0);
   const [selectedTokenID, setSelectedTokenID] = useState<number>(0);
+
+  const { setChainId, chainId } = useAccountStore();
+  const { address } = useAccount();
+  const { validator } = useLoginProvider();
+
+  console.log(validator, address)
+
+
+  async function sendAsset() {
+
+    try {
+
+    const tokenValue = 0.01
+    const value = '0x958543756A4c7AC6fB361f0efBfeCD98E4D297Db'
+    let parseAmount, data='0x', toAddress = '0x958543756A4c7AC6fB361f0efBfeCD98E4D297Db' ;
+    if(true) {
+            parseAmount = parseEther(tokenValue.toString());
+        } else {
+          const provider = await getJsonRpcProvider(chainId.toString())
+            parseAmount = parseUnits(tokenValue.toString(), await  getTokenDecimals(value, provider))
+            data = await buildTransferToken(value, toAddress, parseAmount, provider)
+            parseAmount = BigInt(0);
+            toAddress = value;
+        }
+    const result = await sendTransaction(chainId.toString(), toAddress, parseAmount, data as Hex, validator, address)
+    
+    
+  } catch(e) {
+    console.log('error', e)
+
+  }  
+
+  }
 
   return (
     <div className="w-full h-full text-white border border-accent flex flex-col justify-start md:justify-center items-start md:items-center gap-6 px-4 py-4 md:py-6">
@@ -83,6 +123,7 @@ export default function Bridge() {
                 <Select
                   value={selectedTransferChainID.toString()}
                   onValueChange={(e) => {
+                    setChainId(gasChainsTokens[parseInt(e)].chainId)
                     setSelectedTokenID(0);
                     setSelectedTransferChainID(parseInt(e));
                   }}
@@ -139,6 +180,7 @@ export default function Bridge() {
                 type="number"
                 placeholder={"0.01 ETH"}
                 className="w-full h-full pr-2 py-3 bg-transparent text-black border-y-0 border-b md:border-y border-accent border-r md:border-l-0 border-l text-right focus:outline-none col-span-2 md:col-span-1"
+                onChange={(e) => { console.log(e); }}
               />
             </div>
           </div>
@@ -170,7 +212,13 @@ export default function Bridge() {
               <h5>0x0</h5>
             </div>
           </div>
-          <button className="w-full bg-white hover:bg-transparent hover:text-white border border-accent text-black py-3.5 text-lg font-bold flex flex-row justify-center items-center gap-2">
+          <button className="w-full bg-white hover:bg-transparent hover:text-white border border-accent text-black py-3.5 text-lg font-bold flex flex-row justify-center items-center gap-2"
+          onClick={async ()=>{
+            
+            await sendAsset()
+          
+          }}
+          >
             Transfer <SendHorizonal size={20} />
           </button>
         </div>

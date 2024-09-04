@@ -11,32 +11,33 @@ import {
     ModuleType,
   } from "@rhinestone/module-sdk";
 import { NetworkUtil } from "./networks";
+import AutoDCAModule from "./AutoDCASessionModule.json";
+
 import { SafeSmartAccountClient, getSmartAccountClient } from "./permissionless";
 import { KernelValidator } from "@zerodev/passkey-validator";
 import { ENTRYPOINT_ADDRESS_V07_TYPE } from "permissionless/types";   
 
 
 const webAuthnModule = "0xD990393C670dCcE8b4d8F858FB98c9912dBFAa06"
-export const safePassKeyNFT = "0x0b4532B216D7c961356a9D1dD3FD25dB1FDCd294"
+
+const safe7579Module = "0x7579F9feedf32331C645828139aFF78d517d0001"
+const autoDCAModule = "0x679f144fCcc63c5Af7bcDb2BAda756f1bd40CE3D"
 
 
-export const getSafePassNFTCount = async (chainId: string, account: string): Promise<any> => {
+export const getModules = async (validator: any) => {
 
-    const provider = await getJsonRpcProvider(chainId)
+  const validators = [{ address: validator.address,
+     context: await validator.getEnableData()}, 
+     { address: autoDCAModule,
+      context: '0x' as Hex}]
 
-    const safePassKey = new Contract(
-        safePassKeyNFT,
-        SafePassKeyNFT.abi,
-        provider
-    )
+    const executors = 
+      [
+     { address: autoDCAModule as Hex,
+      context: '0x' as Hex}]
 
-
-    const safePassKeyCount = await safePassKey.balanceOf(account);
-
-    return safePassKeyCount;
-
+      return { validators, executors }
 }
-
 
 export const sendTransaction = async (chainId: string, recipient: string, amount: bigint, data: Hex, walletProvider: any, safeAccount: Hex): Promise<any> => {
 
@@ -48,9 +49,9 @@ export const sendTransaction = async (chainId: string, recipient: string, amount
       }) || 0
     )
 
-    const validators = await isInstalled(parseInt(chainId), safeAccount, webAuthnModule, 'validator') ? [] : [{ address: walletProvider.address, context: await walletProvider.getEnableData()}]
 
-    const smartAccount = await getSmartAccountClient( { chainId, nonceKey: key, address: safeAccount, signUserOperation: walletProvider.signUserOperation, getDummySignature: walletProvider.getDummySignature, validators: validators})
+    const smartAccount = await getSmartAccountClient( { chainId, nonceKey: key, address: safeAccount, signUserOperation: walletProvider.signUserOperation, getDummySignature: walletProvider.getDummySignature, 
+      validators: (await getModules( walletProvider)).validators, executors: (await getModules( walletProvider)).executors })
 
     return await smartAccount.sendTransaction(call);
 }
@@ -128,6 +129,15 @@ export const addWebAuthnModule = async (safeClient: SafeSmartAccountClient, pass
 
     const buildWebAuthnModule = await buildInstallModule(safeClient.chain.id, safeClient.account.address, webAuthnModule, 'validator', await passKeyValidator.getEnableData() )
 
-    await safeClient.sendTransaction({to: buildWebAuthnModule.to as Hex, value: BigInt(buildWebAuthnModule.value), data: buildWebAuthnModule.data as Hex})
+    await safeClient.sendTransactions({ transactions:[{to: buildWebAuthnModule.to as Hex, value: BigInt(buildWebAuthnModule.value), data: buildWebAuthnModule.data as Hex}]})
+    
+}
+
+export const installAutoDCAModules = async (safeClient: SafeSmartAccountClient, passKeyValidator: KernelValidator<ENTRYPOINT_ADDRESS_V07_TYPE>) => {
+
+
+    const buildWebAuthnModule = await buildInstallModule(safeClient.chain.id, safeClient.account.address, webAuthnModule, 'validator', await passKeyValidator.getEnableData() )
+
+    await safeClient.sendTransactions({ transactions:[{to: buildWebAuthnModule.to as Hex, value: BigInt(buildWebAuthnModule.value), data: buildWebAuthnModule.data as Hex}]})
     
 }

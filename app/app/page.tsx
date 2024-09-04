@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LoginContext } from "../context/LoginProvider";
+import { LoginContext, useAccount } from "../context/LoginProvider";
 import Truncate from "../utils/truncate";
 import {
   Copy,
@@ -29,7 +29,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useAccount } from "wagmi";
 import Image from "next/image";
 
 import { Checkbox } from "@/components/ui/checkbox";
