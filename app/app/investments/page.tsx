@@ -65,11 +65,11 @@ export default function Investments() {
             </button>
           </DialogTrigger>
           <DialogContent className="bg-black dark:bg-white flex flex-col justify-start items-start gap-4 rounded-none sm:rounded-none max-w-lg mx-auto border border-accent">
-            <DialogHeader>
+            <DialogHeader className="space-y-1">
               <DialogTitle className="text-white text-xl">
                 Create a Investment
               </DialogTitle>
-              <DialogDescription className="text-base">
+              <DialogDescription className="text-base text-accent mt-0">
                 Create a new investment plan to store your assets and earn
                 yield.
               </DialogDescription>
@@ -246,7 +246,7 @@ export default function Investments() {
                           {startDate ? (
                             format(startDate, "PPP")
                           ) : (
-                            <span>Pick a date</span>
+                            <span>Pick start date</span>
                           )}
                         </button>
                       </PopoverTrigger>
