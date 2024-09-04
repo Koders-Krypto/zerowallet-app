@@ -11,9 +11,14 @@ import {
 import { useEffect, useState } from "react";
 import { toast } from "@/components/ui/use-toast";
 import Image from "next/image";
+import { CopyIcon, Plus } from "lucide-react";
+import { useAccount } from "wagmi";
+import Truncate from "@/app/utils/truncate";
+import { CopytoClipboard } from "@/app/utils/copyclipboard";
 
 export default function Settings() {
   const [gasChain, setGasChain] = useState<number>(0);
+  const { address, isConnecting, isDisconnected } = useAccount();
 
   function saveGasChain() {
     console.log(gasChain);
@@ -60,19 +65,69 @@ export default function Settings() {
               Gas
             </TabsTrigger>
           </TabsList>
-          <div className=" flex flex-col gap-2 w-full h-fit border border-accent p-4">
+          <div className=" flex flex-col gap-2 w-full h-fit border border-accent">
             <TabsContent className="mt-0" value="account">
-              Make changes to your account here.
+              <div className="flex flex-col justify-between items-center gap-0 w-full">
+                <div className="flex flex-row justify-between items-center w-full border-b border-accent px-4 py-3">
+                  <h2 className="text-xl font-bold">Connected Wallets</h2>
+                  <button className="bg-white text-black px-4 text-sm py-2 flex flex-row items-center gap-2">
+                    <Plus size={18} /> Add Wallet
+                  </button>
+                </div>
+                <div className="flex flex-col w-full  px-4 py-3">
+                  <div className="flex flex-row justify-between items-start">
+                    <h3>EOA</h3>
+                    <div className="flex flex-row justify-center items-center gap-2">
+                      <h4>{Truncate(address, 24, "...")}</h4>
+                      <button
+                        onClick={() => {
+                          CopytoClipboard(address || "");
+                          toast({
+                            success: true,
+                            title: "Copy Address",
+                            description:
+                              "Adderess copied to clipboard successfully!",
+                          });
+                        }}
+                        className="flex flex-row"
+                      >
+                        <CopyIcon size={16} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </TabsContent>
             <TabsContent className="mt-0" value="password">
-              <h2 className="text-xl font-bold">Set Gas Chain</h2>
-              <div className="flex flex-col gap-2 py-8 w-64">
+              <div className="flex flex-col justify-between items-center gap-0 w-full">
+                <div className="flex flex-row justify-between items-center w-full border-b border-accent px-4 py-3">
+                  <h2 className="text-xl font-bold">Set Gas Chain</h2>
+                  <div className="flex flex-row justify-center items-center gap-4">
+                    <h3 className="text-sm">Supported Chains</h3>
+                    <div className="flex flex-row justify-center items-center">
+                      {gasChainsTokens.map((show, s) => {
+                        return (
+                          <Image
+                            className="-ml-2"
+                            src={show.icon}
+                            width={25}
+                            height={25}
+                            alt={show.name}
+                            key={s}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-row gap-2 py-8 w-80 px-4">
                 <Select
                   defaultValue={gasChain.toString()}
                   value={gasChain.toString()}
                   onValueChange={(e) => setGasChain(parseInt(e))}
                 >
-                  <SelectTrigger className="w-full text-black h-12 focus:outline-none focus:ring-offset-0 focus:ring-0 focus:ring-accent border border-accent">
+                  <SelectTrigger className="w-full text-black h-full py-2.5 focus:outline-none focus:ring-offset-0 focus:ring-0 focus:ring-accent border border-accent">
                     <SelectValue placeholder="Select chain" />
                   </SelectTrigger>
                   <SelectContent>
@@ -93,7 +148,7 @@ export default function Settings() {
                     })}
                   </SelectContent>
                 </Select>
-                <div className="flex flex-row justify-end items-center mt-2">
+                <div className="flex flex-row justify-end items-center">
                   <button
                     onClick={() => saveGasChain()}
                     className="bg-black text-white border border-accent hover:bg-white hover:text-black px-4 py-2"
