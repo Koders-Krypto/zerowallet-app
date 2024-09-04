@@ -98,18 +98,16 @@ export const sendTransaction = async (chainId: string, to: string, value: bigint
 }
 
 
-export const buildAddSessionKey = async (chainId: string,  safeAccount: string, amount: bigint, fromToken: string, targetToken: string, vault: string): Promise<Transaction> => {
+export const buildAddSessionKey = async (chainId: string,  safeAccount: string, amount: string, refreshInterval: number, fromToken: string, targetToken: string, vault: string): Promise<Transaction> => {
 
     
   const provider = await getJsonRpcProvider(chainId);
   const validAfter =  Math.floor(Date.now()/1000);
-  const validUntil = validAfter + 300;
+  const validUntil = validAfter + 3000;
 
+  const parsedAmount = parseUnits(amount, await  getTokenDecimals(fromToken, provider))
 
-  amount = parseUnits(amount.toString(), await  getTokenDecimals(fromToken, provider))
-
-
-  const sessionData = { vault: vault, token: fromToken, targetToken: targetToken,  account: safeAccount, validAfter: validAfter, validUntil: validUntil, limitAmount: amount, limitUsed: 0, lastUsed: 0, refreshInterval: 60 }
+  const sessionData = { vault: vault, token: fromToken, targetToken: targetToken,  account: safeAccount, validAfter: validAfter, validUntil: validUntil, limitAmount: parsedAmount, limitUsed: 0, lastUsed: 0, refreshInterval: refreshInterval }
 
   const bProvider = await getJsonRpcProvider(chainId)
 

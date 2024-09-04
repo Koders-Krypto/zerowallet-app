@@ -38,9 +38,11 @@ import { cn } from "@/lib/utils";
 import { buildAddSessionKey, getAllSessions, sendTransaction } from "@/app/logic/module";
 import { useAccount, useLoginProvider } from "../../context/LoginProvider";
 import useAccountStore from "@/app/store/account/account.store";
-import { chain, formatTime } from "@/app/logic/utils";
+import { chain, convertToSeconds, formatTime, getTokenBalance } from "@/app/logic/utils";
 import { getAllJobs, scheduleJob } from "@/app/logic/jobsAPI";
 import { WaitForUserOperationReceiptTimeoutError } from "permissionless";
+import { ZeroAddress, formatEther } from "ethers";
+import { getJsonRpcProvider } from "@/app/logic/web3";
 
 type Investment = {
   address: string;
@@ -59,12 +61,14 @@ type Investment = {
 export default function Investments() {
 
   const { chainId } = useAccountStore();
-  const [investValue, setInvestValue] = useState<number>(0);
+  const [investValue, setInvestValue] = useState<string>("0");
   const [investmentAdded, setInvestmentAdded] = useState(true);
   const [fromChain, setFromChain] = useState<number>(chainId);
   const [fromToken, setFromToken] = useState<number>(0);
+  const [balance, setBalance] = useState<string>("0");
   const [targetToken, setTargetToken] = useState<number>(0);
   const [frequency, setFrequency] = useState<number>(0);
+  const [refreshInterval, setRefreshInterval] = useState<number>(1)
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const [investments, setInvestments] = useState<Investment[]>([]);
@@ -73,6 +77,22 @@ export default function Investments() {
   const { address } = useAccount();
   const { validator } = useLoginProvider();
 
+
+
+  useEffect(() => {
+
+      (async () => {
+      
+        const provider = await getJsonRpcProvider(chainId.toString());
+        const token = getChainById(Number(fromChain))?.tokens[fromToken].address
+        if( token == ZeroAddress) {
+          setBalance(formatEther(await provider.getBalance(address)))
+          } else {
+          setBalance(await getTokenBalance(token!, address , provider))
+          }
+            
+      })();
+    }, [ fromChain, fromToken ]);
   
   useEffect(() => {
 
@@ -129,11 +149,11 @@ export default function Investments() {
                 </div>
                 <div className="flex flex-row justify-between items-center gap-2 w-full">
                   <input
-                    type="number"
+                    type="text"
                     // placeholder={0.01}
                     value={investValue}
                     className="bg-transparent focus:outline-none w-full text-white text-4xl"
-                    onChange={(e)=> setInvestValue(parseInt(e.target.value))}
+                    onChange={(e)=> setInvestValue(e.target.value)}
                   />
                   <div className="flex flex-row justify-center items-center gap-2">
                     <Select
@@ -193,14 +213,13 @@ export default function Investments() {
                 </div>
               
                 <div className="flex flex-row justify-between items-center text-sm">
-                  <div className="text-accent">$0.00</div>
+                  <div className="text-accent">${balance}</div>
                   <div className="flex flex-row justify-center items-center gap-2 text-accent">
                     <Wallet2 size={16} />
-                    <h5>0.00</h5>
+                    <h5>{balance}</h5>
                   </div>
                 </div>
               </div>
-
 
               <div className=" px-4 py-3 flex flex-col gap-2 w-full text-base">
                 <div className="flex flex-row justify-start items-center gap-1 text-accent text-sm">
@@ -254,13 +273,16 @@ export default function Investments() {
                 <div className="flex flex-row justify-between items-center gap-2 w-full">
                   <input
                     type="number"
-                    placeholder="1"
+                    value={refreshInterval}
+                    onChange={(e)=> setRefreshInterval(parseInt(e.target.value))}
                     className="bg-transparent focus:outline-none w-full text-white text-4xl"
+
                   />
                   <div className="flex flex-row justify-center items-center gap-2">
                     <Select
                       value={frequency.toString()}
                       onValueChange={(e) => {
+                        console.log(e)
                         setFrequency(parseInt(e));
                       }}
                     >
@@ -352,7 +374,7 @@ export default function Investments() {
 
               try{ 
                 const sessionKeyCall = await buildAddSessionKey(chainId.toString(), 
-                address, BigInt(investValue),
+                address, investValue, convertToSeconds(refreshInterval, Frequency[frequency].label as any),
                 getChainById(Number(fromChain))?.tokens[fromToken].address!,
                 getChainById(Number(fromChain))?.tokens[targetToken].address!,
                 getChainById(Number(fromChain))?.tokens[targetToken].vault!);

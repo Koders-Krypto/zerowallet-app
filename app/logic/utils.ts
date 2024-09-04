@@ -115,6 +115,25 @@ export function formatTime(seconds: number): string {
 }
 
 
+export function convertToSeconds(value: number, unit: 'seconds' | 'minutes' | 'hours' | 'days'): number {
+  let seconds;
+  switch(unit) {
+      case 'minutes':
+          seconds = value * 60;
+          break;
+      case 'hours':
+          seconds = value * 60 * 60;
+          break;
+      case 'days':
+          seconds = value * 60 * 60 * 24;
+          break;
+      default:
+          seconds = value; // Assume value is already in seconds
+  }
+  return seconds;
+}
+
+
 export function fixDecimal(number: string, decimals: number) {
 
     return parseFloat(number).toFixed(decimals).replace(/\.?0+$/, '');;
