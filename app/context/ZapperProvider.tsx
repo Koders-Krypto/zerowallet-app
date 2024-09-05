@@ -26,6 +26,7 @@ interface ZapperContextProps {
   tokenDataError: boolean;
   DeFiDataError: boolean;
   NftDataError: boolean;
+  setIsZapperLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 // Create the context
 export const ZapperContext = createContext<ZapperContextProps>({
@@ -43,6 +44,7 @@ export const ZapperContext = createContext<ZapperContextProps>({
   tokenDataError: false,
   DeFiDataError: false,
   NftDataError: false,
+  setIsZapperLoading: () => {},
 });
 
 // Create the provider component
@@ -153,6 +155,7 @@ export const ZapperProvider = ({
         tokenDataError,
         DeFiDataError,
         NftDataError,
+        setIsZapperLoading,
       }}
     >
       {children}

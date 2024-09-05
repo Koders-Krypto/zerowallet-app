@@ -37,6 +37,7 @@ import {
   getNetworkLogobyName,
   Networks,
 } from "../utils/Zapper";
+import { set } from "date-fns";
 
 export default function App() {
   const { toast } = useToast();
@@ -60,6 +61,7 @@ export default function App() {
     tokenDataError,
     DeFiDataError,
     NftDataError,
+    setIsZapperLoading,
   } = useContext(ZapperContext);
 
   useEffect(() => {
@@ -107,10 +109,17 @@ export default function App() {
                   <h1 className="text-4xl font-black">
                     ${formatNumberCommas(Number(totalBalance.toFixed(0)))}
                   </h1>
-                  <button onClick={() => setRefresh(!refresh)}>
+                  <button
+                    onClick={() => {
+                      setIsZapperLoading(true);
+                      setRefresh(!refresh);
+                    }}
+                  >
                     <RefreshCcwIcon
                       size={20}
-                      className="text-accent hover:text-white"
+                      className={`text-accent hover:text-white ${
+                        isZapperLoading && !tokenDataError ? "animate-spin" : ""
+                      }`}
                     />
                   </button>
                 </div>
