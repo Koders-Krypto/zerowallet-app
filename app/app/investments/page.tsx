@@ -38,7 +38,7 @@ import { cn } from "@/lib/utils";
 import { buildAddSessionKey, getAllSessions, sendTransaction } from "@/app/logic/module";
 import { useAccount, useLoginProvider } from "../../context/LoginProvider";
 import useAccountStore from "@/app/store/account/account.store";
-import { chain, convertToSeconds, formatTime, getTokenBalance } from "@/app/logic/utils";
+import { chain, convertToSeconds, fixDecimal, formatTime, getTokenBalance, getVaultBalance } from "@/app/logic/utils";
 import { getAllJobs, scheduleJob } from "@/app/logic/jobsAPI";
 import { WaitForUserOperationReceiptTimeoutError } from "permissionless";
 import { ZeroAddress, formatEther } from "ethers";
@@ -72,6 +72,7 @@ export default function Investments() {
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const [investments, setInvestments] = useState<Investment[]>([]);
+  const [tokenVaultDetails, setTokenVaultDetails] = useState<any[]>([]);
   const [nextSessionId, setNextSessionId] = useState<number>(0);
 
   const { address } = useAccount();
@@ -94,19 +95,33 @@ export default function Investments() {
       })();
     }, [ fromChain, fromToken ]);
   
-  useEffect(() => {
-
-    (async () => {
+    useEffect(() => {
+      (async () => {
+        if (investmentAdded) {
+          const provider = await getJsonRpcProvider(chainId.toString());
+          let tokensWithVault = getChainById(Number(fromChain))?.tokens.filter((token: any) => token.vault != undefined);
+          
+          if (tokensWithVault) {
+            const updatedTokens = await Promise.all(
+              tokensWithVault.map(async (token) => {
+                const vaultBalance = await getVaultBalance(token.vault!, address, provider);
+                return {
+                  ...token,
+                  vaultBalance,  // Add the vault balance to each token
+                };
+              })
+            );
+            
+            setTokenVaultDetails(updatedTokens);  // Tokens now contain their respective vault balances
+          }
     
-      if(investmentAdded) {
-        console.log('asd')
-      const investments = await getAllSessions(chainId.toString())
-      setNextSessionId(investments.length);
-      setInvestments(investments.filter((investment: Investment) => investment.account.toLowerCase() === address?.toLowerCase()))
-      setInvestmentAdded(false);
-      }      
-    })();
-  }, [ chainId, address, investmentAdded ]);
+          const investments = await getAllSessions(chainId.toString());
+          setNextSessionId(investments.length);
+          setInvestments(investments.filter((investment: Investment) => investment.account.toLowerCase() === address?.toLowerCase()));
+          setInvestmentAdded(false);
+        }
+      })();
+    }, [chainId, address, investmentAdded]);
 
   const Frequency = [
     {
@@ -126,7 +141,7 @@ export default function Investments() {
         <Dialog>
           <DialogTrigger>
             <button className="bg-black text-white py-2 px-6 font-medium text-lg flex flex-row justify-center items-center gap-2 border border-black hover:border-accent hover:bg-transparent hover:text-white">
-              <PlusSquareIcon /> Create Investment
+              <PlusSquareIcon /> Create a Plan
             </button>
           </DialogTrigger>
           <DialogContent className="bg-black dark:bg-white flex flex-col justify-start items-start gap-4 rounded-none sm:rounded-none max-w-lg mx-auto border border-accent">
@@ -398,7 +413,47 @@ export default function Investments() {
         </Dialog>
       </div>
       <div className="grid grid-cols-3 gap-4 text-white w-full">
-        
+      { tokenVaultDetails.map(( tokenVault, index) => <div key={index} className=" w-full flex flex-col gap-0 border border-accent">
+          <div className="flex flex-row justify-between items-center px-4 py-3 border-b border-accent">
+          <div className="flex flex-row justify-start items-center gap-2">
+                  <Image
+                    src={ tokenVault.icon!}
+                    alt="From Token"
+                    width={30}
+                    height={30}
+                  />
+                  <div className="font-semibold">
+                    { tokenVault.name! }
+                  </div>
+                </div>
+            <div>
+              <Image
+                src={ getChainById(Number(chainId))?.icon! }
+                alt="Wallet Icon"
+                width={30}
+                height={30}
+              />
+            </div>
+          </div>
+          <div className="px-4 py-3 flex flex-col justify-start items-start">
+            <div className="flex flex-col justify-between items-start gap-4 w-full">
+              <div className="flex flex-row justify-between items-center w-full">
+                <h4 className="font-semibold">Balance</h4>
+                <h5>{ fixDecimal(tokenVault.vaultBalance, parseInt(tokenVault.vaultBalance) ? 4 : 6) }</h5>
+              </div>
+              <div className="grid grid-cols-2 gap-4 w-full">
+                <button className="border border-accent px-6 py-2.5 bg-white text-black">
+                  Withdraw
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>)
+          }
+          </div>
+         
+    <h3 className="font-bold text-2xl">Your Investment Plans</h3>
+      <div className="grid grid-cols-3 gap-4 text-white w-full"> 
        { investments.map(( investment, index) => <div key={index} className=" w-full flex flex-col gap-0 border border-accent">
           <div className="flex flex-row justify-between items-center px-4 py-3 border-b border-accent">
             <h2 className=" text-xl font-semibold">Investment { index + 1 }</h2>
@@ -410,6 +465,12 @@ export default function Investments() {
                 height={30}
               />
             </div>
+            <div >
+                <button className="border border-accent px-6 py-2.5">
+                  Disable
+                </button>
+            </div>
+            
           </div>
           <div className="px-4 py-3 flex flex-col justify-start items-start">
             <div className="flex flex-col justify-between items-start gap-4 w-full">
@@ -458,14 +519,6 @@ export default function Investments() {
                 { investment.validUntil > Math.floor(Date.now()/1000) ?    <div className="bg-green-600 h-3 w-3 rounded-full"></div> :    <div className="bg-red-600 h-3 w-3 rounded-full"></div> }
                   { investment.validUntil > Math.floor(Date.now()/1000) ? <h5>Active</h5> : <h5>Expired</h5> }
                 </h5>
-              </div>
-              <div className="grid grid-cols-2 gap-4 w-full">
-                <button className="border border-accent px-6 py-2.5">
-                  Disable
-                </button>
-                <button className="border border-accent px-6 py-2.5 bg-white text-black">
-                  Withdraw
-                </button>
               </div>
             </div>
           </div>
