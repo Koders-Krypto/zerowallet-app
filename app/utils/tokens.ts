@@ -1,5 +1,4 @@
 const gasChainsTokens = [
-
   {
     name: "Holesky",
     address: "0xBBE5A39eD493150Be69D31Aa8780218247794152",
@@ -100,7 +99,7 @@ const gasChainsTokens = [
     name: "Polygon",
     address: "0xBBE5A39eD493150Be69D31Aa8780218247794152",
     chainId: 137,
-    icon: "/chains/polygon.svg",
+    icon: "/chains/polygon.png",
     tokens: [
       {
         name: "Matic",
@@ -129,30 +128,24 @@ const gasChainsTokens = [
         decimals: 6,
       },
     ],
-  }
+  },
 ];
-
 
 function getChainById(chainId: number) {
   return gasChainsTokens.find((chain) => chain.chainId === chainId);
 }
 
-const getTokenInfo = (chainId: number, token: string) => 
-
-  {
-    const chain = getChainById(chainId)
-      try{ 
-  
-          return chain?.tokens.find((item: any) => item.address.toLowerCase() == token?.toLowerCase());
-  
-      }
-     catch(e) {
-         console.log('Error getting token info')
-        //  return {};
-     }
-      
+const getTokenInfo = (chainId: number, token: string) => {
+  const chain = getChainById(chainId);
+  try {
+    return chain?.tokens.find(
+      (item: any) => item.address.toLowerCase() == token?.toLowerCase()
+    );
+  } catch (e) {
+    console.log("Error getting token info");
+    //  return {};
   }
-
+};
 
 const findChainIndexByChainId = (chainId: number) => {
   return gasChainsTokens.findIndex((chain) => chain.chainId === chainId);

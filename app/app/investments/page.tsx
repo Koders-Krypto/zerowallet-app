@@ -1,5 +1,9 @@
 "use client";
-import { gasChainsTokens, getChainById, getTokenInfo } from "@/app/utils/tokens";
+import {
+  gasChainsTokens,
+  getChainById,
+  getTokenInfo,
+} from "@/app/utils/tokens";
 import {
   Dialog,
   DialogContent,
@@ -36,10 +40,20 @@ import {
 } from "@/components/ui/popover";
 import { format, set } from "date-fns";
 import { cn } from "@/lib/utils";
-import { buildAddSessionKey, getAllSessions, sendTransaction } from "@/app/logic/module";
+import {
+  buildAddSessionKey,
+  getAllSessions,
+  sendTransaction,
+} from "@/app/logic/module";
 import { useAccount, useLoginProvider } from "../../context/LoginProvider";
 import useAccountStore from "@/app/store/account/account.store";
-import { convertToSeconds, fixDecimal, formatTime, getTokenBalance, getVaultBalance } from "@/app/logic/utils";
+import {
+  convertToSeconds,
+  fixDecimal,
+  formatTime,
+  getTokenBalance,
+  getVaultBalance,
+} from "@/app/logic/utils";
 import { scheduleJob } from "@/app/logic/jobsAPI";
 import { WaitForUserOperationReceiptTimeoutError } from "permissionless";
 import { ZeroAddress, formatEther, formatUnits } from "ethers";
@@ -51,16 +65,15 @@ type Investment = {
   targetToken: string;
   vault: string;
   account: string;
-  validAfter: number;       
-  validUntil: number;        
-  limitAmount: bigint;       
-  limitUsed: bigint;         
-  lastUsed: number;         
-  refreshInterval: bigint;   
+  validAfter: number;
+  validUntil: number;
+  limitAmount: bigint;
+  limitUsed: bigint;
+  lastUsed: number;
+  refreshInterval: bigint;
 };
 
 export default function Investments() {
-
   const { chainId } = useAccountStore();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -71,7 +84,7 @@ export default function Investments() {
   const [balance, setBalance] = useState<string>("0");
   const [targetToken, setTargetToken] = useState<number>(0);
   const [frequency, setFrequency] = useState<number>(0);
-  const [refreshInterval, setRefreshInterval] = useState<number>(1)
+  const [refreshInterval, setRefreshInterval] = useState<number>(1);
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const [investments, setInvestments] = useState<Investment[]>([]);
@@ -81,50 +94,56 @@ export default function Investments() {
   const { address } = useAccount();
   const { validator } = useLoginProvider();
 
-
+  useEffect(() => {
+    (async () => {
+      const provider = await getJsonRpcProvider(chainId.toString());
+      const token = getChainById(Number(fromChain))?.tokens[fromToken].address;
+      if (token == ZeroAddress) {
+        setBalance(formatEther(await provider.getBalance(address)));
+      } else {
+        setBalance(await getTokenBalance(token!, address, provider));
+      }
+    })();
+  }, [fromChain, fromToken]);
 
   useEffect(() => {
-
-      (async () => {
-      
+    (async () => {
+      if (investmentAdded) {
         const provider = await getJsonRpcProvider(chainId.toString());
-        const token = getChainById(Number(fromChain))?.tokens[fromToken].address
-        if( token == ZeroAddress) {
-          setBalance(formatEther(await provider.getBalance(address)))
-          } else {
-          setBalance(await getTokenBalance(token!, address , provider))
-          }
-            
-      })();
-    }, [ fromChain, fromToken ]);
-  
-    useEffect(() => {
-      (async () => {
-        if (investmentAdded) {
-          const provider = await getJsonRpcProvider(chainId.toString());
-          let tokensWithVault = getChainById(Number(fromChain))?.tokens.filter((token: any) => token.vault != undefined);
-          
-          if (tokensWithVault) {
-            const updatedTokens = await Promise.all(
-              tokensWithVault.map(async (token) => {
-                const vaultBalance = await getVaultBalance(token.vault!, address, provider);
-                return {
-                  ...token,
-                  vaultBalance,  // Add the vault balance to each token
-                };
-              })
-            );
-            
-            setTokenVaultDetails(updatedTokens);  // Tokens now contain their respective vault balances
-          }
-    
-          const investments = await getAllSessions(chainId.toString());
-          setNextSessionId(investments.length);
-          setInvestments(investments.filter((investment: Investment) => investment.account.toLowerCase() === address?.toLowerCase()));
-          setInvestmentAdded(false);
+        let tokensWithVault = getChainById(Number(fromChain))?.tokens.filter(
+          (token: any) => token.vault != undefined
+        );
+
+        if (tokensWithVault) {
+          const updatedTokens = await Promise.all(
+            tokensWithVault.map(async (token) => {
+              const vaultBalance = await getVaultBalance(
+                token.vault!,
+                address,
+                provider
+              );
+              return {
+                ...token,
+                vaultBalance, // Add the vault balance to each token
+              };
+            })
+          );
+
+          setTokenVaultDetails(updatedTokens); // Tokens now contain their respective vault balances
         }
-      })();
-    }, [chainId, address, investmentAdded]);
+
+        const investments = await getAllSessions(chainId.toString());
+        setNextSessionId(investments.length);
+        setInvestments(
+          investments.filter(
+            (investment: Investment) =>
+              investment.account.toLowerCase() === address?.toLowerCase()
+          )
+        );
+        setInvestmentAdded(false);
+      }
+    })();
+  }, [chainId, address, investmentAdded]);
 
   const Frequency = [
     {
@@ -141,7 +160,7 @@ export default function Investments() {
     <div className="flex flex-col gap-6 justify-start p-4 items-start border border-accent w-full h-full">
       <div className="flex flex-row justify-between items-center w-full">
         <h3 className="font-bold text-2xl">Your Investments</h3>
-        <Dialog  open={dialogOpen} onOpenChange={setDialogOpen}>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger>
             <button className="bg-black text-white py-2 px-6 font-medium text-lg flex flex-row justify-center items-center gap-2 border border-black hover:border-accent hover:bg-transparent hover:text-white">
               <PlusSquareIcon /> Create a Plan
@@ -171,7 +190,7 @@ export default function Investments() {
                     // placeholder={0.01}
                     value={investValue}
                     className="bg-transparent focus:outline-none w-full text-white text-4xl"
-                    onChange={(e)=> setInvestValue(e.target.value)}
+                    onChange={(e) => setInvestValue(e.target.value)}
                   />
                   <div className="flex flex-row justify-center items-center gap-2">
                     <Select
@@ -208,33 +227,39 @@ export default function Investments() {
                       }}
                     >
                       <SelectTrigger className=" w-24 bg-white px-2 py-2 border border-accent text-black flex flex-row gap-2 items-center justify-center text-sm rounded-full focus:outline-none focus:ring-offset-0 focus:ring-0 focus:ring-accent">
-                        <SelectValue placeholder="From Chain" />
+                        <SelectValue placeholder="From Token" />
                       </SelectTrigger>
                       <SelectContent>
-                        {getChainById(Number(fromChain))?.tokens.map((from, f) => (
-                          <SelectItem key={f} value={f.toString()}>
-                            <div className="flex flex-row justify-center items-center gap-2">
-                              <Image
-                                className="bg-white rounded-full"
-                                src={from.icon}
-                                alt={from.name}
-                                width={25}
-                                height={25}
-                              />
-                              <h3 className="truncate">{from.name}</h3>
-                            </div>
-                          </SelectItem>
-                        ))}
+                        {getChainById(Number(fromChain))?.tokens.map(
+                          (from, f) => (
+                            <SelectItem key={f} value={f.toString()}>
+                              <div className="flex flex-row justify-center items-center gap-2">
+                                <Image
+                                  className="bg-white rounded-full"
+                                  src={from.icon}
+                                  alt={from.name}
+                                  width={25}
+                                  height={25}
+                                />
+                                <h3 className="truncate uppercase">
+                                  {from.name}
+                                </h3>
+                              </div>
+                            </SelectItem>
+                          )
+                        )}
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
-              
+
                 <div className="flex flex-row justify-between items-center text-sm">
-                  <div className="text-accent">${balance}</div>
+                  <div className="text-accent">
+                    ${Number(balance).toFixed(8)}
+                  </div>
                   <div className="flex flex-row justify-center items-center gap-2 text-accent">
                     <Wallet2 size={16} />
-                    <h5>{balance}</h5>
+                    <h5>{Number(balance).toFixed(8)}</h5>
                   </div>
                 </div>
               </div>
@@ -262,7 +287,7 @@ export default function Investments() {
                         <SelectValue placeholder="From Chain" />
                       </SelectTrigger>
                       <SelectContent>
-                        { tokenVaultDetails.map((from, f) => (
+                        {tokenVaultDetails.map((from, f) => (
                           <SelectItem key={f} value={f.toString()}>
                             <div className="flex flex-row justify-center items-center gap-2">
                               <Image
@@ -282,7 +307,6 @@ export default function Investments() {
                 </div>
               </div>
 
-
               <div className=" px-4 py-3 flex flex-col gap-2 w-full text-base">
                 <div className="flex flex-row justify-start items-center gap-1 text-accent text-sm">
                   <div className="text-accent">Every</div>
@@ -292,15 +316,16 @@ export default function Investments() {
                   <input
                     type="number"
                     value={refreshInterval}
-                    onChange={(e)=> setRefreshInterval(parseInt(e.target.value))}
+                    onChange={(e) =>
+                      setRefreshInterval(parseInt(e.target.value))
+                    }
                     className="bg-transparent focus:outline-none w-full text-white text-4xl"
-
                   />
                   <div className="flex flex-row justify-center items-center gap-2">
                     <Select
                       value={frequency.toString()}
                       onValueChange={(e) => {
-                        console.log(e)
+                        console.log(e);
                         setFrequency(parseInt(e));
                       }}
                     >
@@ -387,163 +412,212 @@ export default function Investments() {
                 </div>
               </div>
             </div>
-            <button className="bg-transparent py-3 w-full bg-white text-black hover:border-t hover:border-accent hover:bg-transparent hover:text-white text-lg"
-            disabled={isLoading}
-            onClick={async () => {
-
-              setIsLoading(true);
-              try{ 
-                const sessionKeyCall = await buildAddSessionKey(chainId.toString(), 
-                address, investValue, convertToSeconds(refreshInterval, Frequency[frequency].label as any),
-                getChainById(Number(fromChain))?.tokens[fromToken].address!,
-                getChainById(Number(fromChain))?.tokens[targetToken].address!,
-                getChainById(Number(fromChain))?.tokens[targetToken].vault!);
-              await sendTransaction(chainId.toString(), sessionKeyCall.to, sessionKeyCall.value, sessionKeyCall.data, validator, address);
-              } catch(error) {
-
-                if (error instanceof WaitForUserOperationReceiptTimeoutError) {
-                  console.error("User operation timed out:", error.message);
-                } else {
-                  
-                  throw error;
+            <button
+              className="bg-transparent py-3 w-full bg-white text-black border border-accent hover:bg-transparent hover:text-white text-lg"
+              disabled={isLoading}
+              onClick={async () => {
+                setIsLoading(true);
+                try {
+                  const sessionKeyCall = await buildAddSessionKey(
+                    chainId.toString(),
+                    address,
+                    investValue,
+                    convertToSeconds(
+                      refreshInterval,
+                      Frequency[frequency].label as any
+                    ),
+                    getChainById(Number(fromChain))?.tokens[fromToken].address!,
+                    getChainById(Number(fromChain))?.tokens[targetToken]
+                      .address!,
+                    getChainById(Number(fromChain))?.tokens[targetToken].vault!
+                  );
+                  await sendTransaction(
+                    chainId.toString(),
+                    sessionKeyCall.to,
+                    sessionKeyCall.value,
+                    sessionKeyCall.data,
+                    validator,
+                    address
+                  );
+                } catch (error) {
+                  if (
+                    error instanceof WaitForUserOperationReceiptTimeoutError
+                  ) {
+                    console.error("User operation timed out:", error.message);
+                  } else {
+                    throw error;
+                  }
                 }
-              }
-              await scheduleJob(nextSessionId.toString());
-              setInvestmentAdded(true);
-              setDialogOpen(false); 
-              setIsLoading(false);
-
-            }}
+                await scheduleJob(nextSessionId.toString());
+                setInvestmentAdded(true);
+                setDialogOpen(false);
+                setIsLoading(false);
+              }}
             >
               {isLoading ? (
-              <span className="flex items-center justify-center">
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Creating your investement plan...
-              </span>
-            ) : (
-              "Create Plan"
-            )}
+                <span className="flex items-center justify-center">
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Creating your investement plan...
+                </span>
+              ) : (
+                "Create Plan"
+              )}
             </button>
           </DialogContent>
         </Dialog>
       </div>
       <div className="grid grid-cols-3 gap-4 text-white w-full">
-      { tokenVaultDetails.map(( tokenVault, index) => <div key={index} className=" w-full flex flex-col gap-0 border border-accent">
-          <div className="flex flex-row justify-between items-center px-4 py-3 border-b border-accent">
-          <div className="flex flex-row justify-start items-center gap-2">
-                  <Image
-                    src={ tokenVault.icon!}
-                    alt="From Token"
-                    width={30}
-                    height={30}
-                  />
-                  <div className="font-semibold">
-                    { tokenVault.name! }
-                  </div>
+        {tokenVaultDetails.map((tokenVault, index) => (
+          <div
+            key={index}
+            className=" w-full flex flex-col gap-0 border border-accent"
+          >
+            <div className="flex flex-row justify-between items-center px-4 py-3 border-b border-accent">
+              <div className="flex flex-row justify-start items-center gap-2">
+                <Image
+                  src={tokenVault.icon!}
+                  alt="From Token"
+                  width={30}
+                  height={30}
+                />
+                <div className="font-semibold">{tokenVault.name!}</div>
+              </div>
+              <div>
+                <Image
+                  src={getChainById(Number(chainId))?.icon!}
+                  alt="Wallet Icon"
+                  width={30}
+                  height={30}
+                />
+              </div>
+            </div>
+            <div className="px-4 py-3 flex flex-col justify-start items-start">
+              <div className="flex flex-col justify-between items-start gap-4 w-full">
+                <div className="flex flex-row justify-between items-center w-full">
+                  <h4 className="font-semibold">Balance</h4>
+                  <h5>
+                    {fixDecimal(
+                      tokenVault.vaultBalance,
+                      parseInt(tokenVault.vaultBalance) ? 4 : 6
+                    )}
+                  </h5>
                 </div>
-            <div>
-              <Image
-                src={ getChainById(Number(chainId))?.icon! }
-                alt="Wallet Icon"
-                width={30}
-                height={30}
-              />
-            </div>
-          </div>
-          <div className="px-4 py-3 flex flex-col justify-start items-start">
-            <div className="flex flex-col justify-between items-start gap-4 w-full">
-              <div className="flex flex-row justify-between items-center w-full">
-                <h4 className="font-semibold">Balance</h4>
-                <h5>{ fixDecimal(tokenVault.vaultBalance, parseInt(tokenVault.vaultBalance) ? 4 : 6) }</h5>
-              </div>
-              <div className="grid grid-cols-2 gap-4 w-full">
-                <button className="border border-accent px-6 py-2.5 bg-white text-black">
-                  Withdraw
-                </button>
+                <div className="grid grid-cols-2 gap-4 w-full">
+                  <div></div>
+                  <button className="border border-accent px-6 py-2.5 bg-white text-black text-sm">
+                    Withdraw
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>)
-          }
-          </div>
-         
-    <h3 className="font-bold text-2xl">Your Investment Plans</h3>
-      <div className="grid grid-cols-3 gap-4 text-white w-full"> 
-       { investments.map(( investment, index) => <div key={index} className=" w-full flex flex-col gap-0 border border-accent">
-          <div className="flex flex-row justify-between items-center px-4 py-3 border-b border-accent">
-            <h2 className=" text-xl font-semibold">Investment { index + 1 }</h2>
-            <div>
-              <Image
-                src={ getChainById(Number(chainId))?.icon! }
-                alt="Wallet Icon"
-                width={30}
-                height={30}
-              />
-            </div>
-            <div >
+        ))}
+      </div>
+      {investments.length > 0 && (
+        <h3 className="font-bold text-2xl">Your Investment Plans</h3>
+      )}
+
+      <div className="grid grid-cols-3 gap-4 text-white w-full">
+        {investments.map((investment, index) => (
+          <div
+            key={index}
+            className=" w-full flex flex-col gap-0 border border-accent"
+          >
+            <div className="flex flex-row justify-between items-center px-4 py-3 border-b border-accent">
+              <h2 className=" text-xl font-semibold">Investment {index + 1}</h2>
+              <div>
+                <Image
+                  src={getChainById(Number(chainId))?.icon!}
+                  alt="Wallet Icon"
+                  width={30}
+                  height={30}
+                />
+              </div>
+              <div>
                 <button className="border border-accent px-6 py-2.5">
                   Disable
                 </button>
-            </div>
-            
-          </div>
-          <div className="px-4 py-3 flex flex-col justify-start items-start">
-            <div className="flex flex-col justify-between items-start gap-4 w-full">
-              <div className="flex flex-row justify-between items-center gap-3 w-full">
-                <div className="flex flex-row justify-start items-center gap-2">
-                  <Image
-                    src={ getTokenInfo(Number(chainId), investment.token)?.icon!}
-                    alt="From Token"
-                    width={30}
-                    height={30}
-                  />
-                  <div className="font-semibold">
-                    { getTokenInfo(Number(chainId), investment.token)?.name! }
-                  </div>
-                </div>
-                <div>
-                  <ChevronsRight />
-                </div>
-                <div className="flex flex-row justify-start items-center gap-2">
-                  <Image
-                    src={getTokenInfo(Number(chainId), investment.targetToken)?.icon!}
-                    alt="From Token"
-                    width={30}
-                    height={30}
-                  />
-                  <div className="font-semibold">
-                    { getTokenInfo(Number(chainId), investment.targetToken)?.name }
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-row justify-between items-center w-full">
-                <h4 className="font-semibold">Invests</h4>
-                <h5>{ formatUnits(investment.limitAmount, getTokenInfo(Number(chainId), investment.token)?.decimals) }</h5>
-              </div>
-              <div className="flex flex-row justify-between items-center w-full">
-                <h4 className="font-semibold">Every</h4>
-                <h5>{ formatTime(Number(investment.refreshInterval)) }</h5>
-              </div>
-              <div className="flex flex-row justify-between items-center w-full">
-                <h4 className="font-semibold">Expires On</h4>
-                <>
-                <h5>{ `${(new Date(Number(investment.validUntil)*1000)).toDateString()} ${(new Date(Number(investment.validUntil)*1000)).toLocaleTimeString()}` }</h5>
-                </>
-              
-              </div>
-              <div className="flex flex-row justify-between items-center w-full">
-                <h4 className="font-semibold">Status</h4>
-                <h5 className="flex flex-row justify-center items-center gap-2">
-               
-                { investment.validUntil > Math.floor(Date.now()/1000) ?    <div className="bg-green-600 h-3 w-3 rounded-full"></div> :    <div className="bg-red-600 h-3 w-3 rounded-full"></div> }
-                  { investment.validUntil > Math.floor(Date.now()/1000) ? <h5>Active</h5> : <h5>Expired</h5> }
-                </h5>
               </div>
             </div>
+            <div className="px-4 py-3 flex flex-col justify-start items-start">
+              <div className="flex flex-col justify-between items-start gap-4 w-full">
+                <div className="flex flex-row justify-between items-center gap-3 w-full">
+                  <div className="flex flex-row justify-start items-center gap-2">
+                    <Image
+                      src={
+                        getTokenInfo(Number(chainId), investment.token)?.icon!
+                      }
+                      alt="From Token"
+                      width={30}
+                      height={30}
+                    />
+                    <div className="font-semibold">
+                      {getTokenInfo(Number(chainId), investment.token)?.name!}
+                    </div>
+                  </div>
+                  <div>
+                    <ChevronsRight />
+                  </div>
+                  <div className="flex flex-row justify-start items-center gap-2">
+                    <Image
+                      src={
+                        getTokenInfo(Number(chainId), investment.targetToken)
+                          ?.icon!
+                      }
+                      alt="From Token"
+                      width={30}
+                      height={30}
+                    />
+                    <div className="font-semibold">
+                      {
+                        getTokenInfo(Number(chainId), investment.targetToken)
+                          ?.name
+                      }
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-row justify-between items-center w-full">
+                  <h4 className="font-semibold">Invests</h4>
+                  <h5>
+                    {formatUnits(
+                      investment.limitAmount,
+                      getTokenInfo(Number(chainId), investment.token)?.decimals
+                    )}
+                  </h5>
+                </div>
+                <div className="flex flex-row justify-between items-center w-full">
+                  <h4 className="font-semibold">Every</h4>
+                  <h5>{formatTime(Number(investment.refreshInterval))}</h5>
+                </div>
+                <div className="flex flex-row justify-between items-center w-full">
+                  <h4 className="font-semibold">Expires On</h4>
+                  <>
+                    <h5>{`${new Date(
+                      Number(investment.validUntil) * 1000
+                    ).toDateString()} ${new Date(
+                      Number(investment.validUntil) * 1000
+                    ).toLocaleTimeString()}`}</h5>
+                  </>
+                </div>
+                <div className="flex flex-row justify-between items-center w-full">
+                  <h4 className="font-semibold">Status</h4>
+                  <h5 className="flex flex-row justify-center items-center gap-2">
+                    {investment.validUntil > Math.floor(Date.now() / 1000) ? (
+                      <div className="bg-green-600 h-3 w-3 rounded-full"></div>
+                    ) : (
+                      <div className="bg-red-600 h-3 w-3 rounded-full"></div>
+                    )}
+                    {investment.validUntil > Math.floor(Date.now() / 1000) ? (
+                      <h5>Active</h5>
+                    ) : (
+                      <h5>Expired</h5>
+                    )}
+                  </h5>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>)
-          }
-
+        ))}
       </div>
     </div>
   );
