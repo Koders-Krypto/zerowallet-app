@@ -20,16 +20,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEffect, useState } from "react";
+import { ChangeEventHandler, useEffect, useState } from "react";
 import {
   BadgeInfo,
   CalendarIcon,
   ChevronsRight,
   Loader2,
-  Plus,
   PlusSquareIcon,
   Wallet2,
-  Zap,
 } from "lucide-react";
 
 import { Calendar } from "@/components/ui/calendar";
@@ -58,6 +56,8 @@ import { scheduleJob } from "@/app/logic/jobsAPI";
 import { WaitForUserOperationReceiptTimeoutError } from "permissionless";
 import { ZeroAddress, formatEther, formatUnits } from "ethers";
 import { getJsonRpcProvider } from "@/app/logic/web3";
+import { setHours, setMinutes } from "date-fns";
+import moment from "moment";
 
 type Investment = {
   address: string;
@@ -156,6 +156,35 @@ export default function Investments() {
       label: "days",
     },
   ];
+
+  const [selected, setSelected] = useState<Date>();
+  const [startTimeValue, setStartTimeValue] = useState<string>("00:00");
+
+  const handleStartTimeChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    const time = e.target.value;
+    if (!selected) {
+      setStartTimeValue(time);
+      return;
+    }
+    const [hours, minutes] = time.split(":").map((str) => parseInt(str, 10));
+    const newSelectedDate = setHours(setMinutes(selected, minutes), hours);
+    setSelected(newSelectedDate);
+    setStartTimeValue(time);
+  };
+
+  const [endTimeValue, setEndTimeValue] = useState<string>("00:00");
+
+  const handleEndTimeChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    const time = e.target.value;
+    if (!selected) {
+      setEndTimeValue(time);
+      return;
+    }
+    const [hours, minutes] = time.split(":").map((str) => parseInt(str, 10));
+    const newSelectedDate = setHours(setMinutes(selected, minutes), hours);
+    setSelected(newSelectedDate);
+    setEndTimeValue(time);
+  };
   return (
     <div className="flex flex-col gap-6 justify-start p-4 items-start border border-accent w-full h-full">
       <div className="flex flex-row justify-between items-center w-full">
@@ -348,7 +377,7 @@ export default function Investments() {
               <div className="flex flex-row divide-x divide-accent">
                 <div className=" px-4 py-3 flex flex-col justify-start items-start gap-2 w-full text-base">
                   <div className="flex flex-row justify-start items-center gap-1 text-accent text-sm">
-                    <div className="text-accent">Start Time</div>
+                    <div className="text-accent">Start Date</div>
                     <BadgeInfo size={14} />
                   </div>
                   <div className="flex flex-row justify-between items-center gap-2 w-full mt-2">
@@ -356,18 +385,28 @@ export default function Investments() {
                       <PopoverTrigger asChild>
                         <button
                           className={cn(
-                            "w-fit justify-start text-left font-normal flex flex-row items-center border-accent border-0"
+                            "w-fit justify-start text-left font-normal flex flex-row items-center border-accent text-white border-0"
                           )}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4 text-white" />
                           {startDate ? (
-                            format(startDate, "PPP")
+                            format(startDate, "PPP") +
+                            " " +
+                            moment(startTimeValue, "HH:mm:ss").format("hh:mm A")
                           ) : (
                             <span className="text-white">Pick start date</span>
                           )}
                         </button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0">
+                        <div className="w-full flex flex-row justify-center items-center mt-4">
+                          <input
+                            className="focus:outline-none text-black bg-transparent w-28"
+                            type="time"
+                            value={startTimeValue}
+                            onChange={handleStartTimeChange}
+                          />
+                        </div>
                         <Calendar
                           mode="single"
                           selected={startDate}
@@ -380,7 +419,7 @@ export default function Investments() {
                 </div>
                 <div className=" px-4 py-3 flex flex-col justify-start items-start gap-2 w-full text-base">
                   <div className="flex flex-row justify-start items-center gap-1 text-accent text-sm">
-                    <div className="text-accent">End Time</div>
+                    <div className="text-accent">End Date</div>
                     <BadgeInfo size={14} />
                   </div>
                   <div className="flex flex-row justify-between items-center gap-2 w-full mt-2">
@@ -388,18 +427,28 @@ export default function Investments() {
                       <PopoverTrigger asChild>
                         <button
                           className={cn(
-                            "w-fit justify-start text-left font-normal flex flex-row items-center border-accent border-0"
+                            "w-fit justify-start text-left font-normal flex flex-row items-center border-accent text-white border-0"
                           )}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4 text-white" />
                           {endDate ? (
-                            format(endDate, "PPP")
+                            format(endDate, "PPP") +
+                            " " +
+                            moment(endTimeValue, "HH:mm:ss").format("hh:mm A")
                           ) : (
                             <span className="text-white">Pick end date</span>
                           )}
                         </button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0">
+                        <div className="w-full flex flex-row justify-center items-center mt-4">
+                          <input
+                            className="focus:outline-none text-black bg-transparent w-28"
+                            type="time"
+                            value={endTimeValue}
+                            onChange={handleEndTimeChange}
+                          />
+                        </div>
                         <Calendar
                           mode="single"
                           selected={endDate}
