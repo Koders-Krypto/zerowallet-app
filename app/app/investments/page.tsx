@@ -21,6 +21,7 @@ import {
   BadgeInfo,
   CalendarIcon,
   ChevronsRight,
+  Loader2,
   Plus,
   PlusSquareIcon,
   Wallet2,
@@ -38,10 +39,10 @@ import { cn } from "@/lib/utils";
 import { buildAddSessionKey, getAllSessions, sendTransaction } from "@/app/logic/module";
 import { useAccount, useLoginProvider } from "../../context/LoginProvider";
 import useAccountStore from "@/app/store/account/account.store";
-import { chain, convertToSeconds, fixDecimal, formatTime, getTokenBalance, getVaultBalance } from "@/app/logic/utils";
-import { getAllJobs, scheduleJob } from "@/app/logic/jobsAPI";
+import { convertToSeconds, fixDecimal, formatTime, getTokenBalance, getVaultBalance } from "@/app/logic/utils";
+import { scheduleJob } from "@/app/logic/jobsAPI";
 import { WaitForUserOperationReceiptTimeoutError } from "permissionless";
-import { ZeroAddress, formatEther } from "ethers";
+import { ZeroAddress, formatEther, formatUnits } from "ethers";
 import { getJsonRpcProvider } from "@/app/logic/web3";
 
 type Investment = {
@@ -61,6 +62,8 @@ type Investment = {
 export default function Investments() {
 
   const { chainId } = useAccountStore();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [investValue, setInvestValue] = useState<string>("0");
   const [investmentAdded, setInvestmentAdded] = useState(true);
   const [fromChain, setFromChain] = useState<number>(chainId);
@@ -138,7 +141,7 @@ export default function Investments() {
     <div className="flex flex-col gap-6 justify-start p-4 items-start border border-accent w-full h-full">
       <div className="flex flex-row justify-between items-center w-full">
         <h3 className="font-bold text-2xl">Your Investments</h3>
-        <Dialog>
+        <Dialog  open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger>
             <button className="bg-black text-white py-2 px-6 font-medium text-lg flex flex-row justify-center items-center gap-2 border border-black hover:border-accent hover:bg-transparent hover:text-white">
               <PlusSquareIcon /> Create a Plan
@@ -259,7 +262,7 @@ export default function Investments() {
                         <SelectValue placeholder="From Chain" />
                       </SelectTrigger>
                       <SelectContent>
-                        {getChainById(Number(fromChain))?.tokens.map((from, f) => (
+                        { tokenVaultDetails.map((from, f) => (
                           <SelectItem key={f} value={f.toString()}>
                             <div className="flex flex-row justify-center items-center gap-2">
                               <Image
@@ -385,8 +388,10 @@ export default function Investments() {
               </div>
             </div>
             <button className="bg-transparent py-3 w-full bg-white text-black hover:border-t hover:border-accent hover:bg-transparent hover:text-white text-lg"
+            disabled={isLoading}
             onClick={async () => {
 
+              setIsLoading(true);
               try{ 
                 const sessionKeyCall = await buildAddSessionKey(chainId.toString(), 
                 address, investValue, convertToSeconds(refreshInterval, Frequency[frequency].label as any),
@@ -405,9 +410,19 @@ export default function Investments() {
               }
               await scheduleJob(nextSessionId.toString());
               setInvestmentAdded(true);
+              setDialogOpen(false); 
+              setIsLoading(false);
+
             }}
             >
-              Create
+              {isLoading ? (
+              <span className="flex items-center justify-center">
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                Creating your investement plan...
+              </span>
+            ) : (
+              "Create Plan"
+            )}
             </button>
           </DialogContent>
         </Dialog>
@@ -487,7 +502,7 @@ export default function Investments() {
                   </div>
                 </div>
                 <div>
-                  <Zap />
+                  <ChevronsRight />
                 </div>
                 <div className="flex flex-row justify-start items-center gap-2">
                   <Image
@@ -497,9 +512,13 @@ export default function Investments() {
                     height={30}
                   />
                   <div className="font-semibold">
-                    {getTokenInfo(Number(chainId), investment.targetToken)?.name}
+                    { getTokenInfo(Number(chainId), investment.targetToken)?.name }
                   </div>
                 </div>
+              </div>
+              <div className="flex flex-row justify-between items-center w-full">
+                <h4 className="font-semibold">Invests</h4>
+                <h5>{ formatUnits(investment.limitAmount, getTokenInfo(Number(chainId), investment.token)?.decimals) }</h5>
               </div>
               <div className="flex flex-row justify-between items-center w-full">
                 <h4 className="font-semibold">Every</h4>
