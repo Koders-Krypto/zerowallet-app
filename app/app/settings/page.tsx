@@ -15,6 +15,12 @@ import { CopyIcon, Plus } from "lucide-react";
 import { useAccount } from "wagmi";
 import Truncate from "@/app/utils/truncate";
 import { CopytoClipboard } from "@/app/utils/copyclipboard";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export default function Settings() {
   const [gasChain, setGasChain] = useState<number>(0);
@@ -47,11 +53,31 @@ export default function Settings() {
       setGasChain(arrayID);
     }
   }, []);
+
+  const FaqsData = [
+    {
+      question: "Is it accessible?",
+      answer: "Yes. It adheres to the WAI-ARIA design pattern.",
+    },
+    {
+      question: "Is it accessible?",
+      answer: "Yes. It adheres to the WAI-ARIA design pattern.",
+    },
+    {
+      question: "What is the best way to get started?",
+      answer: "Yes. It adheres to the WAI-ARIA design pattern.",
+    },
+    {
+      question: "How do I use it?",
+      answer:
+        "You can use it to create a new account or import an existing one.",
+    },
+  ];
   return (
     <div className="border border-accent w-full h-full text-white p-4">
       <Tabs defaultValue="account" className="w-full h-full bg-transparent">
         <div className="flex flex-col md:flex-row gap-6 w-full h-full">
-          <TabsList className="flex flex-row md:flex-col justify-start items-start h-fit w-full md:w-96 rounded-none bg-transparent text-xl border border-accent p-0 text-white">
+          <TabsList className="flex flex-row md:flex-col justify-start items-start h-fit w-full md:w-96 rounded-none bg-transparent text-xl border border-accent p-0 text-white divide-y divide-accent">
             <TabsTrigger
               className="py-3 w-full text-lg rounded-none data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:font-bold"
               value="account"
@@ -63,6 +89,12 @@ export default function Settings() {
               value="password"
             >
               Gas
+            </TabsTrigger>
+            <TabsTrigger
+              className="py-3 w-full text-lg rounded-none data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:font-bold"
+              value="faqs"
+            >
+              FAQ{"'"}s
             </TabsTrigger>
           </TabsList>
           <div className=" flex flex-col gap-2 w-full h-fit border border-accent">
@@ -156,6 +188,32 @@ export default function Settings() {
                     Save
                   </button>
                 </div>
+              </div>
+            </TabsContent>
+            <TabsContent className="mt-0" value="faqs">
+              <div className="flex flex-row justify-between items-center w-full border-b border-accent px-4 py-3">
+                <h2 className="text-xl font-bold">
+                  Frequently Asked Questions
+                </h2>
+                <div className="flex flex-row justify-center items-center gap-4"></div>
+              </div>
+              <div className="px-4 py-0">
+                <Accordion className=" divide-y divide-accent" type="multiple">
+                  {FaqsData.map((faq, f) => {
+                    return (
+                      <AccordionItem
+                        className="border-b-0 py-1 "
+                        value={f.toString()}
+                        key={f}
+                      >
+                        <AccordionTrigger className=" hover:no-underline">
+                          {faq.question}
+                        </AccordionTrigger>
+                        <AccordionContent>{faq.answer}</AccordionContent>
+                      </AccordionItem>
+                    );
+                  })}
+                </Accordion>
               </div>
             </TabsContent>
           </div>

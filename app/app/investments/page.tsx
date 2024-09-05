@@ -313,14 +313,14 @@ export default function Investments() {
                       <PopoverTrigger asChild>
                         <button
                           className={cn(
-                            "w-fit justify-start text-left font-normal flex flex-row items-center border-accent text-white border-0"
+                            "w-fit justify-start text-left font-normal flex flex-row items-center border-accent border-0"
                           )}
                         >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          <CalendarIcon className="mr-2 h-4 w-4 text-white" />
                           {startDate ? (
                             format(startDate, "PPP")
                           ) : (
-                            <span>Pick start date</span>
+                            <span className="text-white">Pick start date</span>
                           )}
                         </button>
                       </PopoverTrigger>
@@ -345,14 +345,14 @@ export default function Investments() {
                       <PopoverTrigger asChild>
                         <button
                           className={cn(
-                            "w-fit justify-start text-left font-normal flex flex-row items-center border-accent border-0 text-white"
+                            "w-fit justify-start text-left font-normal flex flex-row items-center border-accent border-0"
                           )}
                         >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          <CalendarIcon className="mr-2 h-4 w-4 text-white" />
                           {endDate ? (
                             format(endDate, "PPP")
                           ) : (
-                            <span>Pick end date</span>
+                            <span className="text-white">Pick end date</span>
                           )}
                         </button>
                       </PopoverTrigger>
