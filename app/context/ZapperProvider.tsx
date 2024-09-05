@@ -21,6 +21,8 @@ interface ZapperContextProps {
   selectedNetworks: NetworkType[];
   setSelectedNetworks: React.Dispatch<React.SetStateAction<NetworkType[]>>;
   tokensByNetwork: ZapperTokenDataTypes[];
+  refresh: boolean;
+  setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
 }
 // Create the context
 export const ZapperContext = createContext<ZapperContextProps>({
@@ -33,6 +35,8 @@ export const ZapperContext = createContext<ZapperContextProps>({
   selectedNetworks: [],
   setSelectedNetworks: () => {},
   tokensByNetwork: [],
+  refresh: false,
+  setRefresh: () => {},
 });
 
 // Create the provider component
@@ -41,6 +45,7 @@ export const ZapperProvider = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
+  const [refresh, setRefresh] = useState(false);
   const { accountInfo } = useContext(LoginContext);
 
   const [tokenData, setTokenData] = useState<ZapperTokenDataTypes[] | any[]>(
@@ -94,7 +99,7 @@ export const ZapperProvider = ({
       fetchNFTData(accountInfo.address.toString());
       fetchDefiData(accountInfo.address.toString());
     }
-  }, [accountInfo.address]);
+  }, [accountInfo.address, refresh]);
 
   useEffect(() => {
     if (tokenData.length > 0) {
@@ -129,6 +134,8 @@ export const ZapperProvider = ({
         selectedNetworks,
         setSelectedNetworks,
         tokensByNetwork,
+        refresh,
+        setRefresh,
       }}
     >
       {children}

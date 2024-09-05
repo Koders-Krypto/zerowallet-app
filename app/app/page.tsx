@@ -7,6 +7,7 @@ import {
   Copy,
   PiggyBank,
   RefreshCcw,
+  RefreshCcwIcon,
   SendHorizonal,
   Trash,
 } from "lucide-react";
@@ -58,6 +59,8 @@ export default function App() {
     selectedNetworks,
     setSelectedNetworks,
     tokensByNetwork,
+    refresh,
+    setRefresh,
   } = useContext(ZapperContext);
 
   useEffect(() => {
@@ -95,9 +98,17 @@ export default function App() {
 
             <div className="flex flex-col justify-start items-start ml-0 gap-2">
               <div className="flex flex-col-reverse justify-start items-start gap-1">
-                <h1 className="text-4xl font-black">
-                  ${formatNumberCommas(Number(totalBalance.toFixed(0)))}
-                </h1>
+                <div className="flex flex-row justify-center items-center gap-2">
+                  <h1 className="text-4xl font-black">
+                    ${formatNumberCommas(Number(totalBalance.toFixed(0)))}
+                  </h1>
+                  <button onClick={() => setRefresh(!refresh)}>
+                    <RefreshCcwIcon
+                      size={20}
+                      className="text-accent hover:text-white"
+                    />
+                  </button>
+                </div>
                 <span className="text-accent text-sm">Networth</span>
               </div>
               {ensname && <div className="text-lg font-medium">{ensname}</div>}
