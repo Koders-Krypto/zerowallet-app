@@ -11,8 +11,14 @@ import {
 import { Fuel, SendHorizonal } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
+import { ethers } from "ethers"; // Add this import
+import { parseUnits } from "ethers"; // Update this import
 
 import { gasChainsTokens, getChainById } from "@/app/utils/tokens";
+import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
+import { config } from "@/app/wallet-connect/config/index";
+import { Address, erc20Abi } from "viem";
+import { switchChain, getChainId } from "@wagmi/core";
 
 interface GasChainType {
   name: string;
@@ -21,6 +27,31 @@ interface GasChainType {
   icon: string;
 }
 
+// ERC-20 contract ABI for transfer function
+const ERC20_ABI = [
+  {
+    constant: false,
+    inputs: [
+      {
+        name: "to",
+        type: "address",
+      },
+      {
+        name: "value",
+        type: "uint256",
+      },
+    ],
+    name: "transfer",
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+      },
+    ],
+    type: "function",
+  },
+];
+
 export default function Bridge() {
   const [selectedGasChain, setSelectedGasChain] = useState<GasChainType>(
     gasChainsTokens[0]
@@ -28,6 +59,61 @@ export default function Bridge() {
   const [selectedTransferChainID, setSelectedTransferChainID] =
     useState<number>(0);
   const [selectedTokenID, setSelectedTokenID] = useState<number>(0);
+  const [recipientAddress, setRecipientAddress] = useState<string>("");
+  const [amount, setAmount] = useState<string>("");
+  const [disableTransfer, setDisableTransfer] = useState<boolean>(true);
+  const [transferText, setTransferText] = useState<string>("Transfer");
+  //   const [transferStatus, setTransferStatus] = useState<"IDLE" | "PENDING" | "SUCCESS" | "FAILED">("IDLE");
+
+  const waitForTransaction = async (hash: Address) => {
+    try {
+      const transactionReceipt = await waitForTransactionReceipt(config, {
+        confirmations: 2,
+        hash,
+      });
+      if (transactionReceipt.status === "success") {
+        return {
+          success: true,
+          data: transactionReceipt,
+        };
+      }
+      throw transactionReceipt.status;
+    } catch (e: any) {
+      throw e;
+    }
+  };
+
+  const validateInput = () => {
+    if (!recipientAddress) {
+      setDisableTransfer(true);
+      setTransferText("Please enter a recipient address");
+    }
+    if (!amount) {
+      setDisableTransfer(true);
+      setTransferText("Please enter an amount");
+    }
+  };
+
+  const transferTokens = async () => {
+    const chainId = getChainId(config);
+    if (chainId !== selectedGasChain.chainId) {
+      await switchChain(config, { chainId: selectedGasChain.chainId });
+    }
+
+    // Convert the amount to Ether
+    const amountInEther = parseUnits(amount, "ether");
+
+    const result = await writeContract(config, {
+      abi: ERC20_ABI,
+      address: gasChainsTokens[selectedTransferChainID].tokens[selectedTokenID]
+        .address as `0x${string}`,
+      functionName: "transfer",
+      args: [recipientAddress, amountInEther],
+      chainId: selectedGasChain.chainId,
+    });
+
+    await waitForTransaction(result);
+  };
 
   return (
     <div className="w-full h-full text-white border border-accent flex flex-col justify-start md:justify-center items-start md:items-center gap-6 px-4 py-4 md:py-6">
@@ -138,15 +224,17 @@ export default function Bridge() {
               <input
                 type="number"
                 placeholder={"0.01 ETH"}
-                className="w-full h-full pr-2 py-3 bg-transparent text-black border-y-0 border-b md:border-y border-accent border-r md:border-l-0 border-l text-right focus:outline-none col-span-2 md:col-span-1"
+                onChange={(e) => setAmount(e.target.value)}
+                className="w-full h-full pr-2 py-3 bg-black text-white border-y-0 border-b md:border-y border-accent border-r md:border-l-0 border-l text-right focus:outline-none col-span-2 md:col-span-1"
               />
             </div>
           </div>
 
           <input
-            type="number"
+            type="string"
             placeholder="Recipient address (0x0)"
-            className="w-full h-full pl-4 py-3 bg-transparent text-black focus:outline-none border border-accent"
+            className="w-full h-full pl-4 py-3 bg-transparent text-white focus:outline-none border border-accent"
+            onChange={(e) => setRecipientAddress(e.target.value)}
           />
           <div className="border border-accent px-4 py-3 flex flex-col text-sm gap-0 divide-y divide-accent">
             <div className="flex flex-row justify-between items-center pb-2">
@@ -170,7 +258,10 @@ export default function Bridge() {
               <h5>0x0</h5>
             </div>
           </div>
-          <button className="w-full bg-white hover:bg-transparent hover:text-white border border-accent text-black py-3.5 text-lg font-bold flex flex-row justify-center items-center gap-2">
+          <button
+            className="w-full bg-white hover:bg-transparent hover:text-white border border-accent text-black py-3.5 text-lg font-bold flex flex-row justify-center items-center gap-2"
+            onClick={transferTokens}
+          >
             Transfer <SendHorizonal size={20} />
           </button>
         </div>

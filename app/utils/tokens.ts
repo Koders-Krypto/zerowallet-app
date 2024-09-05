@@ -13,13 +13,13 @@ const gasChainsTokens = [
       },
       {
         name: "WETH",
-        address: "0x0000000000000000000000000000000000000001",
+        address: "0x94373a4919B3240D86eA41593D5eBa789FEF3848",
         icon: "/tokens/weth.png",
         decimals: 6,
       },
       {
         name: "USDT",
-        address: "0x0000000000000000000000000000000000000002",
+        address: "0x712e3A792c974B3E3dbE41229Ad4290791C75A82",
         icon: "/tokens/usdt.png",
         decimals: 6,
       },
