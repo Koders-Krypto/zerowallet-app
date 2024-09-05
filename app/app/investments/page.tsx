@@ -580,12 +580,12 @@ export default function Investments() {
           </div>
         ))}
       </div>
-      <div className="flex flex-col gap-4 flex-grow max-h-full h-24 overflow-y-scroll w-full">
+      <div className="flex flex-col gap-2 flex-grow w-full">
         {investments.length > 0 && (
           <h3 className="font-bold text-2xl">Investment Plans</h3>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-white w-full">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-8 text-white w-full  max-h-full h-24 overflow-y-scroll flex-grow pt-5">
           {investments.map((investment, index) => (
             <div
               key={index}
@@ -595,7 +595,7 @@ export default function Investments() {
                 <h2 className=" text-xl font-semibold">
                   Investment {index + 1}
                 </h2>
-                <div className="absolute -right-0 md:-right-4 -top-6 md:-top-4">
+                <div className="absolute -right-px -top-5">
                   <Image
                     className="bg-white rounded-full"
                     src={getChainById(Number(chainId))?.icon!}
