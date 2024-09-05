@@ -9,14 +9,11 @@ import {
   RefreshCcw,
   RefreshCcwIcon,
   SendHorizonal,
-  Trash,
 } from "lucide-react";
 import { CopytoClipboard } from "../utils/copyclipboard";
 import { useContext, useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import ShowQR from "../components/QR/ShowQR";
-import useDappStore from "../store/walletConnect";
-import Link from "next/link";
 import {
   Tooltip,
   TooltipContent,
@@ -50,7 +47,6 @@ export default function App() {
   //Zapper Data
 
   const {
-    tokenData,
     NFTData,
     DefiData,
     isZapperLoading,
@@ -61,6 +57,9 @@ export default function App() {
     tokensByNetwork,
     refresh,
     setRefresh,
+    tokenDataError,
+    DeFiDataError,
+    NftDataError,
   } = useContext(ZapperContext);
 
   useEffect(() => {
@@ -86,7 +85,7 @@ export default function App() {
       <div className="w-full border border-accent flex flex-col gap-6 px-4 py-4 md:py-6">
         <div className="w-full flex flex-col md:flex-row gap-4 justify-between items-center relative">
           <div className="flex flex-col md:flex-row gap-4 justify-start items-start md:items-center w-full">
-            {ensavatar && (
+            {ensavatar ? (
               <img
                 className="rounded-full"
                 src={ensavatar}
@@ -94,6 +93,12 @@ export default function App() {
                 height={120}
                 alt={ensname}
               />
+            ) : (
+              ensname && (
+                <div className=" h-32 w-32 rounded-full bg-black uppercase flex justify-center items-center text-7xl font-bold text-white border border-accent">
+                  {ensname.slice(0, 1)}
+                </div>
+              )
             )}
 
             <div className="flex flex-col justify-start items-start ml-0 gap-2">
@@ -266,8 +271,9 @@ export default function App() {
                 <div className="flex flex-col justify-center items-center gap-2 py-4 md:h-[55vh] text-3xl">
                   <div className="flex flex-col gap-4 justify-center items-center font-bold">
                     <h2>
-                      {" "}
-                      {isZapperLoading
+                      {tokenDataError
+                        ? "Error Fetching Tokens"
+                        : isZapperLoading
                         ? "Loading..."
                         : selectedNetworks.length === 0
                         ? "No Networks Selected"
@@ -394,7 +400,9 @@ export default function App() {
                   <div className="flex flex-col gap-4 justify-center items-center font-bold">
                     <h2>
                       {" "}
-                      {isZapperLoading
+                      {DeFiDataError
+                        ? "Error Fetching DeFi Data"
+                        : isZapperLoading
                         ? "Loading..."
                         : selectedNetworks.length === 0
                         ? "No Networks Selected"
@@ -454,8 +462,8 @@ export default function App() {
           <TabsContent value="NFTs" className="p-0 mt-0">
             {NFTData.length <= 0 && (
               <div className="flex flex-row justify-center items-center h-[55vh]">
-                <div className="flex flex-col gap-4 justify-center items-center font-bold text-xl">
-                  No NFTs Found
+                <div className="flex flex-col gap-4 justify-center items-center font-bold text-2xl">
+                  {DeFiDataError ? "Error Fetching NFT Data" : "No NFTs Found"}
                 </div>
               </div>
             )}

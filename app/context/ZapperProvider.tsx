@@ -23,6 +23,9 @@ interface ZapperContextProps {
   tokensByNetwork: ZapperTokenDataTypes[];
   refresh: boolean;
   setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
+  tokenDataError: boolean;
+  DeFiDataError: boolean;
+  NftDataError: boolean;
 }
 // Create the context
 export const ZapperContext = createContext<ZapperContextProps>({
@@ -37,6 +40,9 @@ export const ZapperContext = createContext<ZapperContextProps>({
   tokensByNetwork: [],
   refresh: false,
   setRefresh: () => {},
+  tokenDataError: false,
+  DeFiDataError: false,
+  NftDataError: false,
 });
 
 // Create the provider component
@@ -60,8 +66,11 @@ export const ZapperProvider = ({
   const [tokensByNetwork, setTokensByNetwork] = useState<
     ZapperTokenDataTypes[]
   >([]);
-
+  const [tokenDataError, setTokenDataError] = useState(false);
+  const [DeFiDataError, setDeFiDataError] = useState(false);
+  const [NftDataError, setNftDataError] = useState(false);
   const fetchTokenData = async (address: string) => {
+    setTokenData([]);
     const response = await fetch(`api/v1/data/tokens?address=${address}`);
     if (response.ok) {
       const data = await response.json();
@@ -69,9 +78,11 @@ export const ZapperProvider = ({
     } else {
       console.log("error");
       setTotalBalance(0);
+      setTokenDataError(true);
     }
   };
   const fetchDefiData = async (address: string) => {
+    setDefiData([]);
     const response = await fetch(`api/v1/data/positions?address=${address}`);
     if (response.ok) {
       const data = await response.json();
@@ -79,10 +90,12 @@ export const ZapperProvider = ({
     } else {
       console.log("error");
       setDefiData([]);
+      setDeFiDataError(true);
     }
   };
 
   const fetchNFTData = async (address: string) => {
+    setNFTData([]);
     const response = await fetch(`api/v1/data/nfts?address=${address}`);
     if (response.ok) {
       const data = await response.json();
@@ -90,6 +103,7 @@ export const ZapperProvider = ({
     } else {
       console.log("error");
       setNFTData([]);
+      setNftDataError(true);
     }
   };
 
@@ -136,6 +150,9 @@ export const ZapperProvider = ({
         tokensByNetwork,
         refresh,
         setRefresh,
+        tokenDataError,
+        DeFiDataError,
+        NftDataError,
       }}
     >
       {children}
