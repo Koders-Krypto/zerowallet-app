@@ -58,6 +58,7 @@ import { ZeroAddress, formatEther, formatUnits } from "ethers";
 import { getJsonRpcProvider } from "@/app/logic/web3";
 import { setHours, setMinutes } from "date-fns";
 import moment from "moment";
+import { waitForExecution } from "@/app/logic/permissionless";
 
 type Investment = {
   address: string;
@@ -466,35 +467,32 @@ export default function Investments() {
               disabled={isLoading}
               onClick={async () => {
                 setIsLoading(true);
-                try {
-                  const sessionKeyCall = await buildAddSessionKey(
-                    chainId.toString(),
-                    address,
-                    investValue,
-                    convertToSeconds(
-                      refreshInterval,
-                      Frequency[frequency].label as any
-                    ),
-                    getChainById(Number(fromChain))?.tokens[fromToken].address!,
-                    getChainById(Number(fromChain))?.tokens[targetToken]
-                      .address!,
-                    getChainById(Number(fromChain))?.tokens[targetToken].vault!
-                  );
-                  await sendTransaction(
-                    chainId.toString(),
-                    sessionKeyCall.to,
-                    sessionKeyCall.value,
-                    sessionKeyCall.data,
-                    validator,
-                    address
-                  );
-                } catch (error) {
-                  if (
-                    error instanceof WaitForUserOperationReceiptTimeoutError
-                  ) {
-                    console.error("User operation timed out:", error.message);
+              try{ 
+                const sessionKeyCall = await buildAddSessionKey(chainId.toString(), 
+                address, investValue, convertToSeconds(refreshInterval, Frequency[frequency].label as any),
+                getChainById(Number(fromChain))?.tokens[fromToken].address!,
+                tokenVaultDetails[targetToken].address!,
+                tokenVaultDetails[targetToken].vault!);
+              await sendTransaction(chainId.toString(), sessionKeyCall.to, sessionKeyCall.value, sessionKeyCall.data, validator, address);
+              } catch(error) {
+
+                if (error instanceof WaitForUserOperationReceiptTimeoutError) {
+
+                  const hashPattern = /hash\s"([^"]+)"/;
+                  const match = error.message.match(hashPattern);
+
+                  if (match && match[1]) {
+                    const transactionHash = match[1];
+                    console.log('Transaction hash:', transactionHash);
+                    await waitForExecution(fromChain.toString(), transactionHash)
                   } else {
-                    throw error;
+                    console.error('No transaction hash found in the error message.');  
+                }
+                  // console.error("User operation timed out:", error.message);
+                  
+                } else {
+                  
+                  throw error;
                   }
                 }
                 await scheduleJob(nextSessionId.toString());
