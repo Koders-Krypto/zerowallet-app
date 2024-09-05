@@ -11,11 +11,9 @@ import {
   Trash,
 } from "lucide-react";
 import { CopytoClipboard } from "../utils/copyclipboard";
-import WalletConnectButton from "../components/WalletConnect/WalletConnect";
 import { useContext, useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import ShowQR from "../components/QR/ShowQR";
-import { SignClientContext } from "../context/SignClientProvider";
 import useDappStore from "../store/walletConnect";
 import Link from "next/link";
 import {
@@ -44,11 +42,8 @@ import {
 
 export default function App() {
   const { toast } = useToast();
-  const [openWalletConnect, setOpenWalletConnect] = useState(false);
   const [openShowQR, setOpenShowQR] = useState(false);
   const { address } = useAccount();
-  const { connectedDapps } = useDappStore();
-  const { disconnect } = useContext(SignClientContext);
   const { ensname, ensavatar } = useContext(LoginContext);
 
   //Zapper Data
@@ -98,7 +93,7 @@ export default function App() {
               />
             )}
 
-            <div className="flex flex-col justify-start items-start ml-0 gap-1">
+            <div className="flex flex-col justify-start items-start ml-0 gap-2">
               <div className="flex flex-col-reverse justify-start items-start gap-1">
                 <h1 className="text-4xl font-black">
                   ${formatNumberCommas(Number(totalBalance.toFixed(0)))}
@@ -132,56 +127,7 @@ export default function App() {
               </div>
             </div>
           </div>
-
-          <div className="w-full flex flex-row justify-end absolute right-0 top-0">
-            <WalletConnectButton
-              open={openWalletConnect}
-              setOpen={setOpenWalletConnect}
-            />
-          </div>
         </div>
-        {connectedDapps.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 w-full text-white text-sm">
-            <div
-              className={`flex flex-col gap-4 w-full overflow-y-auto ${
-                connectedDapps.length > 4 ? "max-h-96" : ""
-              }`}
-            >
-              {connectedDapps.map((dapp: any) => (
-                <div
-                  className="flex flex-row justify-start items-center gap-4 border border-accent px-4 py-3 relative w-full"
-                  key={dapp?.topic}
-                >
-                  <img
-                    src={dapp?.icons[0]}
-                    width={30}
-                    height={30}
-                    alt={dapp?.name}
-                  />
-                  <div className="flex flex-col w-full">
-                    <h3 className="font-bold line-clamp-1">{dapp?.name}</h3>
-                    <h4 className="text-xs line-clamp-1">
-                      {dapp?.description}
-                    </h4>
-                    <Link
-                      href={dapp?.url}
-                      target="_blank"
-                      className="text-xs truncate w-36 underline"
-                    >
-                      {dapp?.url}
-                    </Link>
-                  </div>
-                  <button
-                    className="absolute right-2 top-2 text-red-600"
-                    onClick={() => disconnect(dapp?.topic)}
-                  >
-                    <Trash size={14} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
       <Tabs defaultValue="Tokens" className="w-full flex flex-col gap-4 h-full">
         <div className="flex flex-col-reverse md:flex-row md:justify-between items-end md:items-center gap-2">
