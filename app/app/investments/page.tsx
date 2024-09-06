@@ -87,8 +87,13 @@ export default function Investments() {
   const [targetToken, setTargetToken] = useState<number>(0);
   const [frequency, setFrequency] = useState<number>(0);
   const [refreshInterval, setRefreshInterval] = useState<number>(1);
-  const [startDate, setStartDate] = useState<Date>();
-  const [endDate, setEndDate] = useState<Date>();
+  const [startDate, setStartDate] = useState<Date>(new Date(Date.now()));
+  const [endDate, setEndDate] = useState<Date>(() => {
+    const end = new Date(Date.now());
+    end.setMinutes(end.getMinutes() + 5);
+    return end;
+  });
+
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [tokenVaultDetails, setTokenVaultDetails] = useState<any[]>([]);
   const [nextSessionId, setNextSessionId] = useState<number>(0);
@@ -159,34 +164,81 @@ export default function Investments() {
     },
   ];
 
-  const [selected, setSelected] = useState<Date>();
-  const [startTimeValue, setStartTimeValue] = useState<string>("00:00");
+  const getCurrentTime = (offset = 0) => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + offset); // Add offset to the current minutes
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
+
+  const [startTimeValue, setStartTimeValue] = useState<string>(getCurrentTime());
+  const [endTimeValue, setEndTimeValue] = useState<string>(getCurrentTime(5));
+  
+
 
   const handleStartTimeChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     const time = e.target.value;
-    if (!selected) {
+    if (!startDate) {
       setStartTimeValue(time);
       return;
     }
     const [hours, minutes] = time.split(":").map((str) => parseInt(str, 10));
-    const newSelectedDate = setHours(setMinutes(selected, minutes), hours);
-    setSelected(newSelectedDate);
+    const newSelectedDate = setHours(setMinutes(startDate, minutes), hours);
+    setStartDate(newSelectedDate);
     setStartTimeValue(time);
   };
 
-  const [endTimeValue, setEndTimeValue] = useState<string>("00:00");
 
   const handleEndTimeChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     const time = e.target.value;
-    if (!selected) {
+    if (!endDate) {
       setEndTimeValue(time);
       return;
     }
     const [hours, minutes] = time.split(":").map((str) => parseInt(str, 10));
-    const newSelectedDate = setHours(setMinutes(selected, minutes), hours);
-    setSelected(newSelectedDate);
+    const newSelectedDate = setHours(setMinutes(endDate, minutes), hours);
+    setEndDate(newSelectedDate);
     setEndTimeValue(time);
   };
+
+  const handleStartDaySelect = (date: Date | undefined) => {
+    if (!startTimeValue || !date) {
+      setStartDate(date!);
+      return;
+    }
+    const [hours, minutes] = startTimeValue
+      .split(":")
+      .map((str) => parseInt(str, 10));
+    const newDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      hours,
+      minutes
+    );
+    setStartDate(newDate);
+  };
+
+  const handleEndDaySelect = (date: Date | undefined) => {
+    if (!endTimeValue || !date) {
+      setEndDate(date!);
+      return;
+    }
+    const [hours, minutes] = endTimeValue
+      .split(":")
+      .map((str) => parseInt(str, 10));
+    const newDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      hours,
+      minutes
+    );
+    setEndDate(newDate);
+  };
+
+
   return (
     <div className="flex flex-col gap-6 justify-start p-4 items-start border border-accent w-full h-full">
       <div className="flex flex-row justify-between items-center w-full">
@@ -413,7 +465,7 @@ export default function Investments() {
                         <Calendar
                           mode="single"
                           selected={startDate}
-                          onSelect={setStartDate}
+                          onSelect={handleStartDaySelect}
                           initialFocus
                         />
                       </PopoverContent>
@@ -455,7 +507,7 @@ export default function Investments() {
                         <Calendar
                           mode="single"
                           selected={endDate}
-                          onSelect={setEndDate}
+                          onSelect={handleEndDaySelect}
                           initialFocus
                         />
                       </PopoverContent>
@@ -474,6 +526,8 @@ export default function Investments() {
                     chainId.toString(),
                     address,
                     investValue,
+                    Math.floor(startDate.getTime() / 1000),
+                    Math.floor(endDate.getTime() / 1000),
                     convertToSeconds(
                       refreshInterval,
                       Frequency[frequency].label as any
@@ -654,13 +708,33 @@ export default function Investments() {
                   </div>
                   <div className="flex flex-row justify-between items-center w-full">
                     <h4 className="font-semibold">Invests</h4>
-                    <h5>
-                      {formatUnits(
+                    <div className="flex flex-row justify-start items-center gap-2">
+
+                    <Image
+                        src={
+                          getTokenInfo(Number(chainId), investment.token)
+                            ?.icon!
+                        }
+                        alt="From Token"
+                        width={20}
+                        height={20}
+                      />
+                    <div className="font-semibold">
+                    {formatUnits(
                         investment.limitAmount,
                         getTokenInfo(Number(chainId), investment.token)
                           ?.decimals
                       )}
-                    </h5>
+                    </div>
+
+
+                      <div className="font-semibold">
+                        {
+                          getTokenInfo(Number(chainId), investment.token)
+                            ?.name
+                        }
+                      </div>
+                      </div>
                   </div>
                   <div className="flex flex-row justify-between items-center w-full">
                     <h4 className="font-semibold">Every</h4>

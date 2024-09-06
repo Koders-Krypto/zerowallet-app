@@ -127,6 +127,12 @@ const gasChainsTokens = [
         icon: "/tokens/usdc.svg",
         decimals: 6,
       },
+      {
+        name: "USDT",
+        address: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+        icon: "/tokens/usdt.png",
+        decimals: 6,
+      },
     ],
   },
 ];
