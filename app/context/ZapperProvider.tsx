@@ -130,12 +130,12 @@ export const ZapperProvider = ({
 
   useEffect(() => {
     if (DefiData.length > 0 && tokenData.length > 0) {
-      setIsZapperLoading(false);
       const _defiData = getTotalBalanceDefi(DefiData);
       setDefiTotal(_defiData);
       const _tokenData = getTotalBalanceToken(tokenData);
       setTotalBalance(_defiData + _tokenData);
     }
+    setIsZapperLoading(false);
   }, [DefiData, tokenData]);
 
   return (

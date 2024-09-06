@@ -21,6 +21,7 @@ import {
 import { MenuIcon } from "lucide-react";
 import Links from "../../data/Links.json";
 import Icons from "@/app/utils/Icons";
+import { FadeText } from "@/components/magicui/fade-text";
 
 export default function Topbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -105,9 +106,16 @@ export default function Topbar() {
         </Sheet>
       </div>
       <div className="hidden md:flex flex-row justify-between items-center w-full">
-        <h1 className="capitalize text-2xl font-bold hidden md:block">
-          {formatedPathname || "Assets"}
-        </h1>
+        <FadeText
+          key={formatedPathname}
+          className="capitalize text-2xl font-bold hidden md:block"
+          direction="left"
+          framerProps={{
+            show: { transition: { delay: 0.8 } },
+          }}
+          text={formatedPathname || "Assets"}
+        />
+
         <div className="flex flex-row justify-end items-center gap-4 w-full">
           <WalletButton
             walletInfo={walletInfo}

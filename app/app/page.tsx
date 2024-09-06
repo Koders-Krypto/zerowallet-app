@@ -37,6 +37,7 @@ import {
   Networks,
 } from "../utils/Zapper";
 import { set } from "date-fns";
+import NumberTicker from "@/components/magicui/number-ticker";
 
 export default function App() {
   const { toast } = useToast();
@@ -105,8 +106,13 @@ export default function App() {
             <div className="flex flex-col justify-start items-start ml-0 gap-2">
               <div className="flex flex-col-reverse justify-start items-start gap-1">
                 <div className="flex flex-row justify-center items-center gap-2">
-                  <h1 className="text-4xl font-black">
-                    ${formatNumberCommas(Number(totalBalance.toFixed(0)))}
+                  <h1 className="text-4xl font-black text-white">
+                    $
+                    <NumberTicker
+                      className="text-white"
+                      value={Number(totalBalance.toFixed(0))}
+                    />
+                    {/* ${formatNumberCommas(Number(totalBalance.toFixed(0)))} */}
                   </h1>
                   <button
                     onClick={() => {
@@ -291,7 +297,7 @@ export default function App() {
                       isZapperLoading === false && (
                         <div className="flex flex-col gap-2 justify-center items-center text-sm">
                           <div>On following chains</div>
-                          <div className="flex flex-row flex-wrap max-w-md justify-center items-center gap-4 mt-2">
+                          <div className="flex flex-row flex-wrap max-w-md justify-center items-center gap-2.5 mt-2">
                             {selectedNetworks.map((network) => {
                               return (
                                 <Image

@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { LogOut, Wallet } from "lucide-react";
 import Truncate from "./utils/truncate";
-import Typewriter from "typewriter-effect";
 import { connectPassKey } from "./logic/passkey";
 import { WebAuthnMode } from "@zerodev/passkey-validator";
 import { storePasskey } from "./utils/storage";
@@ -23,6 +22,7 @@ import {
   useAccount,
   useDisconnect,
 } from "./context/LoginProvider";
+import TypingAnimation from "@/components/magicui/typing-animation";
 
 const WalletConnectButton = (props: any) => {
   const { walletInfo, setWalletInfo, setAccountInfo } = useLoginProvider();
@@ -135,19 +135,10 @@ export default function Home() {
         />
 
         <div className="flex flex-col items-center justify-center gap-3">
-          <h1 className="text-2xl md:text-4xl font-bold">
-            <Typewriter
-              options={{
-                cursor: "",
-              }}
-              onInit={(typewriter) => {
-                typewriter
-                  .typeString("Welcome to ZeroWallet")
-                  .pauseFor(1500)
-                  .start();
-              }}
-            />
-          </h1>
+          <TypingAnimation
+            className="text-2xl md:text-4xl font-bold"
+            text="Welcome to ZeroWallet"
+          />
           <p className="text-base md:text-lg text-white">
             🚀 ZeroWallet powered by LayerZero: Simplified gas experience ⛽,
             seamless dApp access across all chains 🌐, no bridging needed.
