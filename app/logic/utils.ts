@@ -18,6 +18,27 @@ import { ethers, formatUnits } from "ethers";
   ];
 
 
+    // ERC4626 token ABI 
+    const ERC4626_ABI = [
+      "function asset() view returns (address)",
+      "function totalAssets() view returns (uint256)",
+      "function decimals() view returns (uint8)",
+      "function convertToShares(uint256 assets) view returns (uint256)",
+      "function convertToAssets(uint256 shares) view returns (uint256)",
+      "function maxDeposit(address receiver) view returns (uint256)",
+      "function previewDeposit(uint256 assets) view returns (uint256)",
+      "function deposit(uint256 assets, address receiver) returns (uint256)",
+      "function maxMint(address receiver) view returns (uint256)",
+      "function previewMint(uint256 shares) view returns (uint256)",
+      "function mint(uint256 shares, address receiver) returns (uint256)",
+      "function maxWithdraw(address owner) view returns (uint256)",
+      "function previewWithdraw(uint256 assets) view returns (uint256)",
+      "function withdraw(uint256 assets, address receiver, address owner) returns (uint256)",
+      "function maxRedeem(address owner) view returns (uint256)",
+      "function previewRedeem(uint256 shares) view returns (uint256)",
+  ];
+  
+
 
 export const publicClient = (chainId: number): PublicClient => {
 
@@ -26,19 +47,6 @@ export const publicClient = (chainId: number): PublicClient => {
   });
 }
 
-export const chain: any = {
-  1: 'ethereum',
-  5: 'goerli',
-  84531: 'base-goerli'
-}
-
-// export const paymasterClient = (chainId: number): PimlicoPaymasterClient => {
-//   return createPimlicoPaymasterClient({
-//     transport: http(
-//       `https://api.pimlico.io/v2/${chain[chainId]}/rpc?apikey=${process.env.NEXT_PUBLIC_PIMLICO_API_KEY}`,
-//     ),
-//   });
-// }
 
 export const generateRandomBuffer = (): ArrayBuffer => {
   const arr = new Uint8Array(32);
@@ -72,6 +80,20 @@ export async function getTokenBalance(tokenAddress: string, account: string, pro
 }
 
 
+export async function getVaultBalance(vaultAddress: string, account: string, provider: any) {
+  // Ethereum provider (you can use Infura or any other provider)
+
+  // Connect to the ERC-20 token contract
+  const tokenContract = new ethers.Contract(vaultAddress, ERC4626_ABI, provider);
+
+  // Get the balance using the balanceOf function
+  const balance = await tokenContract.maxWithdraw(account);
+  const decimals = await tokenContract.decimals()
+
+  return formatUnits(balance, decimals);
+}
+
+
 export async function getTokenDecimals(tokenAddress: string,  provider: any) {
   // Ethereum provider (you can use Infura or any other provider)
 
@@ -98,11 +120,43 @@ return data.data;
 }
 
 
-export function formatTime(seconds: number) {
-  const days = Math.floor(seconds / (3600 * 24));
-  const hours = Math.floor((seconds % (3600 * 24)) / 3600);
+export function formatTime(seconds: number): string {
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   const remainingSeconds = seconds % 60;
 
-  return `${days ? days + " days, " : ""} ${hours ? hours + " hours, "  : ""} ${ minutes ? minutes + " minutes, " : ""} ${remainingSeconds + " seconds"}`;
+  const formattedDays = days ? `${days} day${days > 1 ? 's' : ''}` : '';
+  const formattedHours = hours ? `${hours} hour${hours > 1 ? 's' : ''}` : '';
+  const formattedMinutes = minutes ? `${minutes} min${minutes > 1 ? 's' : ''}` : '';
+  const formattedSeconds = remainingSeconds ? `${remainingSeconds} sec${remainingSeconds > 1 ? 's' : ''}` : '';
+
+  return [formattedDays, formattedHours, formattedMinutes, formattedSeconds]
+    .filter(Boolean)
+    .join(', ');
 }
+
+
+export function convertToSeconds(value: number, unit: 'seconds' | 'minutes' | 'hours' | 'days'): number {
+  let seconds;
+  switch(unit) {
+      case 'minutes':
+          seconds = value * 60;
+          break;
+      case 'hours':
+          seconds = value * 60 * 60;
+          break;
+      case 'days':
+          seconds = value * 60 * 60 * 24;
+          break;
+      default:
+          seconds = value; // Assume value is already in seconds
+  }
+  return seconds;
+}
+
+
+export function fixDecimal(number: string, decimals: number) {
+
+    return parseFloat(number).toFixed(decimals).replace(/\.?0+$/, '');;
+  }
