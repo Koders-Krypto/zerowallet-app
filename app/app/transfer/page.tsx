@@ -8,8 +8,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { Fuel, SendHorizonal } from "lucide-react";
-import { useState } from "react";
+import { Check, Fuel, Loader2, SendHorizonal, X } from "lucide-react";
+import { useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import { ethers } from "ethers"; // Add this import
 import { parseUnits } from "ethers"; // Update this import
@@ -17,8 +17,12 @@ import { parseUnits } from "ethers"; // Update this import
 import { gasChainsTokens, getChainById } from "@/app/utils/tokens";
 import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
 import { config } from "@/app/wallet-connect/config/index";
-import { Address, erc20Abi } from "viem";
+import { Address, erc20Abi, formatEther, formatUnits } from "viem";
 import { switchChain, getChainId } from "@wagmi/core";
+import { useBalance, useSendTransaction } from "wagmi";
+import { LoginContext } from "@/app/context/LoginProvider";
+import { sendTransaction } from "viem/actions";
+import Truncate from "@/app/utils/truncate";
 
 interface GasChainType {
   name: string;
@@ -63,7 +67,8 @@ export default function Bridge() {
   const [amount, setAmount] = useState<string>("");
   const [disableTransfer, setDisableTransfer] = useState<boolean>(true);
   const [transferText, setTransferText] = useState<string>("Transfer");
-  //   const [transferStatus, setTransferStatus] = useState<"IDLE" | "PENDING" | "SUCCESS" | "FAILED">("IDLE");
+  const [transferStatus, setTransferStatus] = useState<"IDLE" | "PENDING" | "SUCCESS" | "FAILED">("IDLE");
+  const { accountInfo } = useContext(LoginContext)
 
   const waitForTransaction = async (hash: Address) => {
     try {
@@ -72,30 +77,57 @@ export default function Bridge() {
         hash,
       });
       if (transactionReceipt.status === "success") {
+        setTransferStatus("SUCCESS")
         return {
           success: true,
           data: transactionReceipt,
         };
       }
+      setTransferStatus("FAILED")
       throw transactionReceipt.status;
     } catch (e: any) {
+      setTransferStatus("FAILED")
       throw e;
     }
   };
+
+  const { data: transferEtherHash, sendTransaction: sendEtherTransaction } = useSendTransaction()
 
   const validateInput = () => {
     if (!recipientAddress) {
       setDisableTransfer(true);
       setTransferText("Please enter a recipient address");
+      return false;
     }
     if (!amount) {
       setDisableTransfer(true);
       setTransferText("Please enter an amount");
+      return false;
     }
+    return true;
   };
 
+  useEffect(() => {
+    if (transferEtherHash) {
+      setTransferStatus("PENDING")
+      waitForTransaction(transferEtherHash).then((res) => {
+        if (res.success) {
+          refetchNativeBalance();
+          setTransferStatus("SUCCESS")
+        } else {
+          refetchNativeBalance();
+          setTransferStatus("FAILED")
+        }
+      })
+    }
+  }, [transferEtherHash])
+
   const transferTokens = async () => {
+    setTransferStatus("PENDING");
     const chainId = getChainId(config);
+    if (!validateInput()) {
+      return;
+    }
     if (chainId !== selectedGasChain.chainId) {
       await switchChain(config, { chainId: selectedGasChain.chainId });
     }
@@ -103,17 +135,48 @@ export default function Bridge() {
     // Convert the amount to Ether
     const amountInEther = parseUnits(amount, "ether");
 
-    const result = await writeContract(config, {
-      abi: ERC20_ABI,
-      address: gasChainsTokens[selectedTransferChainID].tokens[selectedTokenID]
-        .address as `0x${string}`,
-      functionName: "transfer",
-      args: [recipientAddress, amountInEther],
-      chainId: selectedGasChain.chainId,
-    });
-
-    await waitForTransaction(result);
+    if (selectedTokenID === 0) {
+      // Transfer ETH
+      sendEtherTransaction({
+        to: recipientAddress as `0x${string}`,
+        value: amountInEther,
+        chainId: selectedGasChain.chainId,
+      })
+    } else {
+      // Transfer ERC20 token
+      const result = await writeContract(config, {
+        abi: ERC20_ABI,
+        address: gasChainsTokens[selectedTransferChainID].tokens[selectedTokenID]
+          .address as `0x${string}`,
+        functionName: "transfer",
+        args: [recipientAddress, amountInEther],
+        chainId: selectedGasChain.chainId,
+      });
+      await waitForTransaction(result);
+      refetchTokenBalance();
+    }
   };
+
+  const { data: balance, isLoading, refetch: refetchTokenBalance } = useBalance({
+    address: accountInfo.address,
+    token: gasChainsTokens[selectedTransferChainID].tokens[selectedTokenID].address as `0x${string}`,
+    chainId: selectedGasChain.chainId,
+  })
+
+  const { data: nativeBalance, refetch: refetchNativeBalance } = useBalance({
+    address: accountInfo.address,
+    chainId: selectedGasChain.chainId,
+  })
+
+  const getBalance = () => {
+    if (gasChainsTokens[selectedTransferChainID].tokens[selectedTokenID].name === "ETH") {
+      return formatEther(nativeBalance?.value ?? BigInt("0"), 'wei')
+    } else {
+      return formatUnits(balance?.value ?? BigInt("0"), gasChainsTokens[selectedTransferChainID].tokens[selectedTokenID].decimals)
+    }
+  }
+
+
 
   return (
     <div className="w-full h-full text-white border border-accent flex flex-col justify-start md:justify-center items-start md:items-center gap-6 px-4 py-4 md:py-6">
@@ -160,7 +223,7 @@ export default function Bridge() {
           <div className="flex flex-col gap-2">
             <div className="flex flex-row justify-end items-center text-sm absolute top-1.5 right-6">
               <div className="flex flex-row justify-center items-center gap-1">
-                <div>0.001 ETH</div>
+                <div>{getBalance()}</div>
                 <button className="font-bold">Max</button>
               </div>
             </div>
@@ -255,15 +318,19 @@ export default function Bridge() {
             </div>
             <div className="flex flex-row justify-between items-center pt-2">
               <h4>Recipient Address</h4>
-              <h5>0x0</h5>
+              <h5>{Truncate(recipientAddress)}</h5>
             </div>
           </div>
-          <button
+          {transferStatus === 'IDLE' ? <button
             className="w-full bg-white hover:bg-transparent hover:text-white border border-accent text-black py-3.5 text-lg font-bold flex flex-row justify-center items-center gap-2"
             onClick={transferTokens}
           >
             Transfer <SendHorizonal size={20} />
-          </button>
+          </button> : <div className="flex flex-row justify-center items-center gap-2">
+            <div className="w-full bg-white hover:bg-transparent hover:text-white border border-accent text-black py-3.5 text-lg font-bold flex flex-row justify-center items-center gap-2">
+              {transferStatus === 'PENDING' ? <div className="flex flex-row gap-4 items-center"><Loader2 className="animate-spin" size={20} /> Processing</div> : transferStatus === 'SUCCESS' ? <div className="flex flex-row gap-4 items-center"><Check size={20} /> Success</div> : <div className="flex flex-row gap-4 items-center "><X size={20} /> Failed</div>}
+            </div>
+          </div>}
         </div>
       </div>
     </div>
