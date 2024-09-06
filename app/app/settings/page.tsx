@@ -56,28 +56,36 @@ export default function Settings() {
 
   const FaqsData = [
     {
-      question: "Is it accessible?",
-      answer: "Yes. It adheres to the WAI-ARIA design pattern.",
-    },
-    {
-      question: "Is it accessible?",
-      answer: "Yes. It adheres to the WAI-ARIA design pattern.",
-    },
-    {
-      question: "What is the best way to get started?",
-      answer: "Yes. It adheres to the WAI-ARIA design pattern.",
-    },
-    {
-      question: "How do I use it?",
+      question: "What is ZeroWallet?",
       answer:
-        "You can use it to create a new account or import an existing one.",
+        "ZeroWallet is a next-generation, omnichain wallet powered by LayerZero, enabling users to manage their crypto portfolios and interact with decentralized applications (dApps) across multiple blockchain networks. With smart features and gas-efficient cross-chain transactions, ZeroWallet offers a seamless user experience.",
+    },
+    {
+      question: "What chains does ZeroWallet support?",
+      answer:
+        "ZeroWallet is designed to work across multiple chains, including Ethereum, Polygon, Binance Smart Chain, Arbitrum, Optimism, and more. It supports an omnichain environment, allowing seamless interaction with dApps on various networks.",
+    },
+    {
+      question: "How does ZeroWallet handle gas fees?",
+      answer:
+        "ZeroWallet uses LayerZero’s technology to enable users to interact with any chain without needing to hold gas tokens for each specific network. You can pay transaction fees using the native tokens of the chains, eliminating the complexity of managing multiple gas tokens.",
+    },
+    {
+      question: "Does ZeroWallet support NFTs?",
+      answer:
+        "Yes, ZeroWallet supports NFTs (Non-Fungible Tokens) across multiple chains. You can manage, trade, and interact with NFT collections directly from your wallet.",
+    },
+    {
+      question: "Is ZeroWallet secure?",
+      answer:
+        "Yes, ZeroWallet prioritizes security, utilizing advanced cryptographic techniques and LayerZero’s secure messaging to ensure safe transactions across chains. Your private keys and assets are always under your control.",
     },
   ];
   return (
     <div className="border border-accent w-full h-full text-white p-4">
       <Tabs defaultValue="account" className="w-full h-full bg-transparent">
         <div className="flex flex-col md:flex-row gap-6 w-full h-full">
-          <TabsList className="flex flex-row md:flex-col justify-start items-start h-fit w-full md:w-96 rounded-none bg-transparent text-xl border border-accent p-0 text-white divide-y divide-accent">
+          <TabsList className="flex flex-row md:flex-col justify-start items-start h-fit w-full md:w-96 rounded-none bg-transparent text-xl border border-accent p-0 text-white divide-x md:divide-y divide-accent">
             <TabsTrigger
               className="py-3 w-full text-lg rounded-none data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:font-bold"
               value="account"
@@ -86,9 +94,9 @@ export default function Settings() {
             </TabsTrigger>
             <TabsTrigger
               className="py-3 w-full text-lg rounded-none data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:font-bold"
-              value="password"
+              value="chain"
             >
-              Gas
+              Chain
             </TabsTrigger>
             <TabsTrigger
               className="py-3 w-full text-lg rounded-none data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:font-bold"
@@ -103,7 +111,8 @@ export default function Settings() {
                 <div className="flex flex-row justify-between items-center w-full border-b border-accent px-4 py-3">
                   <h2 className="text-xl font-bold">Connected Wallets</h2>
                   <button className="bg-white text-black px-4 text-sm py-2 flex flex-row items-center gap-2">
-                    <Plus size={18} /> Add Wallet
+                    <Plus size={18} />{" "}
+                    <span className="md:block hidden">Add Wallet</span>
                   </button>
                 </div>
                 <div className="flex flex-col w-full  px-4 py-3">
@@ -130,12 +139,14 @@ export default function Settings() {
                 </div>
               </div>
             </TabsContent>
-            <TabsContent className="mt-0" value="password">
+            <TabsContent className="mt-0" value="chain">
               <div className="flex flex-col justify-between items-center gap-0 w-full">
                 <div className="flex flex-row justify-between items-center w-full border-b border-accent px-4 py-3">
-                  <h2 className="text-xl font-bold">Set Gas Chain</h2>
+                  <h2 className="text-xl font-bold">Set Chain</h2>
                   <div className="flex flex-row justify-center items-center gap-4">
-                    <h3 className="text-sm">Supported Chains</h3>
+                    <h3 className="text-sm hidden md:block">
+                      Supported Chains
+                    </h3>
                     <div className="flex flex-row justify-center items-center">
                       {gasChainsTokens.map((show, s) => {
                         return (
@@ -198,18 +209,23 @@ export default function Settings() {
                 <div className="flex flex-row justify-center items-center gap-4"></div>
               </div>
               <div className="px-4 py-0">
-                <Accordion className=" divide-y divide-accent" type="multiple">
+                <Accordion
+                  className=" divide-y divide-accent text-left"
+                  type="single"
+                >
                   {FaqsData.map((faq, f) => {
                     return (
                       <AccordionItem
-                        className="border-b-0 py-1 "
+                        className="border-b-0 py-1 text-left"
                         value={f.toString()}
                         key={f}
                       >
-                        <AccordionTrigger className=" hover:no-underline">
+                        <AccordionTrigger className=" hover:no-underline text-base font-bold text-left">
                           {faq.question}
                         </AccordionTrigger>
-                        <AccordionContent>{faq.answer}</AccordionContent>
+                        <AccordionContent className="text-base">
+                          {faq.answer}
+                        </AccordionContent>
                       </AccordionItem>
                     );
                   })}

@@ -172,10 +172,10 @@ export default function Investments() {
     return `${hours}:${minutes}`;
   };
 
-  const [startTimeValue, setStartTimeValue] = useState<string>(getCurrentTime());
+  const [startTimeValue, setStartTimeValue] = useState<string>(
+    getCurrentTime()
+  );
   const [endTimeValue, setEndTimeValue] = useState<string>(getCurrentTime(5));
-  
-
 
   const handleStartTimeChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     const time = e.target.value;
@@ -188,7 +188,6 @@ export default function Investments() {
     setStartDate(newSelectedDate);
     setStartTimeValue(time);
   };
-
 
   const handleEndTimeChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     const time = e.target.value;
@@ -237,7 +236,6 @@ export default function Investments() {
     );
     setEndDate(newDate);
   };
-
 
   return (
     <div className="flex flex-col gap-6 justify-start p-4 items-start border border-accent w-full h-full">
@@ -586,7 +584,7 @@ export default function Investments() {
           </DialogContent>
         </Dialog>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-white w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 text-white w-full">
         {tokenVaultDetails.map((tokenVault, index) => (
           <div
             key={index}
@@ -639,11 +637,11 @@ export default function Investments() {
           <h3 className="font-bold text-2xl">Investment Plans</h3>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-8 text-white w-full  max-h-full h-24 overflow-y-scroll flex-grow pt-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-8 text-white w-full  max-h-full h-24 overflow-y-scroll flex-grow pt-5">
           {investments.map((investment, index) => (
             <div
               key={index}
-              className=" w-full flex flex-col gap-0 border border-accent relative"
+              className=" w-full flex flex-col gap-0 border border-accent relative h-fit"
             >
               <div className="flex flex-row justify-between items-center px-4 py-3 border-b border-accent">
                 <h2 className=" text-xl font-semibold">
@@ -709,32 +707,26 @@ export default function Investments() {
                   <div className="flex flex-row justify-between items-center w-full">
                     <h4 className="font-semibold">Invests</h4>
                     <div className="flex flex-row justify-start items-center gap-2">
-
-                    <Image
+                      <Image
                         src={
-                          getTokenInfo(Number(chainId), investment.token)
-                            ?.icon!
+                          getTokenInfo(Number(chainId), investment.token)?.icon!
                         }
                         alt="From Token"
                         width={20}
                         height={20}
                       />
-                    <div className="font-semibold">
-                    {formatUnits(
-                        investment.limitAmount,
-                        getTokenInfo(Number(chainId), investment.token)
-                          ?.decimals
-                      )}
-                    </div>
-
+                      <div className="font-semibold">
+                        {formatUnits(
+                          investment.limitAmount,
+                          getTokenInfo(Number(chainId), investment.token)
+                            ?.decimals
+                        )}
+                      </div>
 
                       <div className="font-semibold">
-                        {
-                          getTokenInfo(Number(chainId), investment.token)
-                            ?.name
-                        }
+                        {getTokenInfo(Number(chainId), investment.token)?.name}
                       </div>
-                      </div>
+                    </div>
                   </div>
                   <div className="flex flex-row justify-between items-center w-full">
                     <h4 className="font-semibold">Every</h4>

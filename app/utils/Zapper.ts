@@ -316,6 +316,16 @@ const TokensIcons = [
     symbol: "GTC",
     icon: "/tokens/gitcoin.svg",
   },
+  {
+    name: "rsETH Wrapper",
+    symbol: "rsETHWrapper",
+    icon: "/tokens/wrsETH.webp",
+  },
+  {
+    name: "rsETH",
+    symbol: "rsETHWrapper",
+    icon: "/tokens/rsETH.png",
+  },
 ];
 
 const getIconbySymbol = (symbol: string) => {
