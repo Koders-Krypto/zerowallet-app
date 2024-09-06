@@ -1,7 +1,7 @@
 import { getData, postData, deleteData } from '../utils/fetch';
 
 // Define the base URL of your API
-const BASE_URL = 'http://localhost:8080'; // Change to your actual API base URL
+const BASE_URL = 'https://api.usezero.xyz'; // Change to your actual API base URL
 
 // Schedule a new job
 export const scheduleJob = async (sessionId: string) => {
