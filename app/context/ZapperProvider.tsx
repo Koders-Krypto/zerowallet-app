@@ -21,6 +21,12 @@ interface ZapperContextProps {
   selectedNetworks: NetworkType[];
   setSelectedNetworks: React.Dispatch<React.SetStateAction<NetworkType[]>>;
   tokensByNetwork: ZapperTokenDataTypes[];
+  refresh: boolean;
+  setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
+  tokenDataError: boolean;
+  DeFiDataError: boolean;
+  NftDataError: boolean;
+  setIsZapperLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 // Create the context
 export const ZapperContext = createContext<ZapperContextProps>({
@@ -33,6 +39,12 @@ export const ZapperContext = createContext<ZapperContextProps>({
   selectedNetworks: [],
   setSelectedNetworks: () => {},
   tokensByNetwork: [],
+  refresh: false,
+  setRefresh: () => {},
+  tokenDataError: false,
+  DeFiDataError: false,
+  NftDataError: false,
+  setIsZapperLoading: () => {},
 });
 
 // Create the provider component
@@ -41,6 +53,7 @@ export const ZapperProvider = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
+  const [refresh, setRefresh] = useState(false);
   const { accountInfo } = useContext(LoginContext);
 
   const [tokenData, setTokenData] = useState<ZapperTokenDataTypes[] | any[]>(
@@ -55,8 +68,11 @@ export const ZapperProvider = ({
   const [tokensByNetwork, setTokensByNetwork] = useState<
     ZapperTokenDataTypes[]
   >([]);
-
+  const [tokenDataError, setTokenDataError] = useState(false);
+  const [DeFiDataError, setDeFiDataError] = useState(false);
+  const [NftDataError, setNftDataError] = useState(false);
   const fetchTokenData = async (address: string) => {
+    setTokenData([]);
     const response = await fetch(`api/v1/data/tokens?address=${address}`);
     if (response.ok) {
       const data = await response.json();
@@ -64,9 +80,11 @@ export const ZapperProvider = ({
     } else {
       console.log("error");
       setTotalBalance(0);
+      setTokenDataError(true);
     }
   };
   const fetchDefiData = async (address: string) => {
+    setDefiData([]);
     const response = await fetch(`api/v1/data/positions?address=${address}`);
     if (response.ok) {
       const data = await response.json();
@@ -74,10 +92,12 @@ export const ZapperProvider = ({
     } else {
       console.log("error");
       setDefiData([]);
+      setDeFiDataError(true);
     }
   };
 
   const fetchNFTData = async (address: string) => {
+    setNFTData([]);
     const response = await fetch(`api/v1/data/nfts?address=${address}`);
     if (response.ok) {
       const data = await response.json();
@@ -85,6 +105,7 @@ export const ZapperProvider = ({
     } else {
       console.log("error");
       setNFTData([]);
+      setNftDataError(true);
     }
   };
 
@@ -94,7 +115,7 @@ export const ZapperProvider = ({
       fetchNFTData(accountInfo.address.toString());
       fetchDefiData(accountInfo.address.toString());
     }
-  }, [accountInfo.address]);
+  }, [accountInfo.address, refresh]);
 
   useEffect(() => {
     if (tokenData.length > 0) {
@@ -129,6 +150,12 @@ export const ZapperProvider = ({
         selectedNetworks,
         setSelectedNetworks,
         tokensByNetwork,
+        refresh,
+        setRefresh,
+        tokenDataError,
+        DeFiDataError,
+        NftDataError,
+        setIsZapperLoading,
       }}
     >
       {children}

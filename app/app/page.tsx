@@ -7,17 +7,13 @@ import {
   Copy,
   PiggyBank,
   RefreshCcw,
+  RefreshCcwIcon,
   SendHorizonal,
-  Trash,
 } from "lucide-react";
 import { CopytoClipboard } from "../utils/copyclipboard";
-import WalletConnectButton from "../components/WalletConnect/WalletConnect";
 import { useContext, useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import ShowQR from "../components/QR/ShowQR";
-import { SignClientContext } from "../context/SignClientProvider";
-import useDappStore from "../store/walletConnect";
-import Link from "next/link";
 import {
   Tooltip,
   TooltipContent,
@@ -40,20 +36,17 @@ import {
   getNetworkLogobyName,
   Networks,
 } from "../utils/Zapper";
+import { set } from "date-fns";
 
 export default function App() {
   const { toast } = useToast();
-  const [openWalletConnect, setOpenWalletConnect] = useState(false);
   const [openShowQR, setOpenShowQR] = useState(false);
   const { address } = useAccount();
-  const { connectedDapps } = useDappStore();
-  const { disconnect } = useContext(SignClientContext);
   const { ensname, ensavatar } = useContext(LoginContext);
 
   //Zapper Data
 
   const {
-    tokenData,
     NFTData,
     DefiData,
     isZapperLoading,
@@ -62,6 +55,12 @@ export default function App() {
     selectedNetworks,
     setSelectedNetworks,
     tokensByNetwork,
+    refresh,
+    setRefresh,
+    tokenDataError,
+    DeFiDataError,
+    NftDataError,
+    setIsZapperLoading,
   } = useContext(ZapperContext);
 
   useEffect(() => {
@@ -87,7 +86,7 @@ export default function App() {
       <div className="w-full border border-accent flex flex-col gap-6 px-4 py-4 md:py-6">
         <div className="w-full flex flex-col md:flex-row gap-4 justify-between items-center relative">
           <div className="flex flex-col md:flex-row gap-4 justify-start items-start md:items-center w-full">
-            {ensavatar && (
+            {ensavatar ? (
               <img
                 className="rounded-full"
                 src={ensavatar}
@@ -95,13 +94,34 @@ export default function App() {
                 height={120}
                 alt={ensname}
               />
+            ) : (
+              ensname && (
+                <div className=" h-32 w-32 rounded-full bg-black uppercase flex justify-center items-center text-7xl font-bold text-white border border-accent">
+                  {ensname.slice(0, 1)}
+                </div>
+              )
             )}
 
-            <div className="flex flex-col justify-start items-start ml-0 gap-1">
+            <div className="flex flex-col justify-start items-start ml-0 gap-2">
               <div className="flex flex-col-reverse justify-start items-start gap-1">
-                <h1 className="text-4xl font-black">
-                  ${formatNumberCommas(Number(totalBalance.toFixed(0)))}
-                </h1>
+                <div className="flex flex-row justify-center items-center gap-2">
+                  <h1 className="text-4xl font-black">
+                    ${formatNumberCommas(Number(totalBalance.toFixed(0)))}
+                  </h1>
+                  <button
+                    onClick={() => {
+                      setIsZapperLoading(true);
+                      setRefresh(!refresh);
+                    }}
+                  >
+                    <RefreshCcwIcon
+                      size={20}
+                      className={`text-accent hover:text-white ${
+                        isZapperLoading && !tokenDataError ? "animate-spin" : ""
+                      }`}
+                    />
+                  </button>
+                </div>
                 <span className="text-accent text-sm">Networth</span>
               </div>
               {ensname && <div className="text-lg font-medium">{ensname}</div>}
@@ -131,56 +151,7 @@ export default function App() {
               </div>
             </div>
           </div>
-
-          <div className="w-full flex flex-row justify-end absolute right-0 top-0">
-            <WalletConnectButton
-              open={openWalletConnect}
-              setOpen={setOpenWalletConnect}
-            />
-          </div>
         </div>
-        {connectedDapps.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 w-full text-white text-sm">
-            <div
-              className={`flex flex-col gap-4 w-full overflow-y-auto ${
-                connectedDapps.length > 4 ? "max-h-96" : ""
-              }`}
-            >
-              {connectedDapps.map((dapp: any) => (
-                <div
-                  className="flex flex-row justify-start items-center gap-4 border border-accent px-4 py-3 relative w-full"
-                  key={dapp?.topic}
-                >
-                  <img
-                    src={dapp?.icons[0]}
-                    width={30}
-                    height={30}
-                    alt={dapp?.name}
-                  />
-                  <div className="flex flex-col w-full">
-                    <h3 className="font-bold line-clamp-1">{dapp?.name}</h3>
-                    <h4 className="text-xs line-clamp-1">
-                      {dapp?.description}
-                    </h4>
-                    <Link
-                      href={dapp?.url}
-                      target="_blank"
-                      className="text-xs truncate w-36 underline"
-                    >
-                      {dapp?.url}
-                    </Link>
-                  </div>
-                  <button
-                    className="absolute right-2 top-2 text-red-600"
-                    onClick={() => disconnect(dapp?.topic)}
-                  >
-                    <Trash size={14} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
       <Tabs defaultValue="Tokens" className="w-full flex flex-col gap-4 h-full">
         <div className="flex flex-col-reverse md:flex-row md:justify-between items-end md:items-center gap-2">
@@ -308,8 +279,9 @@ export default function App() {
                 <div className="flex flex-col justify-center items-center gap-2 py-4 md:h-[55vh] text-3xl">
                   <div className="flex flex-col gap-4 justify-center items-center font-bold">
                     <h2>
-                      {" "}
-                      {isZapperLoading
+                      {tokenDataError
+                        ? "Error Fetching Tokens"
+                        : isZapperLoading
                         ? "Loading..."
                         : selectedNetworks.length === 0
                         ? "No Networks Selected"
@@ -436,7 +408,9 @@ export default function App() {
                   <div className="flex flex-col gap-4 justify-center items-center font-bold">
                     <h2>
                       {" "}
-                      {isZapperLoading
+                      {DeFiDataError
+                        ? "Error Fetching DeFi Data"
+                        : isZapperLoading
                         ? "Loading..."
                         : selectedNetworks.length === 0
                         ? "No Networks Selected"
@@ -496,8 +470,8 @@ export default function App() {
           <TabsContent value="NFTs" className="p-0 mt-0">
             {NFTData.length <= 0 && (
               <div className="flex flex-row justify-center items-center h-[55vh]">
-                <div className="flex flex-col gap-4 justify-center items-center font-bold text-xl">
-                  No NFTs Found
+                <div className="flex flex-col gap-4 justify-center items-center font-bold text-2xl">
+                  {DeFiDataError ? "Error Fetching NFT Data" : "No NFTs Found"}
                 </div>
               </div>
             )}
