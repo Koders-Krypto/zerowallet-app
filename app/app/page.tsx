@@ -108,11 +108,14 @@ export default function App() {
                 <div className="flex flex-row justify-center items-start gap-2">
                   <h1 className="text-4xl font-black text-white">
                     $
-                    <NumberTicker
-                      className="text-white"
-                      value={Number(totalBalance.toFixed(0))}
-                    />
-                    {/* ${formatNumberCommas(Number(totalBalance.toFixed(0)))} */}
+                    {totalBalance === 0 ? (
+                      0
+                    ) : (
+                      <NumberTicker
+                        className="text-white"
+                        value={Number(totalBalance.toFixed(0)) || 0}
+                      />
+                    )}
                   </h1>
                   <button
                     className="mt-1"
@@ -122,7 +125,7 @@ export default function App() {
                     }}
                   >
                     <RefreshCcwIcon
-                      size={20}
+                      size={16}
                       className={`text-accent hover:text-white ${
                         isZapperLoading && !tokenDataError ? "animate-spin" : ""
                       }`}
