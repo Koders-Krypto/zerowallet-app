@@ -99,7 +99,7 @@ export const LoginProvider = ({
   }, [wallet, account, accountInfo?.address]);
 
   useEffect(() => {
-    if (!walletInfo) {
+    if (!walletInfo && !loadPasskey()) {
       router.push("/");
     }
     if (walletInfo && pathname === "/") {

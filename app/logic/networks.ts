@@ -106,6 +106,16 @@ export const networks = {
     api: "",
     easExplorer: "",
   },
+  arbitrum: {
+    name: 'Arbitrum One',
+    type: 'mainnet',
+    chainId: 42161,
+    url: "https://arb1.arbitrum.io/rpc",
+    safeService: "https://safe-transaction-arbitrum.safe.global",
+    blockExplorer: "https://arbiscan.io/",
+    api: "",
+    easExplorer: "",
+  },
   celo: {
     name: 'Celo',
     type: 'mainnet',

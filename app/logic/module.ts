@@ -1,6 +1,6 @@
 import { Contract, parseUnits } from "ethers";
 import { getJsonRpcProvider } from "./web3";
-import SafePassKeyNFT from "./SafePassKeyNFT.json";
+import TokenVault from "./TokenVault.json";
 import {  Address, Hex, pad } from "viem";
 import {
     getClient,
@@ -14,13 +14,12 @@ import { NetworkUtil } from "./networks";
 import AutoDCAModule from "./AutoDCASessionModule.json";
 
 import { SafeSmartAccountClient, getSmartAccountClient } from "./permissionless";
-import { KernelValidator } from "@zerodev/passkey-validator";
-import { ENTRYPOINT_ADDRESS_V07_TYPE } from "permissionless/types";   
-import { getTokenDecimals } from "./utils";
+import { getTokenDecimals, getVaultRedeemBalance } from "./utils";
 
 
 const webAuthnModule = "0xD990393C670dCcE8b4d8F858FB98c9912dBFAa06"
-const autoDCAModule = "0x679f144fCcc63c5Af7bcDb2BAda756f1bd40CE3D"
+// const autoDCAModule = "0x679f144fCcc63c5Af7bcDb2BAda756f1bd40CE3D"
+const autoDCAModule = "0xBdE994684051A3caDa9b90Ede0b44A06A9FAC863"
 const sessionKey = "0x126B956dFB28EbBae5E792d08E791329250C8B37"
 
 
@@ -98,6 +97,28 @@ export const sendTransaction = async (chainId: string, to: string, value: bigint
 }
 
 
+export const buildVaultRedeem = async (chainId: string,  safeAccount: string, vault: Hex): Promise<Transaction> => {
+
+    
+  const provider = await getJsonRpcProvider(chainId);
+
+  const vaultContract = new Contract(
+      vault,
+      TokenVault,
+      provider
+  )
+
+  const vaultBalance = await getVaultRedeemBalance(vault, safeAccount, provider)
+
+  console.log(vaultBalance)
+
+  return {
+      to: vault,
+      value: BigInt(0),
+      data: (await vaultContract.redeem.populateTransaction(vaultBalance, safeAccount, safeAccount)).data as Hex
+  }
+}
+
 export const buildAddSessionKey = async (chainId: string,  safeAccount: string, amount: string, validAfter: number, validUntil: number, refreshInterval: number, fromToken: string, targetToken: string, vault: string): Promise<Transaction> => {
 
     
@@ -106,12 +127,10 @@ export const buildAddSessionKey = async (chainId: string,  safeAccount: string, 
 
   const sessionData = { vault: vault, token: fromToken, targetToken: targetToken,  account: safeAccount, validAfter: validAfter, validUntil: validUntil, limitAmount: parsedAmount, limitUsed: 0, lastUsed: 0, refreshInterval: refreshInterval }
 
-  const bProvider = await getJsonRpcProvider(chainId)
-
   const autoDCA = new Contract(
       autoDCAModule,
       AutoDCAModule.abi,
-      bProvider
+      provider
   )
 
   return {

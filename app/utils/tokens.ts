@@ -3,6 +3,7 @@ interface Token {
   address: `0x${string}`;
   icon: string;
   decimals: number;
+  vault?: string;
 }
 
 export interface GasChainType {
@@ -114,47 +115,81 @@ const gasChainsTokens: GasChainType[] = [
       },
     ],
   },
-  //   {
-  //     name: "Polygon",
-  //     address: "0xBBE5A39eD493150Be69D31Aa8780218247794152",
-  //     chainId: 137,
-  //         endpointId: "40245",
-  //     icon: "/chains/polygon.png",
-  //     tokens: [
-  //       {
-  //         name: "Matic",
-  //         address: "0x0000000000000000000000000000000000000000",
-  //         icon: "/tokens/polygon.png",
-  //         decimals: 18,
-  //       },
-  //       {
-  //         name: "WMATIC",
-  //         address: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
-  //         vault: "0x28F53bA70E5c8ce8D03b1FaD41E9dF11Bb646c36",
-  //         icon: "/tokens/wmatic.png",
-  //         decimals: 18,
-  //       },
-  //       {
-  //         name: "WETH",
-  //         address: "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
-  //         icon: "/tokens/weth.png",
-  //         vault: "0x305F25377d0a39091e99B975558b1bdfC3975654",
-  //         decimals: 6,
-  //       },
-  //       {
-  //         name: "USDC",
-  //         address: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
-  //         icon: "/tokens/usdc.svg",
-  //         decimals: 6,
-  //       },
-  //       {
-  //         name: "USDT",
-  //         address: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
-  //         icon: "/tokens/usdt.png",
-  //         decimals: 6,
-  //       },
-  //     ],
-  //   },
+  {
+    name: "Polygon",
+    address: "0xBBE5A39eD493150Be69D31Aa8780218247794152",
+    chainId: 137,
+    icon: "/chains/polygon.png",
+    endpointId: "40137",
+    tokens: [
+      {
+        name: "Matic",
+        address: "0x0000000000000000000000000000000000000000",
+        icon: "/tokens/polygon.png",
+        decimals: 18,
+      },
+      {
+        name: "WMATIC",
+        address: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+        vault: "0x28F53bA70E5c8ce8D03b1FaD41E9dF11Bb646c36",
+        icon: "/tokens/wmatic.png",
+        decimals: 18,
+      },
+      {
+        name: "WETH",
+        address: "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
+        icon: "/tokens/weth.png",
+        vault: "0x305F25377d0a39091e99B975558b1bdfC3975654",
+        decimals: 6,
+      },
+      {
+        name: "USDC",
+        address: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+        icon: "/tokens/usdc.svg",
+        decimals: 6,
+      },
+      {
+        name: "USDT",
+        address: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+        icon: "/tokens/usdt.png",
+        decimals: 6,
+      },
+    ],
+  },
+  {
+    name: "Arbitrum One",
+    address: "0xBBE5A39eD493150Be69D31Aa8780218247794152",
+    chainId: 42161,
+    icon: "/chains/arbitrum.svg",
+    endpointId: "40161",
+    tokens: [
+      {
+        name: "ETH",
+        address: "0x0000000000000000000000000000000000000000",
+        icon: "/chains/ethereum.webp",
+        decimals: 18,
+      },
+      {
+        name: "ARB",
+        address: "0x912CE59144191C1204E64559FE8253a0e49E6548",
+        icon: "/chains/arbitrum.svg",
+        decimals: 18,
+      },
+      {
+        name: "USDe",
+        address: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+        icon: "/tokens/usdc.svg",
+        vault: "0x34a2b066AF16409648eF15d239E656edB8790ca0",
+        decimals: 6,
+      },
+      {
+        name: "USDT",
+        address: "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+        icon: "/tokens/usdt.png",
+        decimals: 6,
+      },
+    ],
+  },
 ];
 
 function getChainById(chainId: number) {

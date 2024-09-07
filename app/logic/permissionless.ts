@@ -1,6 +1,32 @@
-import { Hex, createPublicClient, http, Chain, Transport, Address } from 'viem'
+import { Hex, createPublicClient, http, Chain, Transport, Address, defineChain } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { base, polygon, baseSepolia, sepolia } from 'viem/chains'
+
+
+export const arbitrum = /*#__PURE__*/ defineChain({
+  id: 42_161,
+  name: 'Arbitrum',
+  nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+  rpcUrls: {
+    default: {
+      http: ['https://arb1.arbitrum.io/rpc'],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: 'Arbiscan',
+      url: 'https://arbiscan.io',
+      apiUrl: 'https://api.arbiscan.io/api',
+    },
+  },
+  contracts: {
+    multicall3: {
+      address: '0xca11bde05977b3631167028862be2a173976ca11',
+      blockCreated: 7654707,
+    },
+  },
+})
+
 import {
   ENTRYPOINT_ADDRESS_V07,
   createSmartAccountClient,
@@ -27,7 +53,7 @@ export type SafeSmartAccountClient = SmartAccountClient<
   Erc7579Actions<EntryPoint, SafeSmartAccount<EntryPoint>>
 
   export const getChain = (chainId: string) : Chain => {
-    return [base, polygon, sepolia, baseSepolia].find((chain: any) => chain.id == chainId) as Chain;
+    return [base, polygon, arbitrum, sepolia, baseSepolia].find((chain: any) => chain.id == chainId) as Chain;
   }
   
 
