@@ -1,6 +1,17 @@
-# ZeroWallet - Your Universal Crypto Wallet
+# ZeroWallet: Unlock the Omni-Chain Future
 
-## Getting Started
+## Overview
+
+ZeroWallet, powered by LayerZero, simplifies multi-chain management. Track your portfolio of tokens, positions, and NFTs, invest in yield-generating vaults, and bridge assets across chains. With passkey login via account abstraction, onboarding Web3 users is seamless. Transfer OFTs across supported chains easily.
+
+
+## Development
+
+Clone the repository:
+
+```bash
+git clone https://github.com/zerowallet/zerowallet-app.git
+``` 
 
 Install dependencies:
 

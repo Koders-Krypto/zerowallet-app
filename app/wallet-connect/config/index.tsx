@@ -12,7 +12,7 @@ export const projectId = process.env.NEXT_PUBLIC_PROJECT_ID || "";
 const metadata = {
   name: "ZeroWallet",
   description:
-    "ZeroWallet is a LayerZero-powered crypto wallet that lets you manage gas fees on one chain while accessing dApps across all chains.",
+    "ZeroWallet, powered by LayerZero, simplifies multi-chain management. Track your portfolio of tokens, positions, and NFTs, invest in yield-generating vaults, and bridge assets across chains. With passkey login via account abstraction, onboarding Web3 users is seamless. Transfer OFTs across supported chains easily.",
   url: "https://web3modal.com", // origin must match your domain & subdomain
   icons: ["https://avatars.githubusercontent.com/u/37784886"],
 };

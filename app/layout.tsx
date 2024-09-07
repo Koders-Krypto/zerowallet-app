@@ -14,19 +14,19 @@ import { Toaster } from "@/components/ui/toaster";
 const mulish = Mulish({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "ZeroWallet - Your Universal Crypto Wallet",
+  title: "ZeroWallet - Unlock the Omni-Chain Future",
   description:
-    "ZeroWallet is a LayerZero-powered crypto wallet that lets you manage gas fees on one chain while accessing dApps across all chains.",
+    "ZeroWallet, powered by LayerZero, simplifies multi-chain management. Track your portfolio of tokens, positions, and NFTs, invest in yield-generating vaults, and bridge assets across chains. With passkey login via account abstraction, onboarding Web3 users is seamless. Transfer OFTs across supported chains easily.",
   openGraph: {
-    title: "ZeroWallet - Your Universal Crypto Wallet",
-    url: "https://zerowallet-app.vercel.app/",
+    title: "ZeroWallet - Unlock the Omni-Chain Future",
+    url: "https://wallet.usezero.xyz/",
     description:
-      "ZeroWallet is a LayerZero-powered crypto wallet that lets you manage gas fees on one chain while accessing dApps across all chains.",
+      "ZeroWallet, powered by LayerZero, simplifies multi-chain management. Track your portfolio of tokens, positions, and NFTs, invest in yield-generating vaults, and bridge assets across chains. With passkey login via account abstraction, onboarding Web3 users is seamless. Transfer OFTs across supported chains easily.",
     images: [
       {
-        url: "https://zerowallet-app.vercel.app/og/home.png",
-        secureUrl: "https://zerowallet-app.vercel.app/og/home.png",
-        alt: "ZeroWallet - Your Universal Crypto Wallet",
+        url: "https://wallet.usezero.xyz/og/home.png",
+        secureUrl: "https://wallet.usezero.xyz/og/home.png",
+        alt: "ZeroWallet - Unlock the Omni-Chain Future",
         width: 1200,
         height: 630,
         type: "image/png",
@@ -36,15 +36,15 @@ export const metadata: Metadata = {
     type: "website",
   },
   alternates: {
-    canonical: "https://zerowallet-app.vercel.app/",
+    canonical: "https://wallet.usezero.xyz/",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ZeroWallet - Your Universal Crypto Wallet",
+    title: "ZeroWallet - Unlock the Omni-Chain Future",
     description:
-      "ZeroWallet is a LayerZero-powered crypto wallet that lets you manage gas fees on one chain while accessing dApps across all chains.",
+      "ZeroWallet, powered by LayerZero, simplifies multi-chain management. Track your portfolio of tokens, positions, and NFTs, invest in yield-generating vaults, and bridge assets across chains. With passkey login via account abstraction, onboarding Web3 users is seamless. Transfer OFTs across supported chains easily.",
     creator: "@ZeroWallet",
-    images: ["https://zerowallet-app.vercel.app/og/home.png"],
+    images: ["https://wallet.usezero.xyz/og/home.png"],
   },
   robots: {
     index: true,
