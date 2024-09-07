@@ -103,9 +103,9 @@ export default function App() {
               )
             )}
 
-            <div className="flex flex-col justify-start items-start ml-0 gap-2">
+            <div className="flex flex-col justify-start items-start ml-0 gap-1">
               <div className="flex flex-col-reverse justify-start items-start gap-1">
-                <div className="flex flex-row justify-center items-center gap-2">
+                <div className="flex flex-row justify-center items-start gap-2">
                   <h1 className="text-4xl font-black text-white">
                     $
                     <NumberTicker
@@ -115,6 +115,7 @@ export default function App() {
                     {/* ${formatNumberCommas(Number(totalBalance.toFixed(0)))} */}
                   </h1>
                   <button
+                    className="mt-1"
                     onClick={() => {
                       setIsZapperLoading(true);
                       setRefresh(!refresh);
@@ -130,29 +131,34 @@ export default function App() {
                 </div>
                 <span className="text-accent text-sm">Networth</span>
               </div>
-              {ensname && <div className="text-lg font-medium">{ensname}</div>}
-              <div className="flex flex-row justify-center items-center gap-2 text-sm">
-                <div>{Truncate(address, 20, "...")}</div>
-                <div
-                  onClick={() => {
-                    CopytoClipboard(address || "");
-                    toast({
-                      success: true,
-                      title: "Copy Address",
-                      description: "Adderess copied to clipboard successfully!",
-                    });
-                  }}
-                >
-                  <Copy size={18} />
-                </div>
+              <div className="flex flex-col">
+                {ensname && (
+                  <div className="text-lg font-medium">{ensname}</div>
+                )}
+                <div className="flex flex-row justify-center items-center gap-2 text-sm">
+                  <div>{Truncate(address, 20, "...")}</div>
+                  <div
+                    onClick={() => {
+                      CopytoClipboard(address || "");
+                      toast({
+                        success: true,
+                        title: "Copy Address",
+                        description:
+                          "Adderess copied to clipboard successfully!",
+                      });
+                    }}
+                  >
+                    <Copy size={18} />
+                  </div>
 
-                <div>
-                  <ShowQR
-                    open={openShowQR}
-                    setOpen={setOpenShowQR}
-                    address={address}
-                    ensname={ensname}
-                  />
+                  <div>
+                    <ShowQR
+                      open={openShowQR}
+                      setOpen={setOpenShowQR}
+                      address={address}
+                      ensname={ensname}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
