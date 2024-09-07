@@ -94,6 +94,19 @@ export async function getVaultBalance(vaultAddress: string, account: string, pro
 }
 
 
+export async function getVaultRedeemBalance(vaultAddress: string, account: string, provider: any) {
+  // Ethereum provider (you can use Infura or any other provider)
+
+  // Connect to the ERC-20 token contract
+  const tokenContract = new ethers.Contract(vaultAddress, ERC4626_ABI, provider);
+
+  // Get the balance using the balanceOf function
+  const balance = await tokenContract.maxRedeem(account);
+
+  return balance;
+}
+
+
 export async function getTokenDecimals(tokenAddress: string,  provider: any) {
   // Ethereum provider (you can use Infura or any other provider)
 

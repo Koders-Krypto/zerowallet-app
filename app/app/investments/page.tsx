@@ -40,6 +40,7 @@ import { format, set } from "date-fns";
 import { cn } from "@/lib/utils";
 import {
   buildAddSessionKey,
+  buildVaultRedeem,
   getAllSessions,
   sendTransaction,
 } from "@/app/logic/module";
@@ -76,7 +77,7 @@ type Investment = {
 };
 
 export default function Investments() {
-  const { chainId } = useAccountStore();
+  const { chainId, setChainId } = useAccountStore();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [investValue, setInvestValue] = useState<string>("0");
@@ -279,6 +280,8 @@ export default function Investments() {
                       value={fromChain.toString()}
                       onValueChange={(e) => {
                         setFromChain(parseInt(e));
+                        setChainId(parseInt(e));
+                        setInvestmentAdded(true);
                         setFromToken(0);
                       }}
                     >
@@ -566,7 +569,7 @@ export default function Investments() {
                     throw error;
                   }
                 }
-                await scheduleJob(nextSessionId.toString());
+                await scheduleJob(nextSessionId.toString(), chainId.toString());
                 setInvestmentAdded(true);
                 setDialogOpen(false);
                 setIsLoading(false);
@@ -623,7 +626,14 @@ export default function Investments() {
                 </div>
                 <div className="grid grid-cols-2 gap-4 w-full">
                   <div></div>
-                  <button className="border border-accent px-6 py-2.5 bg-white text-black text-sm hover:bg-transparent hover:text-white">
+                  <button className="border border-accent px-6 py-2.5 bg-white text-black text-sm hover:bg-transparent hover:text-white"
+                  onClick={ async () => { 
+                    
+                    const buildVault = await buildVaultRedeem(chainId.toString(), address, tokenVault.vault); 
+                    await sendTransaction(chainId.toString(), buildVault.to, buildVault.value, buildVault.data, validator, address);
+                  
+                  }}
+                  >
                     Withdraw
                   </button>
                 </div>
