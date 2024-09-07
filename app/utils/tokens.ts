@@ -135,7 +135,41 @@ const gasChainsTokens = [
       },
     ],
   },
+  {
+    name: "Arbitrum One",
+    address: "0xBBE5A39eD493150Be69D31Aa8780218247794152",
+    chainId: 42161,
+    icon: "/chains/arbitrum.svg",
+    tokens: [
+      {
+        name: "ETH",
+        address: "0x0000000000000000000000000000000000000000",
+        icon: "/chains/ethereum.webp",
+        decimals: 18,
+      },
+      {
+        name: "ARB",
+        address: "0x912CE59144191C1204E64559FE8253a0e49E6548",
+        icon: "/chains/arbitrum.svg",
+        decimals: 18,
+      },
+      {
+        name: "USDe",
+        address: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+        icon: "/tokens/usdc.svg",
+        vault: "0x34a2b066AF16409648eF15d239E656edB8790ca0",
+        decimals: 6,
+      },
+      {
+        name: "USDT",
+        address: "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+        icon: "/tokens/usdt.png",
+        decimals: 6,
+      },
+    ],
+  },
 ];
+
 
 function getChainById(chainId: number) {
   return gasChainsTokens.find((chain) => chain.chainId === chainId);
