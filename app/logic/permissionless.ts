@@ -101,7 +101,7 @@ export const getSmartAccountClient = async ( { chainId, nonceKey, signer, addres
   const dummySigner = privateKeyToAccount('0x47cfffe655129fa5bce61a8421eb6ea97ec6d5609b5fbea45ad68bacede19d8b')
   
   // Setting the init Safe Owner to safe4337ModuleAddress (Safe7579 adapter) address which is a contract and can't execute on Safe
-  dummySigner.address = '0x958543756A4c7AC6fB361f0efBfeCD98E4D297Db' as Hex
+  dummySigner.address = safe4337ModuleAddress as Hex
 
   const account = await signerToSafeSmartAccount(publicClient(parseInt(chainId)), {
     entryPoint: ENTRYPOINT_ADDRESS_V07,
