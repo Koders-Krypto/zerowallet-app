@@ -657,7 +657,7 @@ export default function Bridge() {
 
               <div className="flex flex-row justify-between items-center pt-2 py-2">
                 <h4>Native Fee</h4>
-                <h5>{nativeFee} ETH</h5>
+                <h5>{formatEther(BigInt(nativeFee))} ETH</h5>
               </div>
             </div>
           )}
