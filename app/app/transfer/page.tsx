@@ -11,7 +11,7 @@ import {
 import { Check, Fuel, Loader2, SendHorizonal, X } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import Image from "next/image";
-import * as ethers from "ethers"; // Correct import statement
+import * as ethers from "ethersv5"; // Correct import statement
 import {
   gasChainsTokens,
   getChainById,

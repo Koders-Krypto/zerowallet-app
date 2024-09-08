@@ -25,6 +25,7 @@ import {
   BadgeInfo,
   CalendarIcon,
   ChevronsRight,
+  CircleArrowUp,
   Loader2,
   PlusSquareIcon,
   Wallet2,
@@ -40,6 +41,7 @@ import { format, set } from "date-fns";
 import { cn } from "@/lib/utils";
 import {
   buildAddSessionKey,
+  buildTokenBridge,
   buildVaultRedeem,
   getAllSessions,
   sendTransaction,
@@ -50,12 +52,14 @@ import {
   convertToSeconds,
   fixDecimal,
   formatTime,
+  getRedeemBalance,
+  getSendQuote,
   getTokenBalance,
   getVaultBalance,
 } from "@/app/logic/utils";
 import { scheduleJob } from "@/app/logic/jobsAPI";
 import { WaitForUserOperationReceiptTimeoutError } from "permissionless";
-import { ZeroAddress, formatEther, formatUnits } from "ethers";
+import { ZeroAddress, formatEther, formatUnits, parseUnits } from "ethers";
 import { getJsonRpcProvider } from "@/app/logic/web3";
 import { setHours, setMinutes } from "date-fns";
 import moment from "moment";
@@ -626,16 +630,93 @@ export default function Investments() {
                 </div>
                 <div className="grid grid-cols-2 gap-4 w-full">
                   <div></div>
-                  <button className="border border-accent px-6 py-2.5 bg-white text-black text-sm hover:bg-transparent hover:text-white"
-                  onClick={ async () => { 
-                    
-                    const buildVault = await buildVaultRedeem(chainId.toString(), address, tokenVault.vault); 
-                    await sendTransaction(chainId.toString(), buildVault.to, buildVault.value, buildVault.data, validator, address);
-                  
-                  }}
+                  <Dialog>
+        <DialogTrigger className="border border-accent px-6 py-2.5 bg-white text-black text-sm hover:bg-transparent hover:text-white">Withdraw</DialogTrigger>
+        <DialogContent className="bg-black text-white dark:bg-white flex flex-col justify-start items-start gap-4 rounded-none sm:rounded-none max-w-lg mx-auto border border-accent">
+          <DialogHeader>
+            <DialogTitle>Withdraw Funds</DialogTitle>
+            <DialogDescription>
+              Withdraw your funds from the vault to your wallet on desired
+              chain.
+            </DialogDescription>
+            <div className="flex flex-col gap-0 justify-start items-start pt-4">
+              <div className="grid grid-cols-2 gap-4 w-full">
+                <div className="flex flex-col gap-2 w-full">
+                  <label className="text-sm">From Chain</label>
+                  <button
+                    disabled
+                    className="flex flex-row justify-center items-center gap-2 border border-accent w-full py-3 px-4 disabled:cursor-not-allowed"
                   >
-                    Withdraw
+                    <Image
+                      src="/chains/ethereum.webp"
+                      alt="Ethereum"
+                      width={25}
+                      height={25}
+                    />
+                    Ethereum
                   </button>
+                </div>
+                <div className="flex flex-col gap-2 w-full">
+                  <label className="text-sm">Withdraw Amount</label>
+                  <input
+                    placeholder="0.01 ETH"
+                    className="flex flex-row justify-center items-center gap-2 border border-accent w-full py-3 px-4 bg-transparent text-white focus:outline-none"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-row justify-center items-center gap-2 w-full pt-4 pb-2.5">
+                <CircleArrowUp size={30} className=" rotate-180" />
+              </div>
+              <div className="grid grid-cols-2 gap-4 w-full">
+                <div className="flex flex-col gap-2 w-full">
+                  <label className="text-sm">To Chain</label>
+
+                  <Select defaultValue="chain">
+                    <SelectTrigger className="w-auto border border-accent bg-transparent px-4 py-3 flex flex-row justify-center items-center gap-2 focus:outline-none focus:ring-offset-0 focus:ring-0 h-full">
+                      <SelectValue placeholder="Theme" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="chain">
+                        <div className="flex flex-row justify-center items-center gap-2">
+                          <Image
+                            src="/chains/ethereum.webp"
+                            alt="Ethereum"
+                            width={25}
+                            height={25}
+                          />
+                          <span className="text-base">Ethereum</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex flex-col gap-2 w-full">
+                  <label className="text-sm">Recieve Amount</label>
+                  <input
+                    disabled
+                    placeholder="0.01 ETH"
+                    className="flex flex-row justify-center items-center gap-2 border border-accent w-full py-3 px-4 bg-transparent text-white focus:outline-none disabled:cursor-not-allowed"
+                  />
+                </div>
+              </div>
+              <button className="bg-white border border-accent hover:bg-transparent hover:text-white text-black w-full px-6 py-3 text-lg mt-8"
+                onClick={ async () => {
+    
+                  const provider = await getJsonRpcProvider(chainId.toString());
+                  const redeemBalance = await getRedeemBalance( tokenVault.vault, address, provider);
+                  const sendQuote =  await getSendQuote(tokenVault.address, 30101, '0x958543756A4c7AC6fB361f0efBfeCD98E4D297Db', redeemBalance, provider);
+                  const buildVault = await buildVaultRedeem(chainId.toString(), address, tokenVault.vault); 
+                  const buildBridge = await buildTokenBridge(chainId.toString(), address, tokenVault.address, sendQuote.sendParam, sendQuote.fee); 
+                  // await sendTransaction(chainId.toString(), buildVault.to, buildVault.value, buildVault.data, validator, address);  
+                  await sendTransaction(chainId.toString(), buildBridge.to, buildBridge.value, buildBridge.data, validator, address);  
+                }}
+              >
+                Withdraw
+              </button>
+            </div>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
                 </div>
               </div>
             </div>

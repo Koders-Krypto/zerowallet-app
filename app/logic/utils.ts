@@ -1,7 +1,7 @@
 import { PublicClient, createPublicClient, http } from "viem";
 import { PimlicoPaymasterClient, createPimlicoPaymasterClient } from "permissionless/clients/pimlico";
 import { NetworkUtil } from "./networks";
-import { ethers, formatUnits } from "ethers";
+import { ethers, formatUnits, zeroPadBytes, zeroPadValue } from "ethers";
 
 
   // ERC-20 token ABI (replace with the actual ABI)
@@ -36,6 +36,22 @@ import { ethers, formatUnits } from "ethers";
       "function withdraw(uint256 assets, address receiver, address owner) returns (uint256)",
       "function maxRedeem(address owner) view returns (uint256)",
       "function previewRedeem(uint256 shares) view returns (uint256)",
+  ];
+
+  const OFT_ABI = [
+    // Standard ERC20 view functions
+    "function name() view returns (string)",
+    "function symbol() view returns (string)",
+    "function decimals() view returns (uint8)",
+    "function totalSupply() view returns (uint256)",
+    "function balanceOf(address account) view returns (uint256)",
+    // Ownership view functions
+    "function owner() view returns (address)",
+  
+    // Cross-chain related view functions
+    "function quoteSend(tuple(uint32 dstEid, bytes32 to, uint256 amountLD, uint256 minAmountLD, bytes extraOptions, bytes composeMsg, bytes oftCmd) _sendParam, bool _payInLzToken) view returns (tuple(uint256 nativeFee, uint256 lzTokenFee) msgFee)",
+    "function getAmountCanBeSent(uint32 _dstEid) view returns (uint256 currentAmountInFlight, uint256 amountCanBeSent)",
+
   ];
   
 
@@ -73,7 +89,6 @@ export async function getTokenBalance(tokenAddress: string, account: string, pro
 
   // Get the balance using the balanceOf function
   const balance = await tokenContract.balanceOf(account);
-  console.log(balance)
   const decimals = await tokenContract.decimals()
 
   return formatUnits(balance, decimals);
@@ -88,9 +103,62 @@ export async function getVaultBalance(vaultAddress: string, account: string, pro
 
   // Get the balance using the balanceOf function
   const balance = await tokenContract.maxWithdraw(account);
+  console.log(balance)
   const decimals = await tokenContract.decimals()
 
   return formatUnits(balance, decimals);
+}
+
+export async function getRedeemBalance(vaultAddress: string, account: string, provider: any) {
+  // Ethereum provider (you can use Infura or any other provider)
+
+  // Connect to the ERC-20 token contract
+  const tokenContract = new ethers.Contract(vaultAddress, ERC4626_ABI, provider);
+
+  // Get the balance using the balanceOf function
+  const shares = await tokenContract.maxRedeem(account);
+  const balance = await tokenContract.convertToAssets(shares);
+
+  console.log('Redeem balance:', balance)
+  const decimals = await tokenContract.decimals()
+
+  return balance;
+}
+
+export async function getSendQuote(
+  tokenAddress: string,
+  dstEid: number,
+  to: string,
+  amountLD: bigint,
+  provider: ethers.Provider
+) {
+  // Connect to the ERC-20 token contract
+  console.log(tokenAddress)
+  const tokenContract = new ethers.Contract(tokenAddress, OFT_ABI, provider);
+
+  // Prepare the _sendParam tuple
+  const sendParam = {
+    dstEid,
+    to: zeroPadValue(to, 32), // Convert to bytes32
+    amountLD: amountLD,
+    minAmountLD: 0,
+    extraOptions: '0x00030100110100000000000000000000000000030d40',
+    composeMsg: '0x',
+    oftCmd: '0x'
+  };
+
+  const quote = await tokenContract.quoteSend(sendParam, false);
+
+  const decimals = await tokenContract.decimals();
+
+  // Format and return both native fee and lz token fee
+  return {
+    sendParam,
+    fee: {
+      nativeFee: quote.nativeFee,
+      lzTokenFee: quote.lzTokenFee
+    }
+  };
 }
 
 

@@ -1,4 +1,4 @@
-import { Contract, parseUnits } from "ethers";
+import { Contract, formatUnits, parseUnits } from "ethers";
 import { getJsonRpcProvider } from "./web3";
 import TokenVault from "./TokenVault.json";
 import {  Address, Hex, pad } from "viem";
@@ -12,9 +12,10 @@ import {
   } from "@rhinestone/module-sdk";
 import { NetworkUtil } from "./networks";
 import AutoDCAModule from "./AutoDCASessionModule.json";
+import OFT from "./OFT.json";
 
 import { SafeSmartAccountClient, getSmartAccountClient } from "./permissionless";
-import { getTokenDecimals, getVaultRedeemBalance } from "./utils";
+import { getRedeemBalance, getTokenDecimals, getVaultBalance, getVaultRedeemBalance } from "./utils";
 
 
 const webAuthnModule = "0xD990393C670dCcE8b4d8F858FB98c9912dBFAa06"
@@ -110,12 +111,28 @@ export const buildVaultRedeem = async (chainId: string,  safeAccount: string, va
 
   const vaultBalance = await getVaultRedeemBalance(vault, safeAccount, provider)
 
-  console.log(vaultBalance)
-
   return {
       to: vault,
       value: BigInt(0),
       data: (await vaultContract.redeem.populateTransaction(vaultBalance, safeAccount, safeAccount)).data as Hex
+  }
+}
+
+export const buildTokenBridge = async (chainId: string,  safeAccount: string, oftAddress: Hex, _sendParam: any, _fee: any): Promise<Transaction> => {
+
+    
+  const provider = await getJsonRpcProvider(chainId);
+
+  const oftContract = new Contract(
+      oftAddress,
+      OFT,
+      provider
+  )
+
+  return {
+      to: oftAddress,
+      value: _fee.nativeFee,
+      data: (await oftContract.send.populateTransaction(_sendParam, _fee, safeAccount)).data as Hex
   }
 }
 
