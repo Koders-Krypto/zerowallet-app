@@ -653,7 +653,7 @@ export default function Investments() {
               chain.
             </DialogDescription>
             <div className="flex flex-col gap-0 justify-start items-start pt-4">
-              <div className="grid grid-cols-2 gap-4 w-full">
+              <div className="grid grid-rows-3 gap-4 w-full ">
                 <div className="flex flex-col gap-2 w-full">
                   <label className="text-sm">Your Chain</label>
                   <button
@@ -673,10 +673,28 @@ export default function Investments() {
                 <div className="flex flex-col gap-2 w-full">
                   <label className="text-sm">Withdraw Amount</label>
                   <input
-                    value={selectedVault?.vaultBalance}
+                    value={fixDecimal(
+                      selectedVault?.vaultBalance,
+                      parseInt(tokenVault.vaultBalance) ? 4 : 6
+                    )}
                     className="flex flex-row justify-center items-center gap-2 border border-accent w-full py-3 px-4 bg-transparent text-white focus:outline-none"
                   />
+
                 </div>
+               
+                <div className="flex flex-row justify-start items-center gap-2">
+                      <Image
+                        src={
+                          getTokenInfo(Number(chainId), selectedVault?.address)?.icon!
+                        }
+                        alt="From Token"
+                        width={30}
+                        height={30}
+                      />
+                      <div className="font-semibold">
+                        {getTokenInfo(Number(chainId), selectedVault?.address)?.name!}
+                      </div>
+                  </div>
               </div>
               <div className="flex flex-row justify-center items-center gap-2 w-full pt-4 pb-2.5">
                 <CircleArrowUp size={30} className=" rotate-180" />
@@ -716,7 +734,10 @@ export default function Investments() {
                   <label className="text-sm">You Will Receive</label>
                   <input
                     disabled
-                    placeholder={selectedVault?.vaultBalance}
+                    placeholder={fixDecimal(
+                      selectedVault?.vaultBalance,
+                      parseInt(tokenVault.vaultBalance) ? 4 : 6
+                    )}
 
                     className="flex flex-row justify-center items-center gap-2 border border-accent w-full py-3 px-4 bg-transparent text-white focus:outline-none disabled:cursor-not-allowed"
                   />
@@ -733,7 +754,7 @@ export default function Investments() {
                   await sendTransaction(chainId.toString(), buildVault.to, buildVault.value, buildVault.data, validator, address);  
 
                   if(chainId!=toChain) {
-                  const sendQuote =  await getSendQuote(tokenVault.address, parseInt(getChainById(toChain)?.endpointId!), '0x958543756A4c7AC6fB361f0efBfeCD98E4D297Db', redeemBalance, provider);
+                  const sendQuote =  await getSendQuote(tokenVault.address, parseInt(getChainById(toChain)?.endpointId!), address, redeemBalance, provider);
                   const buildBridge = await buildTokenBridge(chainId.toString(), address, tokenVault.address, sendQuote.sendParam, sendQuote.fee); 
                   setLayerZeroHash(await sendTransaction(chainId.toString(), buildBridge.to, buildBridge.value, buildBridge.data, validator, address));  
                   }

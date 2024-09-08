@@ -205,7 +205,7 @@ const gasChainsTokens: GasChainType[] = [
       {
         name: "USDe",
         address: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
-        icon: "/tokens/usdc.svg",
+        icon: "/tokens/usde.png",
         vault: "0x34a2b066AF16409648eF15d239E656edB8790ca0",
         decimals: 6,
       },
