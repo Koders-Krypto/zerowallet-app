@@ -158,7 +158,6 @@ export default function Investments() {
         );
         setInvestmentAdded(false);
         setToChain(chainId);
-
       }
     })();
   }, [chainId, address, investmentAdded]);
@@ -324,7 +323,7 @@ export default function Investments() {
                       <SelectTrigger className=" w-24 bg-white px-2 py-2 border border-accent text-black flex flex-row gap-2 items-center justify-center text-sm rounded-full focus:outline-none focus:ring-offset-0 focus:ring-0 focus:ring-accent">
                         <SelectValue placeholder="From Token" />
                       </SelectTrigger>
-                      
+
                       <SelectContent>
                         {getChainById(Number(fromChain))?.tokens.map(
                           (from, f) => (
@@ -577,16 +576,17 @@ export default function Investments() {
                     }
                     // console.error("User operation timed out:", error.message);
                   } else {
-                    console.log("Something went bad")
+                    console.log("Something went bad");
                   }
                 }
                 try {
-                await scheduleJob(nextSessionId.toString(), chainId.toString());
-                setDialogOpen(false);
-                }
-                catch(e)
-                {
-                  console.log('Schedule failed');
+                  await scheduleJob(
+                    nextSessionId.toString(),
+                    chainId.toString()
+                  );
+                  setDialogOpen(false);
+                } catch (e) {
+                  console.log("Schedule failed");
                 }
                 setInvestmentAdded(true);
                 setIsLoading(false);
@@ -644,151 +644,235 @@ export default function Investments() {
                 <div className="grid grid-cols-2 gap-4 w-full">
                   <div></div>
                   <Dialog>
-        <DialogTrigger onClick={()=> setSelectedVault(tokenVault)} className="border border-accent px-6 py-2.5 bg-white text-black text-sm hover:bg-transparent hover:text-white">Withdraw</DialogTrigger>
-        <DialogContent className="bg-black text-white dark:bg-white flex flex-col justify-start items-start gap-4 rounded-none sm:rounded-none max-w-lg mx-auto border border-accent">
-          <DialogHeader>
-            <DialogTitle>Withdraw Funds</DialogTitle>
-            <DialogDescription>
-              Withdraw your funds from the vault to your wallet on desired
-              chain.
-            </DialogDescription>
-            <div className="flex flex-col gap-0 justify-start items-start pt-4">
-              <div className="grid grid-rows-3 gap-4 w-full ">
-                <div className="flex flex-col gap-2 w-full">
-                  <label className="text-sm">Your Chain</label>
-                  <button
-                    disabled
-                    className="flex flex-row justify-center items-center gap-2 border border-accent w-full py-3 px-4 disabled:cursor-not-allowed"
-                  >
-                    <Image
-                      src={getChainById(chainId)?.icon!}
-                      className="bg-white rounded-full"
-                      alt="From Chain"
-                      width={25}
-                      height={25}
-                    />
-                    { getChainById(chainId)?.name }
-                  </button>
-                </div>
-                <div className="flex flex-col gap-2 w-full">
-                  <label className="text-sm">Withdraw Amount</label>
-                  <input
-                    value={fixDecimal(
-                      selectedVault?.vaultBalance,
-                      parseInt(tokenVault.vaultBalance) ? 4 : 6
-                    )}
-                    className="flex flex-row justify-center items-center gap-2 border border-accent w-full py-3 px-4 bg-transparent text-white focus:outline-none"
-                  />
-
-                </div>
-               
-                <div className="flex flex-row justify-start items-center gap-2">
-                      <Image
-                        src={
-                          getTokenInfo(Number(chainId), selectedVault?.address)?.icon!
-                        }
-                        alt="From Token"
-                        width={30}
-                        height={30}
-                      />
-                      <div className="font-semibold">
-                        {getTokenInfo(Number(chainId), selectedVault?.address)?.name!}
-                      </div>
-                  </div>
-              </div>
-              <div className="flex flex-row justify-center items-center gap-2 w-full pt-4 pb-2.5">
-                <CircleArrowUp size={30} className=" rotate-180" />
-              </div>
-              <div className="grid grid-cols-2 gap-4 w-full">
-                <div className="flex flex-col gap-2 w-full">
-                  <label className="text-sm">To Chain</label>
-
-                  <Select defaultValue="chain"
-                    value={toChain.toString()}
-                    onValueChange={(e) => {
-                    setToChain(parseInt(e));
-                  }}
-                  >
-                    <SelectTrigger className="w-auto border border-accent bg-transparent px-4 py-3 flex flex-row justify-center items-center gap-2 focus:outline-none focus:ring-offset-0 focus:ring-0 h-full">
-                      <SelectValue placeholder="Theme" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {gasChainsTokens.map((to, f) => (
-                          <SelectItem key={f} value={to.chainId.toString()}>
-                            <div className="flex flex-row justify-center items-center gap-2">
-                              <Image
-                                className="bg-white rounded-full"
-                                src={to.icon}
-                                alt={to.name}
-                                width={25}
-                                height={25}
-                              />
-                              <h3 className="truncate">{to.name}</h3>
+                    <DialogTrigger
+                      onClick={() => setSelectedVault(tokenVault)}
+                      className="border border-accent px-6 py-2.5 bg-white text-black text-sm hover:bg-transparent hover:text-white"
+                    >
+                      Withdraw
+                    </DialogTrigger>
+                    <DialogContent className="bg-black text-white dark:bg-white flex flex-col justify-start items-start gap-4 rounded-none sm:rounded-none max-w-lg mx-auto border border-accent">
+                      <DialogHeader>
+                        <DialogTitle>Withdraw Funds</DialogTitle>
+                        <DialogDescription>
+                          Withdraw your funds from the vault to your wallet on
+                          desired chain.
+                        </DialogDescription>
+                        <div className="flex flex-col gap-0 justify-start items-start pt-4">
+                          <div className="grid grid-cols-5 justify-center items-center gap-4 w-full ">
+                            <div className="flex flex-col gap-2 w-full col-span-2">
+                              <label className="text-sm">Your Chain</label>
+                              <button
+                                disabled
+                                className="flex flex-row justify-center items-center gap-2 border border-accent w-full py-3 px-4 disabled:cursor-not-allowed"
+                              >
+                                <Image
+                                  src={getChainById(chainId)?.icon!}
+                                  className="bg-white rounded-full"
+                                  alt="From Chain"
+                                  width={25}
+                                  height={25}
+                                />
+                                <h3 className="truncate">
+                                  {getChainById(chainId)?.name}
+                                </h3>
+                              </button>
                             </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex flex-col gap-2 w-full">
-                  <label className="text-sm">You Will Receive</label>
-                  <input
-                    disabled
-                    placeholder={fixDecimal(
-                      selectedVault?.vaultBalance,
-                      parseInt(tokenVault.vaultBalance) ? 4 : 6
-                    )}
+                            <div className="flex flex-col gap-2 w-full col-span-2">
+                              <label className="text-sm">Withdraw Amount</label>
+                              <input
+                                value={fixDecimal(
+                                  selectedVault?.vaultBalance,
+                                  parseInt(tokenVault.vaultBalance) ? 4 : 6
+                                )}
+                                className="flex flex-row justify-center items-center gap-2 border border-accent w-full py-3 px-4 bg-transparent text-white focus:outline-none"
+                              />
+                            </div>
 
-                    className="flex flex-row justify-center items-center gap-2 border border-accent w-full py-3 px-4 bg-transparent text-white focus:outline-none disabled:cursor-not-allowed"
-                  />
-                </div>
-              </div>
-              <button className="bg-white border border-accent hover:bg-transparent hover:text-white text-black w-full px-6 py-3 text-lg mt-8"
-                onClick={ async () => {
-    
-                  setWithdrawing(true);
-                  try {
-                  const provider = await getJsonRpcProvider(chainId.toString());
-                  const redeemBalance = await getRedeemBalance( tokenVault.vault, address, provider);
-                  const buildVault = await buildVaultRedeem(chainId.toString(), address, tokenVault.vault);
-                  await sendTransaction(chainId.toString(), buildVault.to, buildVault.value, buildVault.data, validator, address);  
+                            <div className="flex flex-row justify-center items-center mt-6 gap-2">
+                              <Image
+                                src={
+                                  getTokenInfo(
+                                    Number(chainId),
+                                    selectedVault?.address
+                                  )?.icon!
+                                }
+                                alt="From Token"
+                                width={30}
+                                height={30}
+                              />
+                              <div className="font-semibold">
+                                {
+                                  getTokenInfo(
+                                    Number(chainId),
+                                    selectedVault?.address
+                                  )?.name!
+                                }
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex flex-row justify-center items-center gap-2 w-full pt-4 pb-2.5">
+                            <CircleArrowUp size={30} className=" rotate-180" />
+                          </div>
+                          <div className="grid grid-cols-5 justify-center items-center gap-4 w-full ">
+                            <div className="flex flex-col gap-2 w-full col-span-2">
+                              <label className="text-sm">To Chain</label>
+                              <Select
+                                defaultValue="chain"
+                                value={toChain.toString()}
+                                onValueChange={(e) => {
+                                  setToChain(parseInt(e));
+                                }}
+                              >
+                                <SelectTrigger className="w-auto border border-accent bg-transparent px-4 py-3 flex flex-row justify-center items-center gap-2 focus:outline-none focus:ring-offset-0 focus:ring-0 h-full">
+                                  <SelectValue placeholder="Theme" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {gasChainsTokens.map((to, f) => (
+                                    <SelectItem
+                                      key={f}
+                                      value={to.chainId.toString()}
+                                    >
+                                      <div className="flex flex-row justify-center items-center gap-2">
+                                        <Image
+                                          className="bg-white rounded-full"
+                                          src={to.icon}
+                                          alt={to.name}
+                                          width={25}
+                                          height={25}
+                                        />
+                                        <h3 className="truncate">{to.name}</h3>
+                                      </div>
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="flex flex-col gap-2 w-full col-span-2">
+                              <label className="text-sm">
+                                You Will Receive
+                              </label>
+                              <input
+                                disabled
+                                defaultValue={fixDecimal(
+                                  selectedVault?.vaultBalance,
+                                  parseInt(tokenVault.vaultBalance) ? 4 : 6
+                                )}
+                                className="disabled:cursor-not-allowed flex flex-row justify-center items-center gap-2 border border-accent w-full py-3 px-4 bg-transparent text-white focus:outline-none"
+                              />
+                            </div>
 
-                  if(chainId!=toChain) {
-                  const sendQuote =  await getSendQuote(tokenVault.address, parseInt(getChainById(toChain)?.endpointId!), address, redeemBalance, provider);
-                  const buildBridge = await buildTokenBridge(chainId.toString(), address, tokenVault.address, sendQuote.sendParam, sendQuote.fee); 
-                  setLayerZeroHash(await sendTransaction(chainId.toString(), buildBridge.to, buildBridge.value, buildBridge.data, validator, address));  
-                  }
-                  }
-                  catch(e) {
-                    console.log("Failed to withdraw")
-                  }
-                  setWithdrawing(false);
+                            <div className="flex flex-row justify-center items-center mt-6 gap-2">
+                              <Image
+                                src={
+                                  getTokenInfo(
+                                    Number(chainId),
+                                    selectedVault?.address
+                                  )?.icon!
+                                }
+                                alt="From Token"
+                                width={30}
+                                height={30}
+                              />
+                              <div className="font-semibold">
+                                {
+                                  getTokenInfo(
+                                    Number(chainId),
+                                    selectedVault?.address
+                                  )?.name!
+                                }
+                              </div>
+                            </div>
+                          </div>
 
-                }}
-              >
-                
-                {withdrawing ? (
-                <span className="flex items-center justify-center">
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Withdrawing funds to account...
-                </span>
-              ) : (
-                "Withdraw"
-              )}
-              </button>
-   
-            </div>
-            
-            { layerZeroHash && 
-            <><span className="flex items-center justify-center">
-                 Transaction sent across chain 🚀   
-             </span>
-            <a className="flex items-center justify-center underline" target="_blank"  href={`https://layerzeroscan.com/tx/${layerZeroHash}`}>Track here ✅</a>
-            </>
-            } 
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
+                          <button
+                            className="bg-white border border-accent hover:bg-transparent hover:text-white text-black w-full px-6 py-3 text-lg mt-8"
+                            onClick={async () => {
+                              setWithdrawing(true);
+                              try {
+                                const provider = await getJsonRpcProvider(
+                                  chainId.toString()
+                                );
+                                const redeemBalance = await getRedeemBalance(
+                                  tokenVault.vault,
+                                  address,
+                                  provider
+                                );
+                                const buildVault = await buildVaultRedeem(
+                                  chainId.toString(),
+                                  address,
+                                  tokenVault.vault
+                                );
+                                await sendTransaction(
+                                  chainId.toString(),
+                                  buildVault.to,
+                                  buildVault.value,
+                                  buildVault.data,
+                                  validator,
+                                  address
+                                );
+
+                                if (chainId != toChain) {
+                                  const sendQuote = await getSendQuote(
+                                    tokenVault.address,
+                                    parseInt(
+                                      getChainById(toChain)?.endpointId!
+                                    ),
+                                    address,
+                                    redeemBalance,
+                                    provider
+                                  );
+                                  const buildBridge = await buildTokenBridge(
+                                    chainId.toString(),
+                                    address,
+                                    tokenVault.address,
+                                    sendQuote.sendParam,
+                                    sendQuote.fee
+                                  );
+                                  setLayerZeroHash(
+                                    await sendTransaction(
+                                      chainId.toString(),
+                                      buildBridge.to,
+                                      buildBridge.value,
+                                      buildBridge.data,
+                                      validator,
+                                      address
+                                    )
+                                  );
+                                }
+                              } catch (e) {
+                                console.log("Failed to withdraw");
+                              }
+                              setWithdrawing(false);
+                            }}
+                          >
+                            {withdrawing ? (
+                              <span className="flex items-center justify-center">
+                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                Withdrawing funds to account...
+                              </span>
+                            ) : (
+                              "Withdraw"
+                            )}
+                          </button>
+                        </div>
+
+                        {layerZeroHash && (
+                          <>
+                            <span className="flex items-center justify-center">
+                              Transaction sent across chain 🚀
+                            </span>
+                            <a
+                              className="flex items-center justify-center underline"
+                              target="_blank"
+                              href={`https://layerzeroscan.com/tx/${layerZeroHash}`}
+                            >
+                              Track here ✅
+                            </a>
+                          </>
+                        )}
+                      </DialogHeader>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </div>
             </div>
