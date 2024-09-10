@@ -1,7 +1,7 @@
 import { Contract, formatUnits, parseUnits } from "ethers";
 import { getJsonRpcProvider } from "./web3";
 import TokenVault from "./TokenVault.json";
-import {  Address, Hex, pad } from "viem";
+import {  Address, Hex, SendTransactionParameters, pad } from "viem";
 import {
     getClient,
     getModule,
@@ -80,9 +80,9 @@ export const getAllSessions = async (chainId: string): Promise<any> => {
 
 
 
-export const sendTransaction = async (chainId: string, to: string, value: bigint, data: Hex, walletProvider: any, safeAccount: Hex): Promise<any> => {
+export const sendTransaction = async (chainId: string, calls: Transaction[], walletProvider: any, safeAccount: Hex): Promise<any> => {
 
-    const call = { to: to as Hex, value: value, data: data }
+    // const call = { to: to as Hex, value: value, data: data }
 
     const key = BigInt(pad(webAuthnModule as Hex, {
         dir: "right",
@@ -94,7 +94,8 @@ export const sendTransaction = async (chainId: string, to: string, value: bigint
     const smartAccount = await getSmartAccountClient( { chainId, nonceKey: key, address: safeAccount, signUserOperation: walletProvider.signUserOperation, getDummySignature: walletProvider.getDummySignature, 
       validators: (await getModules( walletProvider)).validators, executors: (await getModules( walletProvider)).executors })
 
-    return await smartAccount.sendTransaction(call);
+      console.log(smartAccount)
+    return await smartAccount.sendTransactions({ transactions: calls });
 }
 
 

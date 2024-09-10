@@ -43,14 +43,13 @@ import {
 } from 'permissionless/clients/pimlico'
 import { EntryPoint, UserOperation } from 'permissionless/types'
 import { publicClient } from './utils'
+import { Erc7739ActionsParameters } from 'viem/experimental'
 
 export type SafeSmartAccountClient = SmartAccountClient<
   EntryPoint,
   Transport,
-  Chain,
-  SafeSmartAccount<EntryPoint>
-> &
-  Erc7579Actions<EntryPoint, SafeSmartAccount<EntryPoint>>
+  Chain> &
+  Erc7579Actions<EntryPoint, Transport, Chain, SafeSmartAccount<EntryPoint, Transport, Chain>>
 
   export const getChain = (chainId: string) : Chain => {
     return [base, polygon, arbitrum, sepolia, baseSepolia].find((chain: any) => chain.id == chainId) as Chain;
@@ -58,7 +57,7 @@ export type SafeSmartAccountClient = SmartAccountClient<
   
 
 const safe4337ModuleAddress = '0x19e52168B2e0A39a53dcB4cFDEA5850e496F873a'
-const erc7569LaunchpadAddress = '0x2E1a6a9802Eb62ec52E862a6373F1E52A4F3f395'
+const erc7579LaunchpadAddress = '0x2E1a6a9802Eb62ec52E862a6373F1E52A4F3f395'
 
 
 
@@ -111,7 +110,7 @@ export const getSmartAccountClient = async ( { chainId, nonceKey, signer, addres
     safeVersion: '1.4.1',
     saltNonce: BigInt(120),
     safe4337ModuleAddress,
-    erc7569LaunchpadAddress,
+    erc7579LaunchpadAddress,
     validators: validators?.length ? validators : [],
     executors: executors?.length ? executors : [],
   })
@@ -122,8 +121,8 @@ export const getSmartAccountClient = async ( { chainId, nonceKey, signer, addres
   const pimlicoBundlerClient = await getBundlerClient(chainId)
   const paymasterClient = await getPaymasterClient(chainId)
   const smartAccountClient = createSmartAccountClient({
-    chain,
     account,
+    entryPoint: ENTRYPOINT_ADDRESS_V07,
     bundlerTransport: http(getPimlicoEndpoint(chainId)),
     middleware: {
       gasPrice: async () =>
@@ -132,7 +131,7 @@ export const getSmartAccountClient = async ( { chainId, nonceKey, signer, addres
     }
   }).extend(erc7579Actions({ entryPoint: ENTRYPOINT_ADDRESS_V07 }))
 
-  return smartAccountClient as SafeSmartAccountClient
+  return smartAccountClient;
 }
 
 

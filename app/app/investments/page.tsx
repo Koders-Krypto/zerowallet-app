@@ -65,6 +65,7 @@ import { setHours, setMinutes } from "date-fns";
 import moment from "moment";
 import { waitForExecution } from "@/app/logic/permissionless";
 import { Switch } from "@/components/ui/switch";
+import { Transaction } from "viem";
 
 type Investment = {
   address: string;
@@ -549,9 +550,7 @@ export default function Investments() {
                   );
                   await sendTransaction(
                     chainId.toString(),
-                    sessionKeyCall.to,
-                    sessionKeyCall.value,
-                    sessionKeyCall.data,
+                    [sessionKeyCall],
                     validator,
                     address
                   );
@@ -802,16 +801,10 @@ export default function Investments() {
                                   address,
                                   tokenVault.vault
                                 );
-                                await sendTransaction(
-                                  chainId.toString(),
-                                  buildVault.to,
-                                  buildVault.value,
-                                  buildVault.data,
-                                  validator,
-                                  address
-                                );
-
+ 
+                                let calls =  [ buildVault ]
                                 if (chainId != toChain) {
+
                                   const sendQuote = await getSendQuote(
                                     tokenVault.address,
                                     parseInt(
@@ -828,19 +821,19 @@ export default function Investments() {
                                     sendQuote.sendParam,
                                     sendQuote.fee
                                   );
-                                  setLayerZeroHash(
-                                    await sendTransaction(
-                                      chainId.toString(),
-                                      buildBridge.to,
-                                      buildBridge.value,
-                                      buildBridge.data,
-                                      validator,
-                                      address
-                                    )
-                                  );
+
+                                  calls.push(buildBridge)
                                 }
+
+                                await sendTransaction(
+                                  chainId.toString(),
+                                  calls,
+                                  validator,
+                                  address
+                                );
+
                               } catch (e) {
-                                console.log("Failed to withdraw");
+                                console.log("Failed to withdraw", e);
                               }
                               setWithdrawing(false);
                             }}
