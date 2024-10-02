@@ -26,7 +26,7 @@ const autoDCAModule = "0xBdE994684051A3caDa9b90Ede0b44A06A9FAC863"
 
 
 
-interface Transaction {
+export interface Transaction {
   to: Hex;
   value: bigint;
   data: Hex;
