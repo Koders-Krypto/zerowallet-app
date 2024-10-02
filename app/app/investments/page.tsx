@@ -41,6 +41,7 @@ import { format, set } from "date-fns";
 import { cn } from "@/lib/utils";
 import {
   buildAddSessionKey,
+  buildScheduleData,
   buildTokenBridge,
   buildVaultRedeem,
   getAllSessions,
@@ -554,6 +555,7 @@ export default function Investments() {
                     validator,
                     address
                   );
+                
                 } catch (error) {
                   if (
                     error instanceof WaitForUserOperationReceiptTimeoutError
@@ -579,10 +581,12 @@ export default function Investments() {
                   }
                 }
                 try {
-                  await scheduleJob(
-                    nextSessionId.toString(),
-                    chainId.toString()
-                  );
+                  const scheduleData = await buildScheduleData(chainId.toString(), nextSessionId.toString(), getChainById(Number(fromChain))?.tokens[fromToken].address!, investValue)
+                  await scheduleJob({ trigger: { startTime: startDate.getTime(), endTime: endDate.getTime(), interval: convertToSeconds(
+                    refreshInterval,
+                    Frequency[frequency].label as any
+                  ) }, data: { call: { to: scheduleData.to, value: Number(scheduleData.value), data: scheduleData.data }, chainId: chainId.toString(), account: address }});
+
                   setDialogOpen(false);
                 } catch (e) {
                   console.log("Schedule failed");

@@ -129,9 +129,9 @@ export const getSmartAccountClient = async ( { chainId, nonceKey, signer, addres
         (await pimlicoBundlerClient.getUserOperationGasPrice()).fast,
       sponsorUserOperation: paymasterClient.sponsorUserOperation
     }
-  }).extend(erc7579Actions({ entryPoint: ENTRYPOINT_ADDRESS_V07 }))
+  }).extend(erc7579Actions({ entryPoint: ENTRYPOINT_ADDRESS_V07 })) 
 
-  return smartAccountClient;
+  return smartAccountClient as SafeSmartAccountClient;
 }
 
 
