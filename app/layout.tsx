@@ -14,19 +14,19 @@ import { Toaster } from "@/components/ui/toaster";
 const mulish = Mulish({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "ZeroWallet - Unlock the Omni-Chain Future",
+  title: "Brewit Wallet - Personal Barista for Your Crypto Journey",
   description:
-    "ZeroWallet, powered by LayerZero, simplifies multi-chain management. Track your portfolio of tokens, positions, and NFTs, invest in yield-generating vaults, and bridge assets across chains. With passkey login via account abstraction, onboarding Web3 users is seamless. Transfer OFTs across supported chains easily.",
+    "Brewit Wallet - Personal Barista for Your Crypto Journey",
   openGraph: {
-    title: "ZeroWallet - Unlock the Omni-Chain Future",
+    title: "Brewit Wallet - Personal Barista for Your Crypto Journey",
     url: "https://wallet.usezero.xyz/",
     description:
-      "ZeroWallet, powered by LayerZero, simplifies multi-chain management. Track your portfolio of tokens, positions, and NFTs, invest in yield-generating vaults, and bridge assets across chains. With passkey login via account abstraction, onboarding Web3 users is seamless. Transfer OFTs across supported chains easily.",
+      "Brewit Wallet - Personal Barista for Your Crypto Journey",
     images: [
       {
         url: "https://wallet.usezero.xyz/og/home.png",
         secureUrl: "https://wallet.usezero.xyz/og/home.png",
-        alt: "ZeroWallet - Unlock the Omni-Chain Future",
+        alt: "Brewit Wallet - Personal Barista for Your Crypto Journey",
         width: 1200,
         height: 630,
         type: "image/png",
@@ -40,9 +40,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "ZeroWallet - Unlock the Omni-Chain Future",
+    title: "Brewit Wallet - Personal Barista for Your Crypto Journey",
     description:
-      "ZeroWallet, powered by LayerZero, simplifies multi-chain management. Track your portfolio of tokens, positions, and NFTs, invest in yield-generating vaults, and bridge assets across chains. With passkey login via account abstraction, onboarding Web3 users is seamless. Transfer OFTs across supported chains easily.",
+      "Brewit Wallet - Personal Barista for Your Crypto Journey",
     creator: "@ZeroWallet",
     images: ["https://wallet.usezero.xyz/og/home.png"],
   },
