@@ -16,60 +16,7 @@ export interface GasChainType {
 }
 
 const gasChainsTokens: GasChainType[] = [
-  {
-    name: "Ethereum",
-    address: "0xBBE5A39eD493150Be69D31Aa8780218247794152",
-    chainId: 1,
-    endpointId: "30101",
-    icon: "/chains/ethereum.webp",
-    tokens: [
-      {
-        name: "ETH",
-        address: "0x0000000000000000000000000000000000000000",
-        icon: "/chains/ethereum.webp",
-        decimals: 18,
-      },
-      {
-        name: "WETH",
-        address: "0xBe4d09A9B3762addF50EA947f2f67bA69Ff23399",
-        icon: "/tokens/weth.png",
-        decimals: 18,
-      },
-      {
-        name: "USDT",
-        address: "0x712e3A792c974B3E3dbE41229Ad4290791C75A82",
-        icon: "/tokens/usdt.png",
-        decimals: 6,
-      },
-    ],
-  },
-  {
-    name: "Holesky",
-    address: "0xBBE5A39eD493150Be69D31Aa8780218247794152",
-    chainId: 17000,
-    endpointId: "40217",
-    icon: "/chains/ethereum.webp",
-    tokens: [
-      {
-        name: "ETH",
-        address: "0x0000000000000000000000000000000000000000",
-        icon: "/chains/ethereum.webp",
-        decimals: 18,
-      },
-      {
-        name: "WETH",
-        address: "0xBe4d09A9B3762addF50EA947f2f67bA69Ff23399",
-        icon: "/tokens/weth.png",
-        decimals: 18,
-      },
-      {
-        name: "USDT",
-        address: "0x712e3A792c974B3E3dbE41229Ad4290791C75A82",
-        icon: "/tokens/usdt.png",
-        decimals: 6,
-      },
-    ],
-  },
+
   {
     name: "Sepolia",
     address: "0x09545c0Cd0ddfd3B5EfBA5F093B3cA20b6ba4bB9",
@@ -126,6 +73,12 @@ const gasChainsTokens: GasChainType[] = [
         name: "ETH",
         address: "0x0000000000000000000000000000000000000000",
         icon: "/chains/ethereum.webp",
+        decimals: 18,
+      },
+      {
+        name: "OST",
+        address: "0xC432004323f06ca58362A5EFd993A368c93d032b",
+        icon: "/tokens/uni.png",
         decimals: 18,
       },
       {
